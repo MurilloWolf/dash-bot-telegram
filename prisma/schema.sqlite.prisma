@@ -1,0 +1,46 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL") // uses connection pooling
+}
+
+model User {
+  id         String   @id @default(cuid())
+  telegramId String   @unique
+  name       String
+  username   String?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  preferences UserPreferences?
+}
+
+model UserPreferences {
+  id                   String  @id @default(cuid())
+  userId               String  @unique
+  preferredDistances   String  @default("[]") // Store as JSON string
+  notificationsEnabled Boolean @default(true)
+  reminderDays         Int     @default(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Race {
+  id               String   @id @default(cuid())
+  title            String
+  organization     String
+  distances        String   @default("[]") // Store as JSON string
+  distancesNumbers String   @default("[]") // Store as JSON string
+  date             DateTime
+  location         String
+  link             String
+  time             String
+  status           String   @default("open") // open, closed, coming_soon, cancelled
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
