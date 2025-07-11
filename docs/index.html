@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Dash Bot - Documentação</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="Bot inteligente para corredores - Encontre corridas, configure lembretes e personalize sua experiência">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <style>
+    :root {
+      --theme-color: #007bff;
+      --theme-color-dark: #0056b3;
+    }
+    
+    /* Melhorar renderização de cards e gradientes */
+    .markdown-section {
+      max-width: none !important;
+      padding: 30px 20px;
+    }
+    
+    /* Garantir que divs com style inline sejam exibidas corretamente */
+    .markdown-section div[style*="display: grid"],
+    .markdown-section div[style*="display: flex"] {
+      display: grid !important;
+    }
+    
+    .markdown-section div[style*="display: flex"] {
+      display: flex !important;
+    }
+    
+    /* Melhorar espaçamento */
+    .markdown-section h1,
+    .markdown-section h2,
+    .markdown-section h3 {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    
+    /* Melhorar botões */
+    .markdown-section a[style*="background"] {
+      transition: all 0.3s ease;
+    }
+    
+    .markdown-section a[style*="background"]:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    
+    /* Melhorar código inline */
+    .markdown-section code {
+      background: rgba(0,123,255,0.1);
+      color: #0056b3;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    
+    /* Melhorar navbar */
+    .app-nav {
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 0 20px;
+    }
+    
+    .app-nav a {
+      color: #495057;
+      font-weight: 500;
+    }
+    
+    .app-nav a:hover {
+      color: var(--theme-color);
+    }
+    
+    /* Melhorar sidebar */
+    .sidebar {
+      background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+      border-right: 1px solid #e9ecef;
+    }
+    
+    .sidebar-nav > ul > li > a {
+      font-weight: 600;
+      color: #495057;
+    }
+    
+    .sidebar-nav a:hover {
+      color: var(--theme-color);
+    }
+    
+    /* Responsividade melhorada */
+    @media screen and (max-width: 768px) {
+      .markdown-section {
+        padding: 20px 15px;
+      }
+      
+      .markdown-section div[style*="display: grid"] {
+        grid-template-columns: 1fr !important;
+      }
+      
+      .markdown-section div[style*="display: flex"] {
+        flex-direction: column !important;
+      }
+    }
+    
+    /* Melhorar badges */
+    .markdown-section img[alt*="Badge"] {
+      margin: 2px;
+    }
+    
+    /* Scroll suave */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    window.$docsify = {
+      name: '🏃‍♂️ Dash Bot',
+      repo: 'https://github.com/seu-usuario/dash-bot-telegram',
+      homepage: 'README.md',
+      loadSidebar: true,
+      loadNavbar: true,
+      coverpage: false,
+      maxLevel: 4,
+      subMaxLevel: 2,
+      auto2top: true,
+      executeScript: true,
+      search: {
+        maxAge: 86400000,
+        paths: 'auto',
+        placeholder: {
+          '/': '🔍 Buscar na documentação...'
+        },
+        noData: {
+          '/': '😞 Nenhum resultado encontrado!'
+        }
+      },
+      pagination: {
+        previousText: '◀ ANTERIOR',
+        nextText: 'PRÓXIMO ▶',
+        crossChapter: true,
+        crossChapterText: true,
+      },
+      tabs: {
+        persist: true,
+        sync: true,
+        theme: 'classic',
+        tabComments: true,
+        tabHeadings: true
+      }
+    }
+  </script>
+  <!-- Docsify v4 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <!-- Plugins -->
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
+  <!-- Syntax Highlighting -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-typescript.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-javascript.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-sql.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-docker.min.js"></script>
+</body>
+</html>
