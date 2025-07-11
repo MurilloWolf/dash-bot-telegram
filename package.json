@@ -1,18 +1,47 @@
 {
-  "name": "bolt-bot",
-  "version": "1.0.0",
+  "name": "dash-bot",
+  "version": "0.0.0",
+  "type": "module",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node src/index.js",
-    "start": "node src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "dotenv -e .env.development -- tsx watch src/bot.ts",
+    "build": "tsc",
+    "start": "node dist/bot.js",
+    "prisma-generate": "prisma generate",
+    "prisma:migrate:dev": "dotenv -e .env.development -- prisma migrate dev --schema=prisma/schema.sqlite.prisma",
+    "prisma:migrate:prod": "prisma migrate deploy --schema=prisma/schema.postgres.prisma",
+    "prisma:generate:dev": "dotenv -e .env.development -- prisma generate --schema=prisma/schema.sqlite.prisma",
+    "prisma:generate:prod": "prisma generate --schema=prisma/schema.postgres.prisma",
+    "prisma:studio": "prisma studio",
+    "db:seed": "dotenv -e .env.development -- npx tsx src/core/scripts/seedRaces.ts",
+    "db:clear": "dotenv -e .env.development -- npx tsx src/core/scripts/clearDatabase.ts",
+    "db:reset": "npm run db:clear && npm run db:seed",
+    "db:setup": "npm run prisma:migrate:dev && npm run db:seed",
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^16.5.0",
-    "node-telegram-bot-api": "^0.66.0"
+    "@prisma/client": "^5.0.0",
+    "dotenv": "^16.0.0",
+    "dotenv-cli": "^8.0.0",
+    "node-telegram-bot-api": "^0.66.0",
+    "prisma": "^5.0.0",
+    "sqlstring": "^2.3.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.29.0",
+    "@types/node": "^24.0.4",
+    "@types/node-telegram-bot-api": "^0.64.9",
+    "eslint": "^9.29.0",
+    "globals": "^16.2.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.35.0",
+    "vitest": "^3.2.4"
   }
 }
