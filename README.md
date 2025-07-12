@@ -63,7 +63,7 @@ O bot oferece uma interface rica com botões interativos:
 
 - **Runtime**: Node.js com TypeScript
 - **Bot Framework**: node-telegram-bot-api
-- **Database**: Prisma ORM (SQLite para desenvolvimento, PostgreSQL para produção)
+- **Database**: Prisma ORM com PostgreSQL
 - **Arquitetura**: Clean Architecture com SOLID principles
 - **Testes**: Vitest
 
@@ -116,28 +116,46 @@ TELEGRAM_BOT_TOKEN=seu_token_aqui
 BOT_PLATFORM=telegram
 
 # Database
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="postgresql://dashbot:dashbot123@localhost:5432/dashbot"
+POSTGRES_URL_NON_POOLING="postgresql://dashbot:dashbot123@localhost:5432/dashbot"
 
 # External APIs
 RACES_ENDPOINT=https://api.sua-fonte-de-corridas.com/races
 ```
 
-### 4. Configurar Banco de Dados
+### 4. Iniciar Tudo com Um Comando
 
 ```bash
-# Setup completo do banco (migrations + seed)
-npm run db:setup
+# Comando único que faz tudo:
+# ✅ Inicia PostgreSQL
+# ✅ Gera cliente Prisma  
+# ✅ Executa migrações
+# ✅ Popula banco com dados
+# ✅ Inicia o bot
+npm run dev:all
+```
+
+**Ou use os comandos separados:**
+
+```bash
+# Setup automático completo (PostgreSQL + migrations + seed)
+npm run dev:setup
 
 # Ou passo a passo:
-npm run prisma:migrate:dev
-npm run db:seed
+npm run postgres:up           # Iniciar PostgreSQL
+npm run prisma:migrate:dev    # Executar migrations
+npm run db:seed:complete      # Popular banco com dados
+npm run dev                   # Iniciar bot
 ```
 
 ### 5. Executar o Bot
 
 ```bash
-# Desenvolvimento (com hot reload)
+# Se já fez o setup, apenas inicie o bot:
 npm run dev
+
+# Para ver dados no banco:
+npm run prisma:studio
 
 # Produção
 npm run build

@@ -12,6 +12,15 @@ import {
   MediaType,
 } from "../../../domain/entities/Message.ts";
 import prisma from "../client.ts";
+import type {
+  Message as PrismaMessage,
+  Chat as PrismaChat,
+  Media as PrismaMedia,
+  MessageDirection as PrismaMessageDirection,
+  MessageType as PrismaMessageType,
+  ChatType as PrismaChatType,
+  MediaType as PrismaMediaType,
+} from "@prisma/client";
 
 // Mock Prisma client
 vi.mock("../client.ts", () => ({
@@ -49,20 +58,7 @@ vi.mock("../client.ts", () => ({
 
 describe("PrismaMessageRepository", () => {
   let repository: PrismaMessageRepository;
-  let mockMessage: {
-    id: string;
-    telegramId: bigint;
-    direction: string;
-    type: string;
-    text: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-    editedAt: Date | null;
-    isDeleted: boolean;
-    userId: string | null;
-    chatId: string | null;
-    replyToId: string | null;
-  };
+  let mockMessage: PrismaMessage;
 
   beforeEach(() => {
     repository = new PrismaMessageRepository();
@@ -71,8 +67,8 @@ describe("PrismaMessageRepository", () => {
     mockMessage = {
       id: "message-id",
       telegramId: BigInt(123456789),
-      direction: MessageDirection.INCOMING,
-      type: MessageType.TEXT,
+      direction: "INCOMING" as PrismaMessageDirection,
+      type: "TEXT" as PrismaMessageType,
       text: "Test message",
       createdAt: new Date("2024-01-01"),
       updatedAt: new Date("2024-01-01"),
@@ -81,7 +77,7 @@ describe("PrismaMessageRepository", () => {
       userId: "user-id",
       chatId: "chat-id",
       replyToId: null,
-    };
+    } as PrismaMessage;
   });
 
   describe("findById", () => {
@@ -263,16 +259,7 @@ describe("PrismaMessageRepository", () => {
 
 describe("PrismaChatRepository", () => {
   let repository: PrismaChatRepository;
-  let mockChat: {
-    id: string;
-    telegramId: string;
-    type: string;
-    title: string | null;
-    username: string | null;
-    memberCount: number | null;
-    createdAt: Date;
-    updatedAt: Date;
-  };
+  let mockChat: PrismaChat;
 
   beforeEach(() => {
     repository = new PrismaChatRepository();
@@ -281,13 +268,13 @@ describe("PrismaChatRepository", () => {
     mockChat = {
       id: "chat-id",
       telegramId: "telegram-chat-id",
-      type: ChatType.PRIVATE,
+      type: "PRIVATE" as PrismaChatType,
       title: "Test Chat",
       username: "test_chat",
       memberCount: 1,
       createdAt: new Date("2024-01-01"),
       updatedAt: new Date("2024-01-01"),
-    };
+    } as PrismaChat;
   });
 
   describe("findById", () => {
@@ -457,18 +444,7 @@ describe("PrismaChatRepository", () => {
 
 describe("PrismaMediaRepository", () => {
   let repository: PrismaMediaRepository;
-  let mockMedia: {
-    id: string;
-    telegramId: string;
-    type: string;
-    url: string | null;
-    fileSize: number | null;
-    width: number | null;
-    height: number | null;
-    duration: number | null;
-    mimeType: string | null;
-    messageId: string;
-  };
+  let mockMedia: PrismaMedia;
 
   beforeEach(() => {
     repository = new PrismaMediaRepository();
@@ -477,7 +453,7 @@ describe("PrismaMediaRepository", () => {
     mockMedia = {
       id: "media-id",
       telegramId: "telegram-media-id",
-      type: MediaType.PHOTO,
+      type: "PHOTO" as PrismaMediaType,
       url: "https://example.com/photo.jpg",
       fileSize: 1024,
       width: 800,
@@ -485,7 +461,7 @@ describe("PrismaMediaRepository", () => {
       duration: null,
       mimeType: "image/jpeg",
       messageId: "message-id",
-    };
+    } as PrismaMedia;
   });
 
   describe("findById", () => {

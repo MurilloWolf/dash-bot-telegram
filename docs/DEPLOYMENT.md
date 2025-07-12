@@ -16,7 +16,8 @@ TELEGRAM_BOT_TOKEN=your_development_bot_token
 BOT_PLATFORM=telegram
 
 # Database
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="postgresql://dashbot:dashbot123@localhost:5432/dashbot"
+POSTGRES_URL_NON_POOLING="postgresql://dashbot:dashbot123@localhost:5432/dashbot"
 
 # External APIs
 RACES_ENDPOINT=https://api.example.com/races

@@ -65,7 +65,7 @@ e este projeto segue [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Tecnologias**
 
   - Node.js com TypeScript
-  - Prisma ORM (SQLite dev, PostgreSQL prod)
+  - Prisma ORM com PostgreSQL
   - node-telegram-bot-api
   - Vitest para testes
   - ESLint + Prettier
@@ -75,7 +75,7 @@ e este projeto segue [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - Schema para corridas e usuários
   - Migrations automatizadas
   - Seeders para dados de teste
-  - Suporte a SQLite e PostgreSQL
+  - Suporte a PostgreSQL
 
 - **Sistema de Tipos**
   - Tipagem completa em TypeScript

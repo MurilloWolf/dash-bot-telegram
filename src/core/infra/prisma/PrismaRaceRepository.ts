@@ -192,8 +192,16 @@ export class PrismaRaceRepository implements RaceRepository {
       id: race.id,
       title: race.title,
       organization: race.organization,
-      distances: JSON.parse(race.distances || "[]"),
-      distancesNumbers: JSON.parse(race.distancesNumbers || "[]"),
+      distances: JSON.parse(
+        typeof race.distances === "string"
+          ? race.distances
+          : JSON.stringify(race.distances || [])
+      ),
+      distancesNumbers: JSON.parse(
+        typeof race.distancesNumbers === "string"
+          ? race.distancesNumbers
+          : JSON.stringify(race.distancesNumbers || [])
+      ),
       date: race.date,
       location: race.location,
       link: race.link,

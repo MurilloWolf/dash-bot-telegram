@@ -37,7 +37,7 @@ Esta **separação clara de responsabilidades** torna o código **testável, man
 
 - **Runtime**: Node.js with TypeScript
 - **Framework**: Express.js implicit
-- **Database**: Prisma ORM (SQLite for development, PostgreSQL for production)
+- **Database**: Prisma ORM com PostgreSQL
 - **Bot Framework**: node-telegram-bot-api
 - **Testing**: Vitest
 

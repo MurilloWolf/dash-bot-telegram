@@ -351,7 +351,7 @@ Quando você envia `/corridas`, aqui está o que acontece internamente:
 <div style="text-align: center; padding: 15px;">
   <div style="font-size: 2em; margin-bottom: 10px;">🗄️</div>
   <strong>Prisma ORM</strong><br>
-  <small>SQLite (dev) / PostgreSQL (prod)</small>
+  <small>PostgreSQL</small>
 </div>
 
 <div style="text-align: center; padding: 15px;">
@@ -423,7 +423,8 @@ TELEGRAM_BOT_TOKEN=seu_token_aqui
 BOT_PLATFORM=telegram
 
 # Database
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="postgresql://dashbot:dashbot123@localhost:5432/dashbot"
+POSTGRES_URL_NON_POOLING="postgresql://dashbot:dashbot123@localhost:5432/dashbot"
 
 # External APIs
 RACES_ENDPOINT=https://api.sua-fonte-de-corridas.com/races

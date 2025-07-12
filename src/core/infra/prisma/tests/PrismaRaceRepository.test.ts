@@ -2,6 +2,10 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { PrismaRaceRepository } from "../PrismaRaceRepository.ts";
 import { RaceStatus } from "../../../domain/entities/Race.ts";
 import prisma from "../client.ts";
+import type {
+  Race as PrismaRace,
+  RaceStatus as PrismaRaceStatus,
+} from "@prisma/client";
 
 // Mock Prisma client
 vi.mock("../client.ts", () => ({
@@ -19,20 +23,7 @@ vi.mock("../client.ts", () => ({
 
 describe("PrismaRaceRepository", () => {
   let repository: PrismaRaceRepository;
-  let mockRace: {
-    id: string;
-    title: string;
-    organization: string;
-    distances: string;
-    distancesNumbers: string;
-    date: Date;
-    location: string;
-    link: string;
-    time: string;
-    status: string;
-    createdAt: Date;
-    updatedAt: Date;
-  };
+  let mockRace: PrismaRace;
 
   beforeEach(() => {
     repository = new PrismaRaceRepository();
@@ -42,16 +33,16 @@ describe("PrismaRaceRepository", () => {
       id: "race-id",
       title: "Test Race",
       organization: "Test Organization",
-      distances: JSON.stringify(["5K", "10K"]),
-      distancesNumbers: JSON.stringify([5, 10]),
+      distances: JSON.stringify(["5K", "10K"]), // Mantenha como string para compatibilidade
+      distancesNumbers: JSON.stringify([5, 10]), // Mantenha como string para compatibilidade
       date: new Date("2024-01-15"),
       location: "Test Location",
       link: "https://test.com",
       time: "08:00",
-      status: RaceStatus.OPEN,
+      status: "OPEN" as PrismaRaceStatus, // Type assertion para compatibilidade com enum
       createdAt: new Date("2024-01-01"),
       updatedAt: new Date("2024-01-01"),
-    };
+    } as PrismaRace;
   });
 
   describe("findByTitle", () => {

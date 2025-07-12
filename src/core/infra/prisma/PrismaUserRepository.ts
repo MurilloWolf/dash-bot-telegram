@@ -122,7 +122,11 @@ export class PrismaUserPreferencesRepository
     return {
       id: preferences.id,
       userId: preferences.userId,
-      preferredDistances: JSON.parse(preferences.preferredDistances || "[]"),
+      preferredDistances: JSON.parse(
+        typeof preferences.preferredDistances === "string"
+          ? preferences.preferredDistances
+          : JSON.stringify(preferences.preferredDistances || [])
+      ),
       notificationsEnabled: preferences.notificationsEnabled,
       reminderDays: preferences.reminderDays,
       timezone: preferences.timezone,

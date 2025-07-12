@@ -9,6 +9,13 @@ import {
   PaymentStatus,
 } from "../../../domain/entities/Payment.ts";
 import prisma from "../client.ts";
+import type {
+  Product as PrismaProduct,
+  Payment as PrismaPayment,
+  Subscription as PrismaSubscription,
+  BillingType as PrismaBillingType,
+  PaymentStatus as PrismaPaymentStatus,
+} from "@prisma/client";
 
 // Mock Prisma client
 vi.mock("../client.ts", () => ({
@@ -40,18 +47,7 @@ vi.mock("../client.ts", () => ({
 
 describe("PrismaProductRepository", () => {
   let repository: PrismaProductRepository;
-  let mockProduct: {
-    id: string;
-    name: string;
-    description: string | null;
-    price: number;
-    currency: string;
-    billingType: string;
-    interval: string | null;
-    isActive: boolean;
-    features: string;
-    createdAt: Date;
-  };
+  let mockProduct: PrismaProduct;
 
   beforeEach(() => {
     repository = new PrismaProductRepository();
@@ -63,12 +59,12 @@ describe("PrismaProductRepository", () => {
       description: "Test Description",
       price: 9.99,
       currency: "USD",
-      billingType: BillingType.RECURRING,
+      billingType: "RECURRING" as PrismaBillingType,
       interval: "month",
       isActive: true,
       features: JSON.stringify({ feature1: true, feature2: false }),
       createdAt: new Date("2024-01-01"),
-    };
+    } as PrismaProduct;
   });
 
   describe("findById", () => {
@@ -275,22 +271,7 @@ describe("PrismaProductRepository", () => {
 
 describe("PrismaPaymentRepository", () => {
   let repository: PrismaPaymentRepository;
-  let mockPayment: {
-    id: string;
-    telegramChargeId: string | null;
-    provider: string;
-    amount: number;
-    currency: string;
-    status: string;
-    userEmail: string | null;
-    userPhone: string | null;
-    createdAt: Date;
-    paidAt: Date | null;
-    expiresAt: Date | null;
-    invoiceUrl: string | null;
-    userId: string;
-    productId: string | null;
-  };
+  let mockPayment: PrismaPayment;
 
   beforeEach(() => {
     repository = new PrismaPaymentRepository();
@@ -302,7 +283,7 @@ describe("PrismaPaymentRepository", () => {
       provider: "telegram",
       amount: 9.99,
       currency: "USD",
-      status: PaymentStatus.PENDING,
+      status: "PENDING" as PrismaPaymentStatus,
       userEmail: "user@example.com",
       userPhone: "+1234567890",
       createdAt: new Date("2024-01-01"),
@@ -311,7 +292,7 @@ describe("PrismaPaymentRepository", () => {
       invoiceUrl: "https://invoice.example.com",
       userId: "user-id",
       productId: "product-id",
-    };
+    } as PrismaPayment;
   });
 
   describe("findById", () => {
@@ -498,17 +479,7 @@ describe("PrismaPaymentRepository", () => {
 
 describe("PrismaSubscriptionRepository", () => {
   let repository: PrismaSubscriptionRepository;
-  let mockSubscription: {
-    id: string;
-    startDate: Date;
-    endDate: Date | null;
-    isActive: boolean;
-    autoRenew: boolean;
-    cancelledAt: Date | null;
-    userId: string;
-    productId: string;
-    paymentId: string | null;
-  };
+  let mockSubscription: PrismaSubscription;
 
   beforeEach(() => {
     repository = new PrismaSubscriptionRepository();
@@ -524,7 +495,7 @@ describe("PrismaSubscriptionRepository", () => {
       userId: "user-id",
       productId: "product-id",
       paymentId: "payment-id",
-    };
+    } as PrismaSubscription;
   });
 
   describe("findById", () => {

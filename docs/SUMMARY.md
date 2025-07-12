@@ -27,7 +27,7 @@ O **Dash Bot** é um bot inteligente para Telegram desenvolvido especificamente 
 
 - **Runtime**: Node.js 18+ com TypeScript
 - **Framework**: node-telegram-bot-api
-- **Database**: Prisma ORM (SQLite/PostgreSQL)
+- **Database**: Prisma ORM com PostgreSQL
 - **Arquitetura**: Clean Architecture + SOLID
 - **Testes**: Vitest
 - **Qualidade**: ESLint + Prettier
@@ -170,9 +170,9 @@ src/
 
 ### Ambientes Suportados
 
-- **Development**: SQLite + Node.js local
+- **Development**: PostgreSQL + Node.js local
 - **Production**: PostgreSQL + Docker/Railway/Heroku
-- **Testing**: SQLite in-memory
+- **Testing**: PostgreSQL in-memory/container
 
 ### Estratégias de Deploy
 

@@ -66,6 +66,7 @@ model Message {
   chat      Chat?     @relation("ChatMessages", fields: [chatId], references: [id])
   replyToId String?
   replyTo   Message?  @relation("Replies", fields: [replyToId], references: [id])
+  replies   Message[] @relation("Replies")
   media     Media[]
   location  Location?
 

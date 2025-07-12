@@ -87,7 +87,11 @@ export class PrismaProductRepository implements ProductRepository {
       billingType: product.billingType as BillingTypeValue,
       interval: product.interval || undefined,
       isActive: product.isActive,
-      features: JSON.parse(product.features || "{}"),
+      features: JSON.parse(
+        typeof product.features === "string"
+          ? product.features
+          : JSON.stringify(product.features || {})
+      ),
       createdAt: product.createdAt,
     };
   }
