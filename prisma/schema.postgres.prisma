@@ -117,7 +117,8 @@ model Product {
   features    Json // Ex: {"advancedAnalytics": true}
   createdAt   DateTime    @default(now())
 
-  payments Payment[]
+  payments      Payment[]
+  subscriptions Subscription[]
 
   @@index([price, isActive])
 }
@@ -140,6 +141,8 @@ model Payment {
   user      User     @relation(fields: [userId], references: [id])
   productId String?
   product   Product? @relation(fields: [productId], references: [id])
+
+  subscriptions Subscription[]
 
   @@index([userId, status])
   @@index([telegramChargeId])
