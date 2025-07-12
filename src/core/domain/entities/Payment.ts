@@ -1,13 +1,31 @@
+export const BillingType = {
+  ONE_TIME: "ONE_TIME",
+  RECURRING: "RECURRING",
+} as const;
+
+export type BillingTypeValue = (typeof BillingType)[keyof typeof BillingType];
+
+export const PaymentStatus = {
+  PENDING: "PENDING",
+  PAID: "PAID",
+  FAILED: "FAILED",
+  REFUNDED: "REFUNDED",
+  EXPIRED: "EXPIRED",
+} as const;
+
+export type PaymentStatusValue =
+  (typeof PaymentStatus)[keyof typeof PaymentStatus];
+
 export interface Product {
   id: string;
   name: string;
   description?: string;
   price: number;
   currency: string;
-  billingType: string;
+  billingType: BillingTypeValue;
   interval?: string;
   isActive: boolean;
-  features: string;
+  features: Record<string, unknown>;
   createdAt: Date;
 }
 
@@ -17,7 +35,7 @@ export interface Payment {
   provider: string;
   amount: number;
   currency: string;
-  status: string;
+  status: PaymentStatusValue;
   userEmail?: string;
   userPhone?: string;
   createdAt: Date;
@@ -46,15 +64,4 @@ export const ProductType = {
   ENTERPRISE: "ENTERPRISE",
 } as const;
 
-export const PaymentStatus = {
-  PENDING: "PENDING",
-  PAID: "PAID",
-  FAILED: "FAILED",
-  REFUNDED: "REFUNDED",
-  EXPIRED: "EXPIRED",
-} as const;
-
-export const BillingType = {
-  ONE_TIME: "ONE_TIME",
-  RECURRING: "RECURRING",
-} as const;
+export type ProductTypeValue = (typeof ProductType)[keyof typeof ProductType];

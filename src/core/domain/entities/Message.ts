@@ -1,7 +1,7 @@
 export interface Chat {
   id: string;
   telegramId: string;
-  type: string;
+  type: ChatTypeValue;
   title?: string;
   username?: string;
   memberCount?: number;
@@ -13,8 +13,8 @@ export interface Message {
   id: string;
   telegramId: bigint;
   text?: string;
-  direction: string;
-  type: string;
+  direction: MessageDirectionValue;
+  type: MessageTypeValue;
   createdAt: Date;
   updatedAt: Date;
   editedAt?: Date;
@@ -27,7 +27,7 @@ export interface Message {
 export interface Media {
   id: string;
   telegramId: string;
-  type: string;
+  type: MediaTypeValue;
   url?: string;
   fileSize?: number;
   width?: number;
@@ -54,10 +54,15 @@ export const ChatType = {
   BOT: "BOT",
 } as const;
 
+export type ChatTypeValue = (typeof ChatType)[keyof typeof ChatType];
+
 export const MessageDirection = {
   INCOMING: "INCOMING",
   OUTGOING: "OUTGOING",
 } as const;
+
+export type MessageDirectionValue =
+  (typeof MessageDirection)[keyof typeof MessageDirection];
 
 export const MessageType = {
   TEXT: "TEXT",
@@ -72,6 +77,8 @@ export const MessageType = {
   OTHER: "OTHER",
 } as const;
 
+export type MessageTypeValue = (typeof MessageType)[keyof typeof MessageType];
+
 export const MediaType = {
   PHOTO: "PHOTO",
   VIDEO: "VIDEO",
@@ -80,3 +87,5 @@ export const MediaType = {
   VOICE: "VOICE",
   STICKER: "STICKER",
 } as const;
+
+export type MediaTypeValue = (typeof MediaType)[keyof typeof MediaType];
