@@ -63,6 +63,7 @@ describe("UserService", () => {
         name,
         username,
         isActive: true,
+        isPremium: false,
       });
       expect(result).toEqual(newUser);
     });
@@ -160,6 +161,7 @@ describe("UserService", () => {
         telegramId,
         name,
         username: undefined,
+        isPremium: false,
         isActive: true,
       });
       expect(result).toEqual(newUser);
