@@ -3,7 +3,7 @@ import {
   UserConfigCallbackData,
   CallbackData,
 } from "../../../../../types/callbacks/index.ts";
-import { BaseCallbackHandler } from "../../../shared/handlers/BaseCallbackHandler.ts";
+import { BaseCallbackHandler } from "@bot/commands/shared/handlers/BaseCallbackHandler.ts";
 
 export class UserConfigCallbackHandler extends BaseCallbackHandler {
   canHandle(callbackData: CallbackData): boolean {

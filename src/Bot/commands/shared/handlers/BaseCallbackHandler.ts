@@ -3,8 +3,8 @@ import {
   CommandOutput,
   InteractionButton,
 } from "../../../../types/Command.ts";
-import { CallbackHandler } from "../../../../types/PlatformAdapter.ts";
-import { CallbackData } from "../../../../types/callbacks/index.ts";
+import { CallbackHandler } from "@app-types/PlatformAdapter.ts";
+import { CallbackData } from "@app-types/callbacks/index.ts";
 
 export abstract class BaseCallbackHandler implements CallbackHandler {
   abstract canHandle(callbackData: CallbackData): boolean;

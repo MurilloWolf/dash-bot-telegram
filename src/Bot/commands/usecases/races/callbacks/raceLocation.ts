@@ -1,10 +1,10 @@
-import { CommandInput, CommandOutput } from "../../../../../types/Command.ts";
+import { CommandInput, CommandOutput } from "@app-types/Command.ts";
 import {
   CallbackData,
   RaceLocationCallbackData,
 } from "../../../../../types/callbacks/index.ts";
-import { BaseCallbackHandler } from "../../../shared/handlers/BaseCallbackHandler.ts";
-import { CallbackDataSerializer } from "../../../../config/callback/CallbackDataSerializer.ts";
+import { BaseCallbackHandler } from "@bot/commands/shared/handlers/BaseCallbackHandler.ts";
+import { CallbackDataSerializer } from "@bot/config/callback/CallbackDataSerializer.ts";
 
 export class RaceLocationCallbackHandler extends BaseCallbackHandler {
   canHandle(callbackData: CallbackData): boolean {

@@ -7,8 +7,8 @@ import {
   RaceSearchCallbackData,
   CallbackData,
 } from "../../../types/callbacks/index.ts";
-import { UserCallbackData } from "../../../types/callbacks/userCallbacks.ts";
-import { SharedCallbackData } from "../../../types/callbacks/sharedCallbacks.ts";
+import { UserCallbackData } from "@app-types/callbacks/userCallbacks.ts";
+import { SharedCallbackData } from "@app-types/callbacks/sharedCallbacks.ts";
 
 export class CallbackDataSerializer {
   static serialize(data: CallbackData): string {

@@ -1,7 +1,7 @@
-import { CommandInput, CommandOutput } from "../../types/Command.ts";
-import { CommandRegistry } from "../config/commands/CommandRegistry.ts";
+import { CommandRegistry } from "@bot/config/commands/CommandRegistry.ts";
+import { CommandInput, CommandOutput } from "@app-types/Command.ts";
 
-import { listRacesByDistanceCommand as corridasDistanciaCommand } from "../commands/usecases/races/index.ts";
+import { listRacesByDistanceCommand as corridasDistanciaCommand } from "@bot/commands/usecases/races/index.ts";
 
 let commandRegistry: CommandRegistry | null = null;
 

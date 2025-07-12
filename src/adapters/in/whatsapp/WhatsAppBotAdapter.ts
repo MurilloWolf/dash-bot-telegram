@@ -1,4 +1,4 @@
-import { CommandOutput, InteractionKeyboard } from "../../../types/Command.ts";
+import { CommandOutput, InteractionKeyboard } from "@app-types/Command.ts";
 import { PlatformAdapter } from "../../../types/PlatformAdapter.ts";
 
 interface WhatsAppMessage {

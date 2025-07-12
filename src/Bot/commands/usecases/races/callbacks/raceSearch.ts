@@ -1,11 +1,11 @@
-import { CommandInput, CommandOutput } from "../../../../../types/Command.ts";
+import { CommandInput, CommandOutput } from "@app-types/Command.ts";
 import {
   CallbackData,
   RaceSearchCallbackData,
-} from "../../../../../types/callbacks/index.ts";
-import { raceService } from "../../../../../core/infra/dependencies.ts";
-import { CallbackDataSerializer } from "../../../../config/callback/CallbackDataSerializer.ts";
-import { BaseCallbackHandler } from "../../../shared/handlers/BaseCallbackHandler.ts";
+} from "@app-types/callbacks/index.ts";
+import { raceService } from "@core/infra/dependencies.ts";
+import { CallbackDataSerializer } from "@bot/config/callback/CallbackDataSerializer.ts";
+import { BaseCallbackHandler } from "@bot/commands/shared/handlers/BaseCallbackHandler.ts";
 
 /**
  * Handler para busca de corridas por distância

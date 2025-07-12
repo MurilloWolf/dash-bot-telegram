@@ -1,4 +1,4 @@
-import { CommandInput, CommandOutput } from "../../../../../types/Command.ts";
+import { CommandInput, CommandOutput } from "@app-types/Command.ts";
 
 export async function configCommand(
   input: CommandInput

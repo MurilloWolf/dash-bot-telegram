@@ -1,6 +1,6 @@
-import { CommandInput, CommandOutput } from "../../../types/Command.ts";
-import { CallbackHandler } from "../../../types/PlatformAdapter.ts";
-import { CallbackData } from "../../../types/callbacks/index.ts";
+import { CommandInput, CommandOutput } from "@app-types/Command.ts";
+import { CallbackHandler } from "@app-types/PlatformAdapter.ts";
+import { CallbackData } from "@app-types/callbacks/index.ts";
 
 class CallbackManager {
   private handlers: CallbackHandler[] = [];

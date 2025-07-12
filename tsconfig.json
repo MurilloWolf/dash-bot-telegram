@@ -8,7 +8,13 @@
     "strict": true,
     "outDir": "dist",
     "allowImportingTsExtensions": true,
-    "noEmit": true
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@bot/*": ["./src/Bot/*"],
+      "@app-types/*": ["./src/types/*"],
+      "@core/*": ["./src/core/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "tests"]

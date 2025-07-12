@@ -1,9 +1,9 @@
-import { CommandInput, CommandOutput } from "../../../../../types/Command.ts";
+import { CommandInput, CommandOutput } from "@app-types/Command.ts";
 import {
   NavigationCallbackData,
   CallbackData,
 } from "../../../../../types/callbacks/index.ts";
-import { BaseCallbackHandler } from "../../../shared/handlers/BaseCallbackHandler.ts";
+import { BaseCallbackHandler } from "@bot/commands/shared/handlers/BaseCallbackHandler.ts";
 
 export class NavigationCallbackHandler extends BaseCallbackHandler {
   canHandle(callbackData: CallbackData): boolean {

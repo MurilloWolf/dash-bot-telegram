@@ -1,5 +1,5 @@
-import { CommandInput, CommandOutput } from "../../../../../types/Command.ts";
-import { userService } from "../../../../../core/infra/dependencies.ts";
+import { CommandInput, CommandOutput } from "@app-types/Command.ts";
+import { userService } from "@core/infra/dependencies.ts";
 
 export async function startCommand(
   input: CommandInput

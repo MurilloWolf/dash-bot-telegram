@@ -1,4 +1,4 @@
-import { CommandOutput } from "../../../../../types/Command.ts";
+import { CommandOutput } from "@app-types/Command.ts";
 
 export async function helpCommand(): Promise<CommandOutput> {
   return {

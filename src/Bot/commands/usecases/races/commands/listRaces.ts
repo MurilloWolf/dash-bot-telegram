@@ -1,6 +1,6 @@
-import { CommandInput, CommandOutput } from "../../../../../types/Command.ts";
-import { CallbackDataSerializer } from "../../../../config/callback/CallbackDataSerializer.ts";
-import { raceService } from "../../../../../core/infra/dependencies.ts";
+import { CommandInput, CommandOutput } from "@app-types/Command.ts";
+import { CallbackDataSerializer } from "@bot/config/callback/CallbackDataSerializer.ts";
+import { raceService } from "@core/infra/dependencies.ts";
 
 export async function listRacesCommand(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

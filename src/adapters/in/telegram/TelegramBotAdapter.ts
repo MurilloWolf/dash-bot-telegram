@@ -5,15 +5,15 @@ import TelegramBot, {
   InlineKeyboardMarkup,
   ReplyKeyboardMarkup,
 } from "node-telegram-bot-api";
-import { routeCommand } from "../../../Bot/router/CommandRouter.ts";
+import { routeCommand } from "@bot/router/CommandRouter.ts";
 import {
   CommandInput,
   CommandOutput,
   InteractionKeyboard,
 } from "../../../types/Command.ts";
 import { PlatformAdapter } from "../../../types/PlatformAdapter.ts";
-import { CallbackDataSerializer } from "../../../Bot/config/callback/CallbackDataSerializer.ts";
-import { callbackManager } from "../../../Bot/config/callback/CallbackManager.ts";
+import { CallbackDataSerializer } from "@bot/config/callback/CallbackDataSerializer.ts";
+import { callbackManager } from "@bot/config/callback/CallbackManager.ts";
 import parseCommand from "../../../utils/parseCommand.ts";
 import { stripFormatting } from "../../../utils/markdownUtils.ts";
 
