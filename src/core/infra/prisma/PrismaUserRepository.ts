@@ -58,8 +58,12 @@ export class PrismaUserRepository implements UserRepository {
       name: user.name,
       username: user.username || undefined,
       isActive: user.isActive,
+      isPremium: user.isPremium,
+      premiumSince: user.premiumSince || undefined,
+      premiumEndsAt: user.premiumEndsAt || undefined,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
+      lastSeenAt: user.lastSeenAt || undefined,
     };
   }
 }
@@ -121,6 +125,8 @@ export class PrismaUserPreferencesRepository
       preferredDistances: JSON.parse(preferences.preferredDistances || "[]"),
       notificationsEnabled: preferences.notificationsEnabled,
       reminderDays: preferences.reminderDays,
+      timezone: preferences.timezone,
+      language: preferences.language,
     };
   }
 }

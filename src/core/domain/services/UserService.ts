@@ -29,6 +29,7 @@ export class UserService {
       name,
       username,
       isActive: true,
+      isPremium: false,
     });
   }
 
@@ -68,6 +69,8 @@ export class UserService {
         preferredDistances: preferences.preferredDistances || [],
         notificationsEnabled: preferences.notificationsEnabled ?? true,
         reminderDays: preferences.reminderDays ?? 3,
+        timezone: preferences.timezone ?? "America/Sao_Paulo",
+        language: preferences.language ?? "pt-BR",
       });
     }
   }

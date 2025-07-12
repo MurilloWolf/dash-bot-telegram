@@ -8,7 +8,7 @@ export interface Race {
   location: string;
   link: string;
   time: string;
-  status: string;
+  status: RaceStatusValue;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -20,11 +20,11 @@ export const RaceStatus = {
   CANCELLED: "CANCELLED",
 } as const;
 
-export type RaceStatusType = (typeof RaceStatus)[keyof typeof RaceStatus];
+export type RaceStatusValue = (typeof RaceStatus)[keyof typeof RaceStatus];
 
 export interface RaceFilter {
   distances?: number[];
-  status?: string;
+  status?: RaceStatusValue;
   startDate?: Date;
   endDate?: Date;
 }

@@ -1,4 +1,9 @@
-import { Race, RaceFilter, RaceStatus } from "../../domain/entities/Race.ts";
+import {
+  Race,
+  RaceFilter,
+  RaceStatus,
+  RaceStatusValue,
+} from "../../domain/entities/Race.ts";
 import { RaceRepository } from "../../domain/repositories/RaceRepository.ts";
 import prisma from "./client.ts";
 import type { Race as PrismaRace, Prisma } from "@prisma/client";
@@ -173,7 +178,7 @@ export class PrismaRaceRepository implements RaceRepository {
     });
   }
 
-  async updateStatus(id: string, status: string): Promise<Race> {
+  async updateStatus(id: string, status: RaceStatusValue): Promise<Race> {
     const race = await prisma.race.update({
       where: { id },
       data: { status },
@@ -193,7 +198,7 @@ export class PrismaRaceRepository implements RaceRepository {
       location: race.location,
       link: race.link,
       time: race.time,
-      status: race.status || RaceStatus.OPEN,
+      status: (race.status || RaceStatus.OPEN) as RaceStatusValue,
       createdAt: race.createdAt,
       updatedAt: race.updatedAt,
     };

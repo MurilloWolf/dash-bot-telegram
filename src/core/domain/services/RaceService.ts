@@ -1,4 +1,9 @@
-import { Race, RaceFilter, RaceStatus } from "../entities/Race.ts";
+import {
+  Race,
+  RaceFilter,
+  RaceStatus,
+  RaceStatusValue,
+} from "../entities/Race.ts";
 import { RaceRepository } from "../repositories/RaceRepository.ts";
 
 export class RaceService {
@@ -40,7 +45,10 @@ export class RaceService {
     return this.raceRepository.create(raceData);
   }
 
-  async updateRaceStatus(raceId: string, status: string): Promise<Race> {
+  async updateRaceStatus(
+    raceId: string,
+    status: RaceStatusValue
+  ): Promise<Race> {
     return this.raceRepository.updateStatus(raceId, status);
   }
 
