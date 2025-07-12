@@ -138,7 +138,7 @@ export class TelegramPlatformAdapter implements PlatformAdapter {
 
 export async function handleTelegramMessage(bot: TelegramBot, msg: Message) {
   if (!msg.text) return;
-
+  console.log("Message received:", JSON.stringify(msg, null, 2));
   const { command, args } = parseCommand(msg.text);
 
   if (!command) return;

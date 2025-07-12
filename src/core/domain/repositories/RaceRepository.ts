@@ -1,4 +1,4 @@
-import { Race, RaceFilter, RaceStatus } from "../entities/Race.ts";
+import { Race, RaceFilter } from "../entities/Race.ts";
 
 export interface RaceRepository {
   findById(id: string): Promise<Race | null>;
@@ -11,5 +11,5 @@ export interface RaceRepository {
   create(race: Omit<Race, "id" | "createdAt" | "updatedAt">): Promise<Race>;
   update(id: string, race: Partial<Race>): Promise<Race>;
   delete(id: string): Promise<void>;
-  updateStatus(id: string, status: RaceStatus): Promise<Race>;
+  updateStatus(id: string, status: string): Promise<Race>;
 }

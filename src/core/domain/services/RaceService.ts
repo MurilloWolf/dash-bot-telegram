@@ -40,7 +40,7 @@ export class RaceService {
     return this.raceRepository.create(raceData);
   }
 
-  async updateRaceStatus(raceId: string, status: RaceStatus): Promise<Race> {
+  async updateRaceStatus(raceId: string, status: string): Promise<Race> {
     return this.raceRepository.updateStatus(raceId, status);
   }
 
@@ -106,7 +106,7 @@ export class RaceService {
     return `${day}/${month}/${year}`;
   }
 
-  private getStatusEmoji(status: RaceStatus): string {
+  private getStatusEmoji(status: string): string {
     switch (status) {
       case RaceStatus.OPEN:
         return "🔓 Aberto";

@@ -8,21 +8,23 @@ export interface Race {
   location: string;
   link: string;
   time: string;
-  status: RaceStatus;
+  status: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export enum RaceStatus {
-  OPEN = "open",
-  CLOSED = "closed",
-  COMING_SOON = "coming_soon",
-  CANCELLED = "cancelled",
-}
+export const RaceStatus = {
+  OPEN: "OPEN",
+  CLOSED: "CLOSED",
+  COMING_SOON: "COMING_SOON",
+  CANCELLED: "CANCELLED",
+} as const;
+
+export type RaceStatusType = (typeof RaceStatus)[keyof typeof RaceStatus];
 
 export interface RaceFilter {
   distances?: number[];
-  status?: RaceStatus;
+  status?: string;
   startDate?: Date;
   endDate?: Date;
 }

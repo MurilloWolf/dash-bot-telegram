@@ -16,8 +16,12 @@
     "prisma:studio": "prisma studio",
     "db:seed": "dotenv -e .env.development -- npx tsx src/core/scripts/seedRaces.ts",
     "db:clear": "dotenv -e .env.development -- npx tsx src/core/scripts/clearDatabase.ts",
+    "db:seed:complete": "dotenv -e .env.development -- npx tsx src/core/scripts/seedCompleteDatabase.ts",
+    "db:clear:complete": "dotenv -e .env.development -- npx tsx src/core/scripts/clearCompleteDatabase.ts",
     "db:reset": "npm run db:clear && npm run db:seed",
+    "db:reset:complete": "npm run db:clear:complete && npm run db:seed:complete",
     "db:setup": "npm run prisma:migrate:dev && npm run db:seed",
+    "db:setup:complete": "npm run prisma:migrate:dev && npm run db:seed:complete",
     "test": "vitest"
   },
   "keywords": [],

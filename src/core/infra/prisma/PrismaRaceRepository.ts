@@ -173,7 +173,7 @@ export class PrismaRaceRepository implements RaceRepository {
     });
   }
 
-  async updateStatus(id: string, status: RaceStatus): Promise<Race> {
+  async updateStatus(id: string, status: string): Promise<Race> {
     const race = await prisma.race.update({
       where: { id },
       data: { status },
@@ -193,7 +193,7 @@ export class PrismaRaceRepository implements RaceRepository {
       location: race.location,
       link: race.link,
       time: race.time,
-      status: (race.status as RaceStatus) || RaceStatus.OPEN,
+      status: race.status || RaceStatus.OPEN,
       createdAt: race.createdAt,
       updatedAt: race.updatedAt,
     };
