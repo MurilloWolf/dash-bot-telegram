@@ -44,9 +44,6 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=build /app/prisma ./prisma
 
-# Copy environment files
-COPY --from=build /app/.env.production.example ./.env.production.example
-
 # Create non-root user (bot doesn't need root)
 RUN addgroup --system --gid 1001 botuser
 RUN adduser --system --uid 1001 botuser
