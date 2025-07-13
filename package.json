@@ -11,6 +11,7 @@
     "setup": "./scripts/setup-dev.sh",
     "deploy": "./scripts/deploy-fly.sh",
     "prisma": "dotenv -e .env.development -- prisma migrate dev",
+    "studio:prod": "dotenv -e .env.production -- prisma studio",
     "db": "dotenv -e .env.development -- npx tsx src/core/scripts/seedRaces.ts",
     "test": "vitest"
   },
