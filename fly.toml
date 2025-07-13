@@ -10,8 +10,6 @@ primary_region = 'gig'
 
 [env]
   NODE_ENV = "production"
-  # Outras variáveis não-sensíveis podem ser definidas aqui
-  # As sensíveis (tokens, URLs de banco) devem ser definidas como secrets
 
 # Process configuration for the bot
 [processes]
@@ -26,22 +24,3 @@ primary_region = 'gig'
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
-
-# Configuração de restart automático
-[restart]
-  policy = "on-failure"
-  max_restarts = 5
-
-# Health checks para monitorar o bot
-[checks]
-  [checks.bot_health]
-    type = "script"
-    command = "pgrep -f 'node.*bot.js' || pgrep -f 'npm.*start'"
-    interval = "30s"
-    timeout = "10s"
-    grace_period = "30s"
-
-# Configuração de logs
-[metrics]
-  port = 9091
-  path = "/metrics"
