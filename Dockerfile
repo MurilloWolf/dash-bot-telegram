@@ -12,7 +12,6 @@ WORKDIR /app
 # Set production environment
 ENV NODE_ENV="production"
 
-
 # Throw-away build stage to reduce size of final image
 FROM base AS build
 
@@ -22,18 +21,39 @@ RUN apt-get update -qq && \
 
 # Install node modules
 COPY package-lock.json package.json ./
-RUN npm ci
+RUN npm ci --include=dev
 
 # Copy application code
 COPY . .
 
+# Generate Prisma client for production
+RUN npx prisma generate
+
+# Build the application using our custom build system
+RUN npm run build
 
 # Final stage for app image
 FROM base
 
-# Copy built application
-COPY --from=build /app /app
+# Install production dependencies only
+COPY package-lock.json package.json ./
+RUN npm ci --only=production && npm cache clean --force
 
-# Start the server by default, this can be overwritten at runtime
-EXPOSE 3000
+# Copy built application
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=build /app/prisma ./prisma
+
+# Copy environment files
+COPY --from=build /app/.env.production.example ./.env.production.example
+
+# Create non-root user (bot doesn't need root)
+RUN addgroup --system --gid 1001 botuser
+RUN adduser --system --uid 1001 botuser
+USER botuser
+
+# Bot doesn't need to expose ports (it's not a web server)
+# EXPOSE 3000
+
+# Start the bot in production mode
 CMD [ "npm", "run", "start" ]
