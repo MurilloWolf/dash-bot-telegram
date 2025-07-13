@@ -18,11 +18,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.0.0",
+    "@prisma/client": "^6.11.1",
     "dotenv": "^16.0.0",
     "dotenv-cli": "^8.0.0",
     "node-telegram-bot-api": "^0.66.0",
-    "prisma": "^5.0.0",
     "sqlstring": "^2.3.3"
   },
   "devDependencies": {
@@ -32,6 +31,7 @@
     "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^9.29.0",
     "globals": "^16.2.0",
+    "prisma": "^6.11.1",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "tsc-alias": "^1.8.16",
