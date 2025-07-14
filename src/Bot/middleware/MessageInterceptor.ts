@@ -16,11 +16,14 @@ interface TelegramMessage {
     type: string;
     title?: string;
     username?: string;
+    first_name?: string; // Para chats privados
+    last_name?: string; // Para chats privados
     all_members_are_administrators?: boolean;
   };
   from?: {
     id: number;
     first_name: string;
+    last_name?: string;
     username?: string;
   };
   text?: string;
@@ -144,12 +147,35 @@ export class MessageInterceptor {
         return;
       }
 
+      // Buscar ou criar o usuário se necessário (mesmo código da mensagem incoming)
+      let userId: string | undefined;
+      if (messageData.telegramUserId) {
+        try {
+          // Usar o método registerUser que já faz a busca e criação
+          const user = await userService.registerUser(
+            messageData.telegramUserId,
+            messageData.userName || `User ${messageData.telegramUserId}`,
+            messageData.userUsername
+          );
+          userId = user.id;
+        } catch (error) {
+          console.warn(
+            `⚠️ Erro ao buscar/criar usuário ${messageData.telegramUserId}:`,
+            error
+          );
+          // Continua sem userId se não conseguir criar/buscar
+        }
+      }
+
       // Salva ou atualiza o chat se necessário
       let chat = await messageService.getChatByTelegramId(messageData.chatId);
       if (!chat) {
         chat = await messageService.createChat({
           telegramId: messageData.chatId,
-          type: ChatType.PRIVATE, // Assume privado por padrão
+          type: messageData.chatType, // Usa o tipo extraído da mensagem
+          title: messageData.chatTitle,
+          username: messageData.chatUsername,
+          memberCount: messageData.memberCount,
         });
       }
 
@@ -162,12 +188,13 @@ export class MessageInterceptor {
         text: output.text,
         direction: MessageDirection.OUTGOING,
         type: MessageType.TEXT,
+        userId: userId, // Agora inclui o userId da resposta
         chatId: chat.id,
         isDeleted: false,
       });
 
       console.log(
-        `📤 [${input.platform}] Resposta salva: ${temporaryMessageId} para chat ${messageData.chatId}`
+        `📤 [${input.platform}] Resposta salva: ${temporaryMessageId} para chat ${messageData.chatId} (userId: ${userId})`
       );
     } catch (error) {
       console.error("❌ Erro ao interceptar mensagem enviada:", error);
@@ -232,11 +259,34 @@ export class MessageInterceptor {
       return null;
     }
 
+    // Constrói o título do chat baseado no tipo
+    let chatTitle: string | undefined;
+    if (msg.chat.type === "private") {
+      // Para chats privados, usa first_name + last_name do chat
+      const firstName = msg.chat.first_name || "";
+      const lastName = msg.chat.last_name || "";
+      chatTitle = lastName ? `${firstName} ${lastName}` : firstName;
+      console.log(
+        `🏷️ Título do chat privado construído: "${chatTitle}" (firstName: "${firstName}", lastName: "${lastName}")`
+      );
+    } else {
+      // Para grupos/canais, usa o título fornecido
+      chatTitle = msg.chat.title;
+      console.log(`🏷️ Título do grupo/canal: "${chatTitle}"`);
+    }
+
+    // Constrói o nome completo do usuário
+    const userFirstName = msg.from?.first_name || "";
+    const userLastName = msg.from?.last_name || "";
+    const fullUserName = userLastName
+      ? `${userFirstName} ${userLastName}`
+      : userFirstName;
+
     return {
       messageId: msg.message_id,
       chatId: msg.chat.id.toString(),
       chatType: this.convertTelegramChatType(msg.chat.type),
-      chatTitle: msg.chat.title,
+      chatTitle: chatTitle,
       chatUsername: msg.chat.username,
       memberCount: msg.chat.all_members_are_administrators
         ? undefined
@@ -244,7 +294,7 @@ export class MessageInterceptor {
       text: msg.text,
       messageType: this.convertTelegramMessageType(msg),
       telegramUserId: msg.from?.id ? msg.from.id.toString() : undefined,
-      userName: msg.from?.first_name,
+      userName: fullUserName,
       userUsername: msg.from?.username,
       replyToId: msg.reply_to_message?.message_id
         ? msg.reply_to_message.message_id.toString()

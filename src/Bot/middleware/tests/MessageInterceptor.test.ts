@@ -103,7 +103,8 @@ describe("MessageInterceptor", () => {
           chat: {
             id: 456,
             type: "private",
-            title: "Test Chat",
+            first_name: "Test", // Para chats privados, o título vem destes campos
+            last_name: "Chat", // O título será "Test Chat"
             username: "testuser",
           },
           from: {
@@ -120,7 +121,7 @@ describe("MessageInterceptor", () => {
       expect(mockMessageService.createChat).toHaveBeenCalledWith({
         telegramId: "456",
         type: "PRIVATE",
-        title: "Test Chat",
+        title: "Test Chat", // Agora será construído a partir de first_name + last_name
         username: "testuser",
         memberCount: undefined,
       });
@@ -164,9 +165,15 @@ describe("MessageInterceptor", () => {
     it("should handle outgoing message correctly", async () => {
       const mockChat = { id: "chat-123" };
       const mockMessage = { id: "msg-123" };
+      const mockUser = {
+        id: "user-123",
+        telegramId: "12345",
+        name: "Test User",
+      };
 
       mockMessageService.getChatByTelegramId.mockResolvedValue(mockChat);
       mockMessageService.createMessage.mockResolvedValue(mockMessage);
+      mockUserService.registerUser.mockResolvedValue(mockUser);
 
       const input: CommandInput = {
         user: { id: 12345, name: "Test User" },
@@ -174,9 +181,17 @@ describe("MessageInterceptor", () => {
         platform: "telegram",
         raw: {
           message_id: 123,
+          from: {
+            id: 12345,
+            first_name: "Test",
+            last_name: "User", // Adicionado para que o nome completo seja "Test User"
+            username: "testuser",
+          },
           chat: {
             id: 456,
             type: "private",
+            title: "Test Chat",
+            username: "testchat",
           },
           text: "/test command",
         },
@@ -189,13 +204,71 @@ describe("MessageInterceptor", () => {
 
       await interceptor.interceptOutgoingMessage(input, output);
 
+      expect(mockUserService.registerUser).toHaveBeenCalledWith(
+        "12345",
+        "Test User", // Agora espera o nome completo
+        "testuser"
+      );
+
       expect(mockMessageService.createMessage).toHaveBeenCalledWith({
         telegramId: expect.any(BigInt),
         text: "Response message",
         direction: "OUTGOING",
         type: "TEXT",
+        userId: "user-123", // Agora espera o userId
         chatId: "chat-123",
         isDeleted: false,
+      });
+    });
+
+    it("should create chat with correct information when it doesn't exist", async () => {
+      const mockChat = { id: "new-chat-123" };
+      const mockMessage = { id: "msg-123" };
+      const mockUser = {
+        id: "user-123",
+        telegramId: "12345",
+        name: "Test User",
+      };
+
+      mockMessageService.getChatByTelegramId.mockResolvedValue(null); // Chat doesn't exist
+      mockMessageService.createChat.mockResolvedValue(mockChat);
+      mockMessageService.createMessage.mockResolvedValue(mockMessage);
+      mockUserService.registerUser.mockResolvedValue(mockUser);
+
+      const input: CommandInput = {
+        user: { id: 12345, name: "Test User" },
+        args: ["test"],
+        platform: "telegram",
+        raw: {
+          message_id: 123,
+          from: {
+            id: 12345,
+            first_name: "Test",
+            username: "testuser",
+          },
+          chat: {
+            id: 789,
+            type: "group",
+            title: "Test Group Chat",
+            username: "testgroup",
+          },
+          text: "/test command",
+        },
+      };
+
+      const output: CommandOutput = {
+        text: "Response message",
+        format: "HTML",
+      };
+
+      await interceptor.interceptOutgoingMessage(input, output);
+
+      expect(mockMessageService.createChat).toHaveBeenCalledWith({
+        telegramId: "789",
+        type: "GROUP",
+        title: "Test Group Chat",
+        username: "testgroup",
+        memberCount: undefined,
       });
     });
 

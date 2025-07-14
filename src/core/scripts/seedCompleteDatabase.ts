@@ -358,6 +358,7 @@ async function seedCompleteDatabase() {
           text: "Olá! Bem-vindo ao Dash Bot! 🏃‍♂️",
           direction: MessageDirection.OUTGOING,
           type: MessageType.TEXT,
+          userId: users[0].id, // Adicionado userId para a resposta
           chatId: chats[0].id,
         },
       }),
@@ -377,6 +378,7 @@ async function seedCompleteDatabase() {
           text: "🏃‍♂️ Corridas Disponíveis\n\nAqui estão as corridas próximas:",
           direction: MessageDirection.OUTGOING,
           type: MessageType.TEXT,
+          userId: users[0].id, // Adicionado userId para a resposta
           chatId: chats[0].id,
         },
       }),
