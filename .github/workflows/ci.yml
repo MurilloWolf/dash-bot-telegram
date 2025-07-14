@@ -65,9 +65,13 @@ jobs:
           npm run db:setup:test
         env:
           DATABASE_URL: 'postgresql://test:test@localhost:5432/testdb'
+          POSTGRES_URL_NON_POOLING: 'postgresql://test:test@localhost:5432/testdb'
 
       - name: 🧪 Run tests
         run: npm run test:coverage
+        env:
+          DATABASE_URL: 'postgresql://test:test@localhost:5432/testdb'
+          POSTGRES_URL_NON_POOLING: 'postgresql://test:test@localhost:5432/testdb'
 
       - name: 📊 Upload coverage reports
         uses: codecov/codecov-action@v4
