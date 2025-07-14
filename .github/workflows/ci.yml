@@ -32,6 +32,10 @@ jobs:
       - name: 💅 Check Prettier formatting
         run: npm run format:check
 
+      - name: 📊 Generate ESLint report
+        if: always()
+        run: npm run lint:report || true
+
       - name: 📊 Upload ESLint report
         if: always()
         uses: actions/upload-artifact@v4
@@ -116,12 +120,6 @@ jobs:
 
       - name: 🔒 Run security audit
         run: npm audit --audit-level=moderate
-
-      - name: 🔍 Run dependency check
-        uses: securecodewarrior/github-action-add-sarif@v1
-        if: always()
-        with:
-          sarif-file: 'security-audit.sarif'
 
   deploy:
     name: 🚀 Deploy
