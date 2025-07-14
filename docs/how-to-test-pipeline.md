@@ -12,7 +12,7 @@ Antes de fazer push, teste localmente:
 
 # Ou teste individualmente:
 npm run lint              # ✅ ESLint
-npm run format:check      # ✅ Prettier  
+npm run format:check      # ✅ Prettier
 npm test -- --run         # ✅ Testes
 npm run build             # ✅ Build
 ```
@@ -20,6 +20,7 @@ npm run build             # ✅ Build
 ## 🚀 2. Testes Reais no GitHub
 
 ### Método 1: Push Direto (Mais Simples)
+
 ```bash
 # Faça suas alterações
 git add .
@@ -31,6 +32,7 @@ gh run list
 ```
 
 ### Método 2: Via Pull Request (Recomendado)
+
 ```bash
 # Crie uma branch de teste
 git checkout -b test/pipeline-validation
@@ -44,6 +46,7 @@ gh pr create --title "Test: Validate CI/CD Pipeline" --body "Testing all workflo
 ```
 
 ### Método 3: Forçar Todos os Workflows
+
 ```bash
 # Modifique algo que dispare todos os workflows
 echo "Pipeline test at $(date)" >> README.md
@@ -55,6 +58,7 @@ git push
 ## 📊 3. Monitoramento dos Workflows
 
 ### Via GitHub CLI
+
 ```bash
 # Ver status dos workflows
 gh run list --limit 10
@@ -70,32 +74,38 @@ gh run watch
 ```
 
 ### Via GitHub Web
+
 Acesse: `https://github.com/SEU_USUARIO/dash-bot-telegram/actions`
 
 ## 🎯 4. O Que Cada Workflow Testa
 
 ### ✅ Code Quality (sempre passa primeiro)
+
 - ESLint check
 - Prettier formatting
 - Auto-fix de código
 
 ### 🔍 CI/CD Pipeline (principal)
+
 - **Lint & Format**: ESLint + Prettier
-- **Tests**: 272 testes automatizados  
+- **Tests**: 272 testes automatizados
 - **Build**: Compilação TypeScript
 - **Security**: npm audit
 - **Deploy**: Deploy no Fly.io (só na main)
 
 ### 📝 Changelog (automático)
+
 - Gera changelog baseado em commits
 - Incrementa versão automaticamente
 - Cria tag de release
 
 ### 🔒 CodeQL Security
+
 - Análise de segurança do código
 - Detecção de vulnerabilidades
 
 ### 🤖 PR Automation
+
 - Labels automáticos
 - Reviewers automáticos
 - Merge conditions
@@ -103,6 +113,7 @@ Acesse: `https://github.com/SEU_USUARIO/dash-bot-telegram/actions`
 ## 🚨 5. Problemas Comuns e Soluções
 
 ### ❌ Prettier Formatting Failed
+
 ```bash
 # Solução:
 npm run format
@@ -112,6 +123,7 @@ git push
 ```
 
 ### ❌ Tests Failed
+
 ```bash
 # Verificar localmente:
 npm test -- --run
@@ -119,6 +131,7 @@ npm test -- --run
 ```
 
 ### ❌ Build Failed
+
 ```bash
 # Verificar build local:
 npm run build
@@ -126,6 +139,7 @@ npm run build
 ```
 
 ### ❌ Security Audit Failed
+
 ```bash
 # Verificar vulnerabilidades:
 npm audit
@@ -136,6 +150,7 @@ npm audit fix
 ## 🎉 6. Como Saber se Está Funcionando
 
 ### ✅ Sinais de Sucesso:
+
 - ✅ **Code Quality** sempre passa
 - ✅ **CI/CD Pipeline** passa em todas as etapas
 - ✅ **Tests**: 272/272 testes passando
@@ -144,6 +159,7 @@ npm audit fix
 - ✅ **Changelog**: Versão incrementada automaticamente
 
 ### 📈 Métricas Esperadas:
+
 - **Lint**: 0 warnings, 0 errors
 - **Format**: 100% arquivos formatados
 - **Tests**: 272 passed, 0 failed
@@ -151,13 +167,14 @@ npm audit fix
 - **Security**: No vulnerabilities
 
 ### 🔍 Verificação Final:
+
 ```bash
 # Ver status dos últimos workflows
 gh run list --limit 5
 
 # Deve mostrar algo como:
 # ✓ CI/CD Pipeline
-# ✓ Code Quality  
+# ✓ Code Quality
 # ✓ Changelog
 # ✓ CodeQL Security
 ```
