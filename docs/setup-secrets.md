@@ -4,10 +4,10 @@ Este guia explica como configurar todos os secrets necessários para o CI/CD fun
 
 ## 📋 Secrets Necessários
 
-| Secret | Descrição | Obrigatório |
-|--------|-----------|-------------|
-| `FLY_API_TOKEN` | Token para deploy no Fly.io | ✅ |
-| `GITHUB_TOKEN` | Token automático do GitHub | ✅ (automático) |
+| Secret          | Descrição                   | Obrigatório     |
+| --------------- | --------------------------- | --------------- |
+| `FLY_API_TOKEN` | Token para deploy no Fly.io | ✅              |
+| `GITHUB_TOKEN`  | Token automático do GitHub  | ✅ (automático) |
 
 ## 🚀 1. Configurando FLY_API_TOKEN
 
@@ -70,6 +70,7 @@ fly apps create dash-bot-telegram --org personal
 Para cada secret:
 
 #### FLY_API_TOKEN
+
 - **Name:** `FLY_API_TOKEN`
 - **Secret:** Cole o token obtido no Passo 3 acima
 - **Clique em "Add secret"**
@@ -133,6 +134,7 @@ fly status
 ## 🚨 5. Troubleshooting
 
 ### Erro: "Invalid token"
+
 ```bash
 # Gerar novo token
 fly auth token
@@ -142,6 +144,7 @@ gh secret set FLY_API_TOKEN --body "novo_token_aqui"
 ```
 
 ### Erro: "App not found"
+
 ```bash
 # Verificar apps disponíveis
 fly apps list
@@ -151,6 +154,7 @@ fly apps create nome-do-app
 ```
 
 ### Erro: "Database connection"
+
 ```bash
 # Verificar secrets do Fly.io
 fly secrets list
@@ -183,18 +187,19 @@ git push origin main             # Trigger do workflow
 ```yaml
 # Secrets no GitHub Actions
 secrets:
-  FLY_API_TOKEN: "FlyV1_..."
+  FLY_API_TOKEN: 'FlyV1_...'
 
 # Secrets no Fly.io
 fly_secrets:
-  TELEGRAM_BOT_TOKEN: "bot_token..."
-  DATABASE_URL: "postgresql://..."
-  NODE_ENV: "production"
+  TELEGRAM_BOT_TOKEN: 'bot_token...'
+  DATABASE_URL: 'postgresql://...'
+  NODE_ENV: 'production'
 ```
 
 ## 🔐 8. Segurança
 
 ### ✅ Boas Práticas:
+
 - ✅ Nunca commite tokens no código
 - ✅ Use secrets do GitHub para CI/CD
 - ✅ Use secrets do Fly.io para runtime
@@ -202,6 +207,7 @@ fly_secrets:
 - ✅ Use diferentes tokens para diferentes ambientes
 
 ### ❌ Não Faça:
+
 - ❌ Não coloque tokens em .env files commitados
 - ❌ Não compartilhe tokens em chat/email
 - ❌ Não use o mesmo token em múltiplos projetos

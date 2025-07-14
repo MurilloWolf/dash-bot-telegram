@@ -211,7 +211,7 @@ export interface BaseRepository<T, TCreate, TUpdate> {
 
 export interface FilterOptions {
   where?: Record<string, unknown>;
-  orderBy?: Record<string, "asc" | "desc">;
+  orderBy?: Record<string, 'asc' | 'desc'>;
   take?: number;
   skip?: number;
 }
@@ -239,23 +239,23 @@ export class PrismaUserRepository implements UserRepository {
       return user ? this.toDomain(user) : null;
     } catch (error) {
       logger.error(
-        "Failed to find user by telegram ID",
+        'Failed to find user by telegram ID',
         {
-          module: "PrismaUserRepository",
-          action: "find_by_telegram_id",
+          module: 'PrismaUserRepository',
+          action: 'find_by_telegram_id',
           telegramId,
         },
         error as Error
       );
 
-      throw new DatabaseError("User lookup failed", { cause: error });
+      throw new DatabaseError('User lookup failed', { cause: error });
     }
   }
 
   async createWithPreferences(userData: CreateUserData): Promise<User> {
     try {
       // Transaction to ensure atomicity
-      const result = await this.prisma.$transaction(async (tx) => {
+      const result = await this.prisma.$transaction(async tx => {
         // Create user
         const user = await tx.user.create({
           data: {
@@ -274,8 +274,8 @@ export class PrismaUserRepository implements UserRepository {
             preferredDistances: [5, 10, 21],
             notificationsEnabled: true,
             reminderDays: 3,
-            timezone: "America/Sao_Paulo",
-            language: "pt-BR",
+            timezone: 'America/Sao_Paulo',
+            language: 'pt-BR',
           },
         });
 
@@ -286,12 +286,12 @@ export class PrismaUserRepository implements UserRepository {
     } catch (error) {
       if (
         error instanceof PrismaClientKnownRequestError &&
-        error.code === "P2002"
+        error.code === 'P2002'
       ) {
         throw new DuplicateUserError(`User with telegram ID already exists`);
       }
 
-      throw new DatabaseError("User creation failed", { cause: error });
+      throw new DatabaseError('User creation failed', { cause: error });
     }
   }
 
@@ -325,7 +325,7 @@ export class PrismaRaceRepository implements RaceRepository {
     const races = await this.prisma.race.findMany({
       where: {
         AND: [
-          { status: "OPEN" },
+          { status: 'OPEN' },
           { date: { gte: new Date() } },
           {
             distancesNumbers: {
@@ -334,7 +334,7 @@ export class PrismaRaceRepository implements RaceRepository {
           },
         ],
       },
-      orderBy: { date: "asc" },
+      orderBy: { date: 'asc' },
       take: 50,
     });
 
@@ -345,9 +345,9 @@ export class PrismaRaceRepository implements RaceRepository {
     const races = await this.prisma.race.findMany({
       where: {
         date: { gte: new Date() },
-        status: { in: ["OPEN", "COMING_SOON"] },
+        status: { in: ['OPEN', 'COMING_SOON'] },
       },
-      orderBy: { date: "asc" },
+      orderBy: { date: 'asc' },
       take: limit,
     });
 
@@ -360,12 +360,12 @@ export class PrismaRaceRepository implements RaceRepository {
       where: {
         location: {
           contains: location,
-          mode: "insensitive",
+          mode: 'insensitive',
         },
-        status: "OPEN",
+        status: 'OPEN',
         date: { gte: new Date() },
       },
-      orderBy: { date: "asc" },
+      orderBy: { date: 'asc' },
     });
 
     return races.map(this.toDomain);
@@ -380,7 +380,7 @@ export class PrismaRaceRepository implements RaceRepository {
         // Assuming we add a registration count field later
       },
       where: {
-        status: "OPEN",
+        status: 'OPEN',
       },
     });
 
@@ -430,7 +430,7 @@ const user = await prisma.user.findUnique({
 // ✅ Separate query for messages with pagination
 const recentMessages = await prisma.message.findMany({
   where: { userId: id },
-  orderBy: { createdAt: "desc" },
+  orderBy: { createdAt: 'desc' },
   take: 20,
   include: {
     media: true,
@@ -464,12 +464,12 @@ const activeUsers = await prisma.user.findMany({
 const popularRaces = await prisma.race.findMany({
   where: {
     date: { gte: new Date() }, // Indexed
-    status: "OPEN", // Indexed
+    status: 'OPEN', // Indexed
     distancesNumbers: {
       array_contains: [21, 42], // JSON index needed
     },
   },
-  orderBy: [{ date: "asc" }, { createdAt: "desc" }],
+  orderBy: [{ date: 'asc' }, { createdAt: 'desc' }],
 });
 ```
 
@@ -536,7 +536,7 @@ export class PaymentRepository {
     productId: string,
     paymentData: PaymentData
   ): Promise<{ payment: Payment; subscription: Subscription }> {
-    return await this.prisma.$transaction(async (tx) => {
+    return await this.prisma.$transaction(async tx => {
       // Create payment record
       const payment = await tx.payment.create({
         data: {
@@ -545,7 +545,7 @@ export class PaymentRepository {
           amount: paymentData.amount,
           currency: paymentData.currency,
           provider: paymentData.provider,
-          status: "PAID",
+          status: 'PAID',
         },
       });
 
@@ -585,7 +585,7 @@ export class RaceRegistrationService {
     raceId: string,
     distance: number
   ): Promise<RaceRegistration> {
-    return await this.prisma.$transaction(async (tx) => {
+    return await this.prisma.$transaction(async tx => {
       // Verify user exists and is premium for premium races
       const user = await tx.user.findUnique({
         where: { id: userId },
@@ -601,7 +601,7 @@ export class RaceRegistrationService {
         where: { id: raceId },
       });
 
-      if (!race || race.status !== "OPEN") {
+      if (!race || race.status !== 'OPEN') {
         throw new RaceNotAvailableError();
       }
 
@@ -627,7 +627,7 @@ export class RaceRegistrationService {
           raceId,
           distance,
           registeredAt: new Date(),
-          status: "CONFIRMED",
+          status: 'CONFIRMED',
         },
       });
 
@@ -635,7 +635,7 @@ export class RaceRegistrationService {
       await tx.userActivity.create({
         data: {
           userId,
-          action: "RACE_REGISTRATION",
+          action: 'RACE_REGISTRATION',
           metadata: { raceId, distance },
           createdAt: new Date(),
         },
@@ -663,13 +663,13 @@ export class DatabaseMetrics {
       const result = await queryFunction();
       const duration = performance.now() - start;
 
-      logger.databaseOperation(queryName, "SELECT", true, Math.round(duration));
+      logger.databaseOperation(queryName, 'SELECT', true, Math.round(duration));
 
       // Log slow queries
       if (duration > 1000) {
         // > 1 second
         logger.warn(`Slow query detected: ${queryName}`, {
-          module: "Database",
+          module: 'Database',
           queryName,
           duration: Math.round(duration),
         });
@@ -681,7 +681,7 @@ export class DatabaseMetrics {
 
       logger.databaseOperation(
         queryName,
-        "SELECT",
+        'SELECT',
         false,
         Math.round(duration)
       );
@@ -693,7 +693,7 @@ export class DatabaseMetrics {
 
 // Usage
 const users = await DatabaseMetrics.measureQuery(
-  "find_active_premium_users",
+  'find_active_premium_users',
   () => userRepository.findActivePremiumUsers()
 );
 ```
@@ -711,21 +711,20 @@ export class DatabaseHealthCheck {
       const metrics = await this.prisma.$metrics.json();
 
       return {
-        status: "healthy",
+        status: 'healthy',
         connectionPool: {
           activeConnections:
-            metrics.counters.find(
-              (c) => c.key === "db.client.connections.active"
-            )?.value || 0,
+            metrics.counters.find(c => c.key === 'db.client.connections.active')
+              ?.value || 0,
           idleConnections:
-            metrics.counters.find((c) => c.key === "db.client.connections.idle")
+            metrics.counters.find(c => c.key === 'db.client.connections.idle')
               ?.value || 0,
         },
         lastCheck: new Date(),
       };
     } catch (error) {
       return {
-        status: "unhealthy",
+        status: 'unhealthy',
         error: (error as Error).message,
         lastCheck: new Date(),
       };
@@ -767,8 +766,8 @@ export async function migrateUserPreferences() {
         preferredDistances: [5, 10], // Default preferences
         notificationsEnabled: true,
         reminderDays: 3,
-        timezone: "America/Sao_Paulo",
-        language: "pt-BR",
+        timezone: 'America/Sao_Paulo',
+        language: 'pt-BR',
       },
     });
   }
@@ -780,18 +779,18 @@ export async function migrateUserPreferences() {
 ## 🔍 Database Testing Patterns
 
 ```typescript
-describe("UserRepository", () => {
+describe('UserRepository', () => {
   beforeEach(async () => {
     // Clean test database
     await prisma.userPreferences.deleteMany();
     await prisma.user.deleteMany();
   });
 
-  it("should create user with preferences atomically", async () => {
+  it('should create user with preferences atomically', async () => {
     // Arrange
     const userData = {
-      telegramId: "123456789",
-      name: "Test User",
+      telegramId: '123456789',
+      name: 'Test User',
       isActive: true,
       isPremium: false,
     };

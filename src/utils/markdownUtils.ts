@@ -4,25 +4,25 @@
  */
 export function escapeMarkdown(text: string): string {
   return text
-    .replace(/\\/g, "\\\\")
-    .replace(/\*/g, "\\*")
-    .replace(/_/g, "\\_")
-    .replace(/`/g, "\\`")
-    .replace(/\[/g, "\\[")
-    .replace(/\]/g, "\\]")
-    .replace(/\(/g, "\\(")
-    .replace(/\)/g, "\\)")
-    .replace(/~/g, "\\~")
-    .replace(/>/g, "\\>")
-    .replace(/#/g, "\\#")
-    .replace(/\+/g, "\\+")
-    .replace(/-/g, "\\-")
-    .replace(/=/g, "\\=")
-    .replace(/\|/g, "\\|")
-    .replace(/\{/g, "\\{")
-    .replace(/\}/g, "\\}")
-    .replace(/\./g, "\\.")
-    .replace(/!/g, "\\!");
+    .replace(/\\/g, '\\\\')
+    .replace(/\*/g, '\\*')
+    .replace(/_/g, '\\_')
+    .replace(/`/g, '\\`')
+    .replace(/\[/g, '\\[')
+    .replace(/\]/g, '\\]')
+    .replace(/\(/g, '\\(')
+    .replace(/\)/g, '\\)')
+    .replace(/~/g, '\\~')
+    .replace(/>/g, '\\>')
+    .replace(/#/g, '\\#')
+    .replace(/\+/g, '\\+')
+    .replace(/-/g, '\\-')
+    .replace(/=/g, '\\=')
+    .replace(/\|/g, '\\|')
+    .replace(/\{/g, '\\{')
+    .replace(/\}/g, '\\}')
+    .replace(/\./g, '\\.')
+    .replace(/!/g, '\\!');
 }
 
 /**
@@ -30,11 +30,11 @@ export function escapeMarkdown(text: string): string {
  */
 export function stripMarkdown(text: string): string {
   return text
-    .replace(/\*(.+?)\*/g, "$1") // Remove bold
-    .replace(/_(.+?)_/g, "$1") // Remove italics
-    .replace(/`(.+?)`/g, "$1") // Remove inline code
-    .replace(/\[(.+?)\]\(.+?\)/g, "$1") // Remove links
-    .replace(/\\(.)/g, "$1"); // Remove escapes
+    .replace(/\*(.+?)\*/g, '$1') // Remove bold
+    .replace(/_(.+?)_/g, '$1') // Remove italics
+    .replace(/`(.+?)`/g, '$1') // Remove inline code
+    .replace(/\[(.+?)\]\(.+?\)/g, '$1') // Remove links
+    .replace(/\\(.)/g, '$1'); // Remove escapes
 }
 
 /**
@@ -42,11 +42,11 @@ export function stripMarkdown(text: string): string {
  */
 export function stripHTML(text: string): string {
   return text
-    .replace(/<b>(.+?)<\/b>/g, "$1") // Remove HTML bold
-    .replace(/<i>(.+?)<\/i>/g, "$1") // Remove HTML italics
-    .replace(/<code>(.+?)<\/code>/g, "$1") // Remove HTML code
-    .replace(/<a [^>]*>(.+?)<\/a>/g, "$1") // Remove HTML links
-    .replace(/<[^>]*>/g, ""); // Remove other HTML tags
+    .replace(/<b>(.+?)<\/b>/g, '$1') // Remove HTML bold
+    .replace(/<i>(.+?)<\/i>/g, '$1') // Remove HTML italics
+    .replace(/<code>(.+?)<\/code>/g, '$1') // Remove HTML code
+    .replace(/<a [^>]*>(.+?)<\/a>/g, '$1') // Remove HTML links
+    .replace(/<[^>]*>/g, ''); // Remove other HTML tags
 }
 
 /**
@@ -74,7 +74,7 @@ export function italic(text: string): string {
  * Formats text as inline code in Markdown safely
  */
 export function code(text: string): string {
-  return `\`${text.replace(/`/g, "\\`")}\``;
+  return `\`${text.replace(/`/g, '\\`')}\``;
 }
 
 /**
@@ -90,6 +90,6 @@ export function link(text: string, url: string): string {
  */
 export function safeLink(text: string, url: string): string {
   // Remove problematic characters from link text
-  const safeText = text.replace(/[[\]()]/g, "");
+  const safeText = text.replace(/[[\]()]/g, '');
   return `[${safeText}](${url})`;
 }

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock the prisma client
 const mockPrisma = {
@@ -35,7 +35,7 @@ const mockPrisma = {
   $disconnect: vi.fn(),
 };
 
-vi.mock("../../infra/prisma/client.ts", () => ({
+vi.mock('../../infra/prisma/client.ts', () => ({
   default: mockPrisma,
 }));
 
@@ -45,21 +45,21 @@ const mockRaceService = {
   deleteRace: vi.fn(),
 };
 
-vi.mock("../../infra/dependencies.ts", () => ({
+vi.mock('../../infra/dependencies.ts', () => ({
   raceService: mockRaceService,
 }));
 
 // Mock process.exit
-const mockExit = vi.spyOn(process, "exit").mockImplementation(() => {
-  throw new Error("process.exit called");
+const mockExit = vi.spyOn(process, 'exit').mockImplementation(() => {
+  throw new Error('process.exit called');
 });
 
-describe("clearCompleteDatabase", () => {
+describe('clearCompleteDatabase', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("should clear all tables in the correct order", async () => {
+  it('should clear all tables in the correct order', async () => {
     // Mock all deleteMany operations to succeed
     mockPrisma.user.deleteMany.mockResolvedValue({ count: 0 });
     mockPrisma.userPreferences.deleteMany.mockResolvedValue({ count: 0 });
@@ -75,14 +75,14 @@ describe("clearCompleteDatabase", () => {
 
     // Mock race service
     mockRaceService.getAllRaces.mockResolvedValue([
-      { id: "1", title: "Test Race" },
-      { id: "2", title: "Another Race" },
+      { id: '1', title: 'Test Race' },
+      { id: '2', title: 'Another Race' },
     ]);
     mockRaceService.deleteRace.mockResolvedValue(undefined);
 
     // Import and run the script
     const { clearCompleteDatabase } = await import(
-      "../clearCompleteDatabase.ts"
+      '../clearCompleteDatabase.ts'
     );
     await clearCompleteDatabase();
 
@@ -95,65 +95,65 @@ describe("clearCompleteDatabase", () => {
     expect(mockPrisma.userPreferences.deleteMany).toHaveBeenCalledWith({});
     expect(mockPrisma.user.deleteMany).toHaveBeenCalledWith({});
     expect(mockRaceService.getAllRaces).toHaveBeenCalled();
-    expect(mockRaceService.deleteRace).toHaveBeenCalledWith("1");
-    expect(mockRaceService.deleteRace).toHaveBeenCalledWith("2");
+    expect(mockRaceService.deleteRace).toHaveBeenCalledWith('1');
+    expect(mockRaceService.deleteRace).toHaveBeenCalledWith('2');
   });
 
-  it("should handle database errors gracefully", async () => {
+  it('should handle database errors gracefully', async () => {
     // Mock one operation to fail
     mockPrisma.message.deleteMany.mockRejectedValue(
-      new Error("Database error")
+      new Error('Database error')
     );
     mockPrisma.$disconnect.mockResolvedValue(undefined);
 
     // Import and run the script
     const { clearCompleteDatabase } = await import(
-      "../clearCompleteDatabase.ts"
+      '../clearCompleteDatabase.ts'
     );
 
     // Should call process.exit on error
     await expect(clearCompleteDatabase()).rejects.toThrow(
-      "process.exit called"
+      'process.exit called'
     );
 
     expect(mockExit).toHaveBeenCalledWith(1);
   });
 });
 
-describe("clearDatabase", () => {
+describe('clearDatabase', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("should clear main tables", async () => {
+  it('should clear main tables', async () => {
     // Mock race service
     mockRaceService.getAllRaces.mockResolvedValue([
-      { id: "1", title: "Test Race" },
-      { id: "2", title: "Another Race" },
+      { id: '1', title: 'Test Race' },
+      { id: '2', title: 'Another Race' },
     ]);
     mockRaceService.deleteRace.mockResolvedValue(undefined);
     mockPrisma.$disconnect.mockResolvedValue(undefined);
 
     // Import and run the script
-    const { clearDatabase } = await import("../clearDatabase.ts");
+    const { clearDatabase } = await import('../clearDatabase.ts');
     await clearDatabase();
 
     // Verify the operations were called
     expect(mockRaceService.getAllRaces).toHaveBeenCalled();
-    expect(mockRaceService.deleteRace).toHaveBeenCalledWith("1");
-    expect(mockRaceService.deleteRace).toHaveBeenCalledWith("2");
+    expect(mockRaceService.deleteRace).toHaveBeenCalledWith('1');
+    expect(mockRaceService.deleteRace).toHaveBeenCalledWith('2');
   });
 
-  it("should handle database errors gracefully", async () => {
+  it('should handle database errors gracefully', async () => {
     // Mock one operation to fail
-    mockRaceService.getAllRaces.mockRejectedValue(new Error("Database error"));
+    mockRaceService.getAllRaces.mockRejectedValue(new Error('Database error'));
     mockPrisma.$disconnect.mockResolvedValue(undefined);
 
     // Import and run the script
-    const { clearDatabase } = await import("../clearDatabase.ts");
+    const { clearDatabase } = await import('../clearDatabase.ts');
 
     // Should call process.exit on error
-    await expect(clearDatabase()).rejects.toThrow("process.exit called");
+    await expect(clearDatabase()).rejects.toThrow('process.exit called');
 
     expect(mockExit).toHaveBeenCalledWith(1);
   });

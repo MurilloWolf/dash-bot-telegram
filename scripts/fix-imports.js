@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { readdir, readFile, writeFile } from "fs/promises";
-import { join, extname } from "path";
+import { readdir, readFile, writeFile } from 'fs/promises';
+import { join, extname } from 'path';
 
 /**
  * Recursively walks through directory and returns all .js files
@@ -17,7 +17,7 @@ async function getAllJsFiles(dir) {
 
       if (entry.isDirectory()) {
         await walk(fullPath);
-      } else if (entry.isFile() && extname(entry.name) === ".js") {
+      } else if (entry.isFile() && extname(entry.name) === '.js') {
         files.push(fullPath);
       }
     }
@@ -31,7 +31,7 @@ async function getAllJsFiles(dir) {
  * Fixes TypeScript imports in compiled JavaScript files
  */
 async function fixImportsInFile(filePath) {
-  const content = await readFile(filePath, "utf8");
+  const content = await readFile(filePath, 'utf8');
 
   // Replace imports with .ts extension to .js
   const fixedContent = content
@@ -43,7 +43,7 @@ async function fixImportsInFile(filePath) {
     );
 
   if (content !== fixedContent) {
-    await writeFile(filePath, fixedContent, "utf8");
+    await writeFile(filePath, fixedContent, 'utf8');
     console.log(`✅ Fixed imports in: ${filePath}`);
     return true;
   }
@@ -55,10 +55,10 @@ async function fixImportsInFile(filePath) {
  * Main function to fix all imports in dist directory
  */
 async function fixAllImports() {
-  const distDir = join(process.cwd(), "dist");
+  const distDir = join(process.cwd(), 'dist');
 
   try {
-    console.log("🔧 Fixing TypeScript imports in compiled files...");
+    console.log('🔧 Fixing TypeScript imports in compiled files...');
 
     const jsFiles = await getAllJsFiles(distDir);
     let fixedCount = 0;
@@ -72,7 +72,7 @@ async function fixAllImports() {
 
     console.log(`✅ Successfully fixed ${fixedCount} files`);
   } catch (error) {
-    console.error("❌ Error fixing imports:", error);
+    console.error('❌ Error fixing imports:', error);
     process.exit(1);
   }
 }

@@ -1,6 +1,6 @@
-import { CommandOutput, InteractionKeyboard } from "@app-types/Command.ts";
-import { PlatformAdapter } from "../../../types/PlatformAdapter.ts";
-import { logger } from "../../../utils/Logger.ts";
+import { CommandOutput, InteractionKeyboard } from '@app-types/Command.ts';
+import { PlatformAdapter } from '../../../types/PlatformAdapter.ts';
+import { logger } from '../../../utils/Logger.ts';
 
 interface WhatsAppMessage {
   type: string;
@@ -30,7 +30,9 @@ export class WhatsAppPlatformAdapter implements PlatformAdapter {
   private convertKeyboardToWhatsApp(
     keyboard?: InteractionKeyboard
   ): WhatsAppMessage | undefined {
-    if (!keyboard) return undefined;
+    if (!keyboard) {
+      return undefined;
+    }
 
     // WhatsApp has different button limitations
     // Here you would implement the conversion to WhatsApp-specific format
@@ -39,20 +41,20 @@ export class WhatsAppPlatformAdapter implements PlatformAdapter {
     if (keyboard.inline) {
       // For WhatsApp Business API, you can use interactive buttons
       return {
-        type: "interactive",
+        type: 'interactive',
         interactive: {
-          type: "button",
+          type: 'button',
           body: {
-            text: "Choose an option:",
+            text: 'Choose an option:',
           },
           action: {
             buttons: keyboard.buttons
               .flat()
               .slice(0, 3)
-              .map((button) => ({
-                type: "reply",
+              .map(button => ({
+                type: 'reply',
                 reply: {
-                  id: String(button.callbackData ?? ""),
+                  id: String(button.callbackData ?? ''),
                   title: button.text,
                 },
               })),
@@ -77,7 +79,7 @@ export class WhatsAppPlatformAdapter implements PlatformAdapter {
       } else {
         // Send simple text message
         await this.whatsAppClient.sendMessage(chatId, {
-          type: "text",
+          type: 'text',
           text: {
             body: output.text,
           },
@@ -85,17 +87,17 @@ export class WhatsAppPlatformAdapter implements PlatformAdapter {
       }
     } catch (error) {
       logger.error(
-        "Failed to send WhatsApp message",
+        'Failed to send WhatsApp message',
         {
-          module: "WhatsAppBotAdapter",
-          action: "send_message_error",
+          module: 'WhatsAppBotAdapter',
+          action: 'send_message_error',
           chatId: chatId.toString(),
         },
         error as Error
       );
       // Fallback to simple text
       await this.whatsAppClient.sendMessage(chatId, {
-        type: "text",
+        type: 'text',
         text: {
           body: output.text,
         },
@@ -111,8 +113,8 @@ export class WhatsAppPlatformAdapter implements PlatformAdapter {
     // WhatsApp doesn't support message editing
     // As fallback, we send a new message
     logger.warn("WhatsApp doesn't support message editing", {
-      module: "WhatsAppBotAdapter",
-      action: "edit_message_fallback",
+      module: 'WhatsAppBotAdapter',
+      action: 'edit_message_fallback',
       chatId: chatId.toString(),
       messageId: messageId.toString(),
     });
@@ -144,8 +146,8 @@ export function startWhatsAppBot() {
   // const whatsAppClient = new WhatsAppClient(config);
   // const adapter = new WhatsAppPlatformAdapter(whatsAppClient);
 
-  logger.info("WhatsApp bot adapter created (example implementation)", {
-    module: "WhatsAppBotAdapter",
-    action: "initialize",
+  logger.info('WhatsApp bot adapter created (example implementation)', {
+    module: 'WhatsAppBotAdapter',
+    action: 'initialize',
   });
 }

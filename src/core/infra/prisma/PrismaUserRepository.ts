@@ -1,13 +1,13 @@
-import { User, UserPreferences } from "../../domain/entities/User.ts";
+import { User, UserPreferences } from '../../domain/entities/User.ts';
 import {
   UserRepository,
   UserPreferencesRepository,
-} from "../../domain/repositories/UserRepository.ts";
-import prisma from "./client.ts";
+} from '../../domain/repositories/UserRepository.ts';
+import prisma from './client.ts';
 import type {
   User as PrismaUser,
   UserPreferences as PrismaUserPreferences,
-} from "@prisma/client";
+} from '@prisma/client';
 
 export class PrismaUserRepository implements UserRepository {
   async findById(id: string): Promise<User | null> {
@@ -27,7 +27,7 @@ export class PrismaUserRepository implements UserRepository {
   }
 
   async create(
-    userData: Omit<User, "id" | "createdAt" | "updatedAt">
+    userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<User> {
     const user = await prisma.user.create({
       data: userData,
@@ -80,7 +80,7 @@ export class PrismaUserPreferencesRepository
   }
 
   async create(
-    preferencesData: Omit<UserPreferences, "id">
+    preferencesData: Omit<UserPreferences, 'id'>
   ): Promise<UserPreferences> {
     const preferences = await prisma.userPreferences.create({
       data: {
@@ -123,7 +123,7 @@ export class PrismaUserPreferencesRepository
       id: preferences.id,
       userId: preferences.userId,
       preferredDistances: JSON.parse(
-        typeof preferences.preferredDistances === "string"
+        typeof preferences.preferredDistances === 'string'
           ? preferences.preferredDistances
           : JSON.stringify(preferences.preferredDistances || [])
       ),

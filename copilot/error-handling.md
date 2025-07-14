@@ -28,10 +28,10 @@ export async function exampleCommand(
   try {
     // 1. Input validation
     if (!input.user?.id) {
-      logger.warn("Command called without user ID", {
-        module: "ExampleCommand",
-        action: "validate_input",
-        command: "example",
+      logger.warn('Command called without user ID', {
+        module: 'ExampleCommand',
+        action: 'validate_input',
+        command: 'example',
       });
       return ErrorResponses.USER_NOT_FOUND;
     }
@@ -40,18 +40,18 @@ export async function exampleCommand(
     const data = await riskyOperation(input.user.id);
 
     // 3. Success logging
-    logger.commandExecution("example", input.user.id.toString());
+    logger.commandExecution('example', input.user.id.toString());
 
     return {
-      text: "✅ Operação realizada com sucesso!",
-      format: "HTML",
+      text: '✅ Operação realizada com sucesso!',
+      format: 'HTML',
     };
   } catch (error) {
     // 4. Error logging with context
-    logger.commandError("example", error as Error, input.user?.id?.toString());
+    logger.commandError('example', error as Error, input.user?.id?.toString());
 
     // 5. User-friendly error response
-    return handleCommandError("example", error as Error, input);
+    return handleCommandError('example', error as Error, input);
   }
 }
 ```
@@ -70,13 +70,12 @@ export class UserService {
       this.validateUserInput(telegramId, name);
 
       // Check if user exists
-      const existingUser = await this.userRepository.findByTelegramId(
-        telegramId
-      );
+      const existingUser =
+        await this.userRepository.findByTelegramId(telegramId);
       if (existingUser) {
-        logger.info("User already exists, returning existing", {
-          module: "UserService",
-          action: "register_user_existing",
+        logger.info('User already exists, returning existing', {
+          module: 'UserService',
+          action: 'register_user_existing',
           telegramId: telegramId,
           userId: existingUser.id,
         });
@@ -94,9 +93,9 @@ export class UserService {
 
       const newUser = await this.userRepository.create(userData);
 
-      logger.info("User created successfully", {
-        module: "UserService",
-        action: "register_user_success",
+      logger.info('User created successfully', {
+        module: 'UserService',
+        action: 'register_user_success',
         telegramId: telegramId,
         userId: newUser.id,
       });
@@ -104,10 +103,10 @@ export class UserService {
       return newUser;
     } catch (error) {
       logger.error(
-        "Failed to register user",
+        'Failed to register user',
         {
-          module: "UserService",
-          action: "register_user_error",
+          module: 'UserService',
+          action: 'register_user_error',
           telegramId: telegramId,
           name: name,
           username: username,
@@ -118,7 +117,7 @@ export class UserService {
       // Re-throw with more context
       if (error instanceof DatabaseError) {
         throw new UserRegistrationError(
-          "Database error during user registration",
+          'Database error during user registration',
           { cause: error, telegramId }
         );
       }
@@ -128,16 +127,16 @@ export class UserService {
   }
 
   private validateUserInput(telegramId: string, name: string): void {
-    if (!telegramId || typeof telegramId !== "string") {
-      throw new ValidationError("Invalid telegram ID");
+    if (!telegramId || typeof telegramId !== 'string') {
+      throw new ValidationError('Invalid telegram ID');
     }
 
-    if (!name || typeof name !== "string" || name.trim().length === 0) {
-      throw new ValidationError("Invalid name");
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+      throw new ValidationError('Invalid name');
     }
 
     if (!/^\d+$/.test(telegramId)) {
-      throw new ValidationError("Telegram ID must be numeric");
+      throw new ValidationError('Telegram ID must be numeric');
     }
   }
 }
@@ -157,10 +156,10 @@ export class PrismaUserRepository implements UserRepository {
       return user ? this.toDomain(user) : null;
     } catch (error) {
       logger.error(
-        "Database error finding user by telegram ID",
+        'Database error finding user by telegram ID',
         {
-          module: "PrismaUserRepository",
-          action: "find_by_telegram_id",
+          module: 'PrismaUserRepository',
+          action: 'find_by_telegram_id',
           telegramId: telegramId,
         },
         error as Error
@@ -174,7 +173,7 @@ export class PrismaUserRepository implements UserRepository {
         });
       }
 
-      throw new DatabaseError("Unknown database error", { cause: error });
+      throw new DatabaseError('Unknown database error', { cause: error });
     }
   }
 
@@ -194,10 +193,10 @@ export class PrismaUserRepository implements UserRepository {
       return this.toDomain(prismaUser);
     } catch (error) {
       logger.error(
-        "Database error creating user",
+        'Database error creating user',
         {
-          module: "PrismaUserRepository",
-          action: "create_user",
+          module: 'PrismaUserRepository',
+          action: 'create_user',
           telegramId: data.telegramId,
         },
         error as Error
@@ -206,14 +205,14 @@ export class PrismaUserRepository implements UserRepository {
       // Handle unique constraint violations
       if (
         error instanceof PrismaClientKnownRequestError &&
-        error.code === "P2002"
+        error.code === 'P2002'
       ) {
         throw new DuplicateUserError(
           `User with telegram ID ${data.telegramId} already exists`
         );
       }
 
-      throw new DatabaseError("Failed to create user", { cause: error });
+      throw new DatabaseError('Failed to create user', { cause: error });
     }
   }
 }
@@ -238,38 +237,38 @@ export abstract class DomainError extends Error {
 
 // User-related errors
 export class UserNotFoundError extends DomainError {
-  readonly code = "USER_NOT_FOUND";
+  readonly code = 'USER_NOT_FOUND';
 }
 
 export class UserRegistrationError extends DomainError {
-  readonly code = "USER_REGISTRATION_FAILED";
+  readonly code = 'USER_REGISTRATION_FAILED';
 }
 
 export class DuplicateUserError extends DomainError {
-  readonly code = "DUPLICATE_USER";
+  readonly code = 'DUPLICATE_USER';
 }
 
 // Race-related errors
 export class RaceNotFoundError extends DomainError {
-  readonly code = "RACE_NOT_FOUND";
+  readonly code = 'RACE_NOT_FOUND';
 }
 
 export class InvalidRaceDataError extends DomainError {
-  readonly code = "INVALID_RACE_DATA";
+  readonly code = 'INVALID_RACE_DATA';
 }
 
 // System errors
 export class DatabaseError extends DomainError {
-  readonly code = "DATABASE_ERROR";
+  readonly code = 'DATABASE_ERROR';
 }
 
 export class ExternalAPIError extends DomainError {
-  readonly code = "EXTERNAL_API_ERROR";
+  readonly code = 'EXTERNAL_API_ERROR';
 }
 
 // Input validation errors
 export class ValidationError extends DomainError {
-  readonly code = "VALIDATION_ERROR";
+  readonly code = 'VALIDATION_ERROR';
 }
 ```
 
@@ -333,8 +332,8 @@ export class Logger {
   // Domain-specific logging methods
   commandExecution(commandName: string, userId?: string): void {
     this.info(`Command executed: ${commandName}`, {
-      module: "CommandRouter",
-      action: "command_execution",
+      module: 'CommandRouter',
+      action: 'command_execution',
       commandName,
       userId,
     });
@@ -344,8 +343,8 @@ export class Logger {
     this.error(
       `Command failed: ${commandName}`,
       {
-        module: "CommandRouter",
-        action: "command_error",
+        module: 'CommandRouter',
+        action: 'command_error',
         commandName,
         userId,
       },
@@ -355,13 +354,13 @@ export class Logger {
 
   messageIntercept(
     platform: string,
-    direction: "received" | "sent",
+    direction: 'received' | 'sent',
     chatId?: string,
     userId?: string
   ): void {
-    const emoji = direction === "received" ? "📥" : "📤";
+    const emoji = direction === 'received' ? '📥' : '📤';
     this.info(`${emoji} [${platform}] Message ${direction}`, {
-      module: "MessageInterceptor",
+      module: 'MessageInterceptor',
       action: `message_${direction}`,
       platform,
       chatId,
@@ -376,11 +375,11 @@ export class Logger {
     duration?: number
   ): void {
     const message = `Database ${operation} on ${table}: ${
-      success ? "SUCCESS" : "FAILED"
+      success ? 'SUCCESS' : 'FAILED'
     }`;
     this.info(message, {
-      module: "Database",
-      action: "database_operation",
+      module: 'Database',
+      action: 'database_operation',
       table,
       operation,
       success,
@@ -390,8 +389,8 @@ export class Logger {
 
   botStartup(message: string): void {
     this.info(`🚀 ${message}`, {
-      module: "Bot",
-      action: "startup",
+      module: 'Bot',
+      action: 'startup',
     });
   }
 }
@@ -425,40 +424,40 @@ export interface LogContext {
 export const ErrorResponses = {
   // User errors
   USER_NOT_FOUND: {
-    text: "❌ Usuário não encontrado. Use /start para começar.",
-    format: "HTML" as const,
+    text: '❌ Usuário não encontrado. Use /start para começar.',
+    format: 'HTML' as const,
   },
 
   INVALID_INPUT: {
-    text: "❌ Entrada inválida. Verifique os parâmetros e tente novamente.",
-    format: "HTML" as const,
+    text: '❌ Entrada inválida. Verifique os parâmetros e tente novamente.',
+    format: 'HTML' as const,
   },
 
   PERMISSION_DENIED: {
-    text: "❌ Você não tem permissão para esta ação.",
-    format: "HTML" as const,
+    text: '❌ Você não tem permissão para esta ação.',
+    format: 'HTML' as const,
   },
 
   // System errors
   INTERNAL_ERROR: {
-    text: "❌ Erro interno. Tente novamente mais tarde.",
-    format: "HTML" as const,
+    text: '❌ Erro interno. Tente novamente mais tarde.',
+    format: 'HTML' as const,
   },
 
   DATABASE_ERROR: {
-    text: "❌ Problema de conectividade. Tente novamente em alguns instantes.",
-    format: "HTML" as const,
+    text: '❌ Problema de conectividade. Tente novamente em alguns instantes.',
+    format: 'HTML' as const,
   },
 
   // Feature-specific errors
   NOT_PREMIUM: {
-    text: "❌ Esta funcionalidade está disponível apenas para usuários premium. Use /premium para mais informações.",
-    format: "HTML" as const,
+    text: '❌ Esta funcionalidade está disponível apenas para usuários premium. Use /premium para mais informações.',
+    format: 'HTML' as const,
   },
 
   RACE_NOT_FOUND: {
-    text: "❌ Corrida não encontrada. Use /corridas para ver as disponíveis.",
-    format: "HTML" as const,
+    text: '❌ Corrida não encontrada. Use /corridas para ver as disponíveis.',
+    format: 'HTML' as const,
   },
 } as const;
 ```
@@ -491,7 +490,7 @@ export function handleCommandError(
     return ErrorResponses.DATABASE_ERROR;
   }
 
-  if (error instanceof DomainError && error.code === "NOT_PREMIUM") {
+  if (error instanceof DomainError && error.code === 'NOT_PREMIUM') {
     return ErrorResponses.NOT_PREMIUM;
   }
 
@@ -532,14 +531,14 @@ export async function withRetry<T>(
 
       const delay = baseDelay * Math.pow(2, attempt);
       logger.warn(`Operation failed, retrying in ${delay}ms`, {
-        module: "RetryStrategy",
-        action: "retry_attempt",
+        module: 'RetryStrategy',
+        action: 'retry_attempt',
         attempt: attempt + 1,
         maxRetries,
         delay,
       });
 
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
 
@@ -564,7 +563,7 @@ export class UserService {
 export class CircuitBreaker {
   private failures = 0;
   private lastFailureTime = 0;
-  private state: "CLOSED" | "OPEN" | "HALF_OPEN" = "CLOSED";
+  private state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' = 'CLOSED';
 
   constructor(
     private failureThreshold: number = 5,
@@ -572,11 +571,11 @@ export class CircuitBreaker {
   ) {}
 
   async execute<T>(operation: () => Promise<T>): Promise<T> {
-    if (this.state === "OPEN") {
+    if (this.state === 'OPEN') {
       if (Date.now() - this.lastFailureTime > this.resetTimeout) {
-        this.state = "HALF_OPEN";
+        this.state = 'HALF_OPEN';
       } else {
-        throw new Error("Circuit breaker is OPEN");
+        throw new Error('Circuit breaker is OPEN');
       }
     }
 
@@ -592,7 +591,7 @@ export class CircuitBreaker {
 
   private onSuccess(): void {
     this.failures = 0;
-    this.state = "CLOSED";
+    this.state = 'CLOSED';
   }
 
   private onFailure(): void {
@@ -600,7 +599,7 @@ export class CircuitBreaker {
     this.lastFailureTime = Date.now();
 
     if (this.failures >= this.failureThreshold) {
-      this.state = "OPEN";
+      this.state = 'OPEN';
     }
   }
 }

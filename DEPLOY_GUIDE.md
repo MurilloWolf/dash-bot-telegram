@@ -33,16 +33,19 @@ git push origin main
 ### 1. Instalar Fly CLI
 
 **macOS:**
+
 ```bash
 curl -L https://fly.io/install.sh | sh
 ```
 
 **Linux:**
+
 ```bash
 curl -L https://fly.io/install.sh | sh
 ```
 
 **Windows:**
+
 ```bash
 iwr https://fly.io/install.ps1 -useb | iex
 ```

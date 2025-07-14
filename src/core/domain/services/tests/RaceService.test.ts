@@ -1,14 +1,14 @@
-import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
-import { RaceService } from "../RaceService.ts";
+import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
+import { RaceService } from '../RaceService.ts';
 import {
   Race,
   RaceFilter,
   RaceStatus,
   RaceStatusValue,
-} from "../../entities/Race.ts";
-import { RaceRepository } from "../../repositories/RaceRepository.ts";
+} from '../../entities/Race.ts';
+import { RaceRepository } from '../../repositories/RaceRepository.ts';
 
-describe("RaceService", () => {
+describe('RaceService', () => {
   let raceService: RaceService;
   let mockRaceRepository: RaceRepository;
 
@@ -30,19 +30,19 @@ describe("RaceService", () => {
     raceService = new RaceService(mockRaceRepository);
   });
 
-  describe("getAvailableRaces", () => {
-    it("should return available races", async () => {
+  describe('getAvailableRaces', () => {
+    it('should return available races', async () => {
       const races: Race[] = [
         {
-          id: "race-1",
-          title: "Corrida 1",
-          organization: "Org 1",
-          distances: ["5km"],
+          id: 'race-1',
+          title: 'Corrida 1',
+          organization: 'Org 1',
+          distances: ['5km'],
           distancesNumbers: [5],
-          date: new Date("2024-12-25"),
-          location: "São Paulo",
-          link: "https://example.com",
-          time: "07:00",
+          date: new Date('2024-12-25'),
+          location: 'São Paulo',
+          link: 'https://example.com',
+          time: '07:00',
           status: RaceStatus.OPEN,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -57,7 +57,7 @@ describe("RaceService", () => {
       expect(result).toEqual(races);
     });
 
-    it("should return empty array when no races are available", async () => {
+    it('should return empty array when no races are available', async () => {
       (mockRaceRepository.findOpenRaces as Mock).mockResolvedValue([]);
 
       const result = await raceService.getAvailableRaces();
@@ -67,20 +67,20 @@ describe("RaceService", () => {
     });
   });
 
-  describe("getRacesByDistances", () => {
-    it("should return races by distances", async () => {
+  describe('getRacesByDistances', () => {
+    it('should return races by distances', async () => {
       const distances = [5, 10, 21];
       const races: Race[] = [
         {
-          id: "race-1",
-          title: "Corrida 1",
-          organization: "Org 1",
-          distances: ["5km", "10km"],
+          id: 'race-1',
+          title: 'Corrida 1',
+          organization: 'Org 1',
+          distances: ['5km', '10km'],
           distancesNumbers: [5, 10],
-          date: new Date("2024-12-25"),
-          location: "São Paulo",
-          link: "https://example.com",
-          time: "07:00",
+          date: new Date('2024-12-25'),
+          location: 'São Paulo',
+          link: 'https://example.com',
+          time: '07:00',
           status: RaceStatus.OPEN,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -97,7 +97,7 @@ describe("RaceService", () => {
       expect(result).toEqual(races);
     });
 
-    it("should return empty array when no races match distances", async () => {
+    it('should return empty array when no races match distances', async () => {
       const distances = [42];
 
       (mockRaceRepository.findByDistances as Mock).mockResolvedValue([]);
@@ -111,20 +111,20 @@ describe("RaceService", () => {
     });
   });
 
-  describe("getRacesByTitle", () => {
-    it("should return races by title", async () => {
-      const title = "Corrida São Paulo";
+  describe('getRacesByTitle', () => {
+    it('should return races by title', async () => {
+      const title = 'Corrida São Paulo';
       const races: Race[] = [
         {
-          id: "race-1",
-          title: "Corrida São Paulo 2024",
-          organization: "Org 1",
-          distances: ["5km"],
+          id: 'race-1',
+          title: 'Corrida São Paulo 2024',
+          organization: 'Org 1',
+          distances: ['5km'],
           distancesNumbers: [5],
-          date: new Date("2024-12-25"),
-          location: "São Paulo",
-          link: "https://example.com",
-          time: "07:00",
+          date: new Date('2024-12-25'),
+          location: 'São Paulo',
+          link: 'https://example.com',
+          time: '07:00',
           status: RaceStatus.OPEN,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -139,8 +139,8 @@ describe("RaceService", () => {
       expect(result).toEqual(races);
     });
 
-    it("should return null when no races match title", async () => {
-      const title = "Corrida Inexistente";
+    it('should return null when no races match title', async () => {
+      const title = 'Corrida Inexistente';
 
       (mockRaceRepository.findByTitle as Mock).mockResolvedValue(null);
 
@@ -151,21 +151,21 @@ describe("RaceService", () => {
     });
   });
 
-  describe("getRacesByRange", () => {
-    it("should return races by distance range", async () => {
+  describe('getRacesByRange', () => {
+    it('should return races by distance range', async () => {
       const startDistance = 5;
       const endDistance = 21;
       const races: Race[] = [
         {
-          id: "race-1",
-          title: "Corrida 1",
-          organization: "Org 1",
-          distances: ["10km", "21km"],
+          id: 'race-1',
+          title: 'Corrida 1',
+          organization: 'Org 1',
+          distances: ['10km', '21km'],
           distancesNumbers: [10, 21],
-          date: new Date("2024-12-25"),
-          location: "São Paulo",
-          link: "https://example.com",
-          time: "07:00",
+          date: new Date('2024-12-25'),
+          location: 'São Paulo',
+          link: 'https://example.com',
+          time: '07:00',
           status: RaceStatus.OPEN,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -186,7 +186,7 @@ describe("RaceService", () => {
       expect(result).toEqual(races);
     });
 
-    it("should return empty array when no races match range", async () => {
+    it('should return empty array when no races match range', async () => {
       const startDistance = 50;
       const endDistance = 100;
 
@@ -205,19 +205,19 @@ describe("RaceService", () => {
     });
   });
 
-  describe("getNextRace", () => {
-    it("should return next race", async () => {
+  describe('getNextRace', () => {
+    it('should return next race', async () => {
       const races: Race[] = [
         {
-          id: "race-1",
-          title: "Próxima Corrida",
-          organization: "Org 1",
-          distances: ["10km"],
+          id: 'race-1',
+          title: 'Próxima Corrida',
+          organization: 'Org 1',
+          distances: ['10km'],
           distancesNumbers: [10],
-          date: new Date("2024-12-25"),
-          location: "São Paulo",
-          link: "https://example.com",
-          time: "07:00",
+          date: new Date('2024-12-25'),
+          location: 'São Paulo',
+          link: 'https://example.com',
+          time: '07:00',
           status: RaceStatus.OPEN,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -232,7 +232,7 @@ describe("RaceService", () => {
       expect(result).toEqual(races);
     });
 
-    it("should return null when no next race is available", async () => {
+    it('should return null when no next race is available', async () => {
       (mockRaceRepository.findNextRace as Mock).mockResolvedValue(null);
 
       const result = await raceService.getNextRace();
@@ -242,19 +242,19 @@ describe("RaceService", () => {
     });
   });
 
-  describe("getAllRaces", () => {
-    it("should return all races without filter", async () => {
+  describe('getAllRaces', () => {
+    it('should return all races without filter', async () => {
       const races: Race[] = [
         {
-          id: "race-1",
-          title: "Corrida 1",
-          organization: "Org 1",
-          distances: ["5km"],
+          id: 'race-1',
+          title: 'Corrida 1',
+          organization: 'Org 1',
+          distances: ['5km'],
           distancesNumbers: [5],
-          date: new Date("2024-12-25"),
-          location: "São Paulo",
-          link: "https://example.com",
-          time: "07:00",
+          date: new Date('2024-12-25'),
+          location: 'São Paulo',
+          link: 'https://example.com',
+          time: '07:00',
           status: RaceStatus.OPEN,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -269,7 +269,7 @@ describe("RaceService", () => {
       expect(result).toEqual(races);
     });
 
-    it("should return filtered races", async () => {
+    it('should return filtered races', async () => {
       const filter: RaceFilter = {
         distances: [5, 10],
         status: RaceStatus.OPEN,
@@ -277,15 +277,15 @@ describe("RaceService", () => {
 
       const races: Race[] = [
         {
-          id: "race-1",
-          title: "Corrida 1",
-          organization: "Org 1",
-          distances: ["5km", "10km"],
+          id: 'race-1',
+          title: 'Corrida 1',
+          organization: 'Org 1',
+          distances: ['5km', '10km'],
           distancesNumbers: [5, 10],
-          date: new Date("2024-12-25"),
-          location: "São Paulo",
-          link: "https://example.com",
-          time: "07:00",
+          date: new Date('2024-12-25'),
+          location: 'São Paulo',
+          link: 'https://example.com',
+          time: '07:00',
           status: RaceStatus.OPEN,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -301,19 +301,19 @@ describe("RaceService", () => {
     });
   });
 
-  describe("getRaceById", () => {
-    it("should return race by id", async () => {
-      const raceId = "race-123";
+  describe('getRaceById', () => {
+    it('should return race by id', async () => {
+      const raceId = 'race-123';
       const race: Race = {
         id: raceId,
-        title: "Corrida Específica",
-        organization: "Org 1",
-        distances: ["10km"],
+        title: 'Corrida Específica',
+        organization: 'Org 1',
+        distances: ['10km'],
         distancesNumbers: [10],
-        date: new Date("2024-12-25"),
-        location: "São Paulo",
-        link: "https://example.com",
-        time: "07:00",
+        date: new Date('2024-12-25'),
+        location: 'São Paulo',
+        link: 'https://example.com',
+        time: '07:00',
         status: RaceStatus.OPEN,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -327,8 +327,8 @@ describe("RaceService", () => {
       expect(result).toEqual(race);
     });
 
-    it("should return null when race does not exist", async () => {
-      const raceId = "race-inexistente";
+    it('should return null when race does not exist', async () => {
+      const raceId = 'race-inexistente';
 
       (mockRaceRepository.findById as Mock).mockResolvedValue(null);
 
@@ -339,22 +339,22 @@ describe("RaceService", () => {
     });
   });
 
-  describe("createRace", () => {
-    it("should create a new race", async () => {
-      const raceData: Omit<Race, "id" | "createdAt" | "updatedAt"> = {
-        title: "Nova Corrida",
-        organization: "Org 1",
-        distances: ["5km", "10km"],
+  describe('createRace', () => {
+    it('should create a new race', async () => {
+      const raceData: Omit<Race, 'id' | 'createdAt' | 'updatedAt'> = {
+        title: 'Nova Corrida',
+        organization: 'Org 1',
+        distances: ['5km', '10km'],
         distancesNumbers: [5, 10],
-        date: new Date("2024-12-25"),
-        location: "São Paulo",
-        link: "https://example.com",
-        time: "07:00",
+        date: new Date('2024-12-25'),
+        location: 'São Paulo',
+        link: 'https://example.com',
+        time: '07:00',
         status: RaceStatus.OPEN,
       };
 
       const createdRace: Race = {
-        id: "race-123",
+        id: 'race-123',
         ...raceData,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -369,21 +369,21 @@ describe("RaceService", () => {
     });
   });
 
-  describe("updateRaceStatus", () => {
-    it("should update race status", async () => {
-      const raceId = "race-123";
+  describe('updateRaceStatus', () => {
+    it('should update race status', async () => {
+      const raceId = 'race-123';
       const status: RaceStatusValue = RaceStatus.CLOSED;
 
       const updatedRace: Race = {
         id: raceId,
-        title: "Corrida Fechada",
-        organization: "Org 1",
-        distances: ["10km"],
+        title: 'Corrida Fechada',
+        organization: 'Org 1',
+        distances: ['10km'],
         distancesNumbers: [10],
-        date: new Date("2024-12-25"),
-        location: "São Paulo",
-        link: "https://example.com",
-        time: "07:00",
+        date: new Date('2024-12-25'),
+        location: 'São Paulo',
+        link: 'https://example.com',
+        time: '07:00',
         status: RaceStatus.CLOSED,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -400,8 +400,8 @@ describe("RaceService", () => {
       expect(result).toEqual(updatedRace);
     });
 
-    it("should handle different status values", async () => {
-      const raceId = "race-123";
+    it('should handle different status values', async () => {
+      const raceId = 'race-123';
       const statuses: RaceStatusValue[] = [
         RaceStatus.OPEN,
         RaceStatus.CLOSED,
@@ -412,14 +412,14 @@ describe("RaceService", () => {
       for (const status of statuses) {
         const updatedRace: Race = {
           id: raceId,
-          title: "Corrida Teste",
-          organization: "Org 1",
-          distances: ["10km"],
+          title: 'Corrida Teste',
+          organization: 'Org 1',
+          distances: ['10km'],
           distancesNumbers: [10],
-          date: new Date("2024-12-25"),
-          location: "São Paulo",
-          link: "https://example.com",
-          time: "07:00",
+          date: new Date('2024-12-25'),
+          location: 'São Paulo',
+          link: 'https://example.com',
+          time: '07:00',
           status,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -440,9 +440,9 @@ describe("RaceService", () => {
     });
   });
 
-  describe("deleteRace", () => {
-    it("should delete a race", async () => {
-      const raceId = "race-123";
+  describe('deleteRace', () => {
+    it('should delete a race', async () => {
+      const raceId = 'race-123';
 
       (mockRaceRepository.delete as Mock).mockResolvedValue(undefined);
 

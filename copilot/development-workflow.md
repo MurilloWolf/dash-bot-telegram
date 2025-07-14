@@ -38,7 +38,7 @@ export async function listRacesCommand(
     // 3. Transform to presentation layer
     return formatRacesResponse(races, input);
   } catch (error) {
-    return handleCommandError("listRaces", error as Error, input);
+    return handleCommandError('listRaces', error as Error, input);
   }
 }
 ```
@@ -84,12 +84,12 @@ export async function createUser(
   // Business logic with error handling
   try {
     const user = await this.userRepository.create(data);
-    logger.info("User created successfully", { userId: user.id });
+    logger.info('User created successfully', { userId: user.id });
     return Result.success(user);
   } catch (error) {
-    logger.error("Failed to create user", { data }, error);
+    logger.error('Failed to create user', { data }, error);
     return Result.failure(
-      new UserCreationError("Database error", { cause: error })
+      new UserCreationError('Database error', { cause: error })
     );
   }
 }
@@ -110,9 +110,8 @@ export class UserService {
     const user = await this.userRepository.findById(userId);
     if (!user) throw new UserNotFoundError();
 
-    const subscription = await this.subscriptionRepository.findById(
-      subscriptionId
-    );
+    const subscription =
+      await this.subscriptionRepository.findById(subscriptionId);
     if (!subscription.isValid()) throw new InvalidSubscriptionError();
 
     await this.userRepository.update(userId, {
@@ -129,11 +128,11 @@ export async function upgradeToPremiumCommand(
   try {
     await userService.upgradeUserToPremium(input.user.id, input.args[0]);
     return {
-      text: "✅ Upgrade para Premium realizado com sucesso!",
-      format: "HTML",
+      text: '✅ Upgrade para Premium realizado com sucesso!',
+      format: 'HTML',
     };
   } catch (error) {
-    return handleCommandError("upgradeToPremium", error, input);
+    return handleCommandError('upgradeToPremium', error, input);
   }
 }
 
@@ -181,8 +180,8 @@ export class PrismaUserRepository implements UserRepository {
 
 ```typescript
 // ✅ Unit Tests - Maioria dos testes
-describe("UserService", () => {
-  it("should upgrade user to premium when subscription is valid", async () => {
+describe('UserService', () => {
+  it('should upgrade user to premium when subscription is valid', async () => {
     // Test business logic in isolation
     const mockUser = MockFactories.createUser();
     const mockSubscription = MockFactories.createValidSubscription();
@@ -200,11 +199,11 @@ describe("UserService", () => {
 });
 
 // ✅ Integration Tests - Alguns testes críticos
-describe("User Registration Flow", () => {
-  it("should register new user with preferences", async () => {
+describe('User Registration Flow', () => {
+  it('should register new user with preferences', async () => {
     // Test with real database
-    const telegramId = "123456789";
-    const result = await userService.registerUser(telegramId, "Test User");
+    const telegramId = '123456789';
+    const result = await userService.registerUser(telegramId, 'Test User');
 
     expect(result.telegramId).toBe(telegramId);
 
@@ -214,13 +213,13 @@ describe("User Registration Flow", () => {
 });
 
 // ✅ E2E Tests - Poucos testes críticos
-describe("Complete Race Listing Flow", () => {
-  it("should list races for telegram user", async () => {
+describe('Complete Race Listing Flow', () => {
+  it('should list races for telegram user', async () => {
     // Test complete flow from adapter to database
-    const telegramMessage = createMockTelegramMessage("/corridas");
+    const telegramMessage = createMockTelegramMessage('/corridas');
     const response = await telegramAdapter.processMessage(telegramMessage);
 
-    expect(response.text).toContain("Corridas Disponíveis");
+    expect(response.text).toContain('Corridas Disponíveis');
     expect(response.keyboard).toBeDefined();
   });
 });
@@ -230,9 +229,9 @@ describe("Complete Race Listing Flow", () => {
 
 ```typescript
 // ✅ Testes devem ser legíveis como especificações
-describe("Race filtering by distance", () => {
-  describe("when user requests 5km races", () => {
-    it("should return only races with 5km distance", async () => {
+describe('Race filtering by distance', () => {
+  describe('when user requests 5km races', () => {
+    it('should return only races with 5km distance', async () => {
       // Given
       const races = [
         createRace({ distances: [5, 10] }),
@@ -246,7 +245,7 @@ describe("Race filtering by distance", () => {
 
       // Then
       expect(result).toHaveLength(2);
-      expect(result.every((race) => race.distances.includes(5))).toBe(true);
+      expect(result.every(race => race.distances.includes(5))).toBe(true);
     });
   });
 });
@@ -275,10 +274,10 @@ const users = await prisma.user.findMany({
 // ✅ Pagination for large datasets
 const races = await prisma.race.findMany({
   where: {
-    status: "OPEN",
+    status: 'OPEN',
     date: { gte: new Date() },
   },
-  orderBy: { date: "asc" },
+  orderBy: { date: 'asc' },
   take: 20,
   skip: page * 20,
 });
@@ -294,7 +293,7 @@ export async function exportUserData(userId: string): Promise<ReadableStream> {
       const messages = await messageRepository.streamByUserId(userId);
 
       for await (const message of messages) {
-        const chunk = JSON.stringify(message) + "\n";
+        const chunk = JSON.stringify(message) + '\n';
         controller.enqueue(new TextEncoder().encode(chunk));
       }
 
@@ -319,16 +318,16 @@ export class TelegramAdapter {
 ```typescript
 // ✅ Comprehensive input validation
 export function validateTelegramId(id: unknown): asserts id is string {
-  if (typeof id !== "string") {
-    throw new ValidationError("Telegram ID must be string");
+  if (typeof id !== 'string') {
+    throw new ValidationError('Telegram ID must be string');
   }
 
   if (!/^\d{5,}$/.test(id)) {
-    throw new ValidationError("Invalid Telegram ID format");
+    throw new ValidationError('Invalid Telegram ID format');
   }
 
   if (id.length > 20) {
-    throw new ValidationError("Telegram ID too long");
+    throw new ValidationError('Telegram ID too long');
   }
 }
 
@@ -337,7 +336,7 @@ const users = await prisma.user.findMany({
   where: {
     name: {
       contains: userInput, // Prisma handles escaping
-      mode: "insensitive",
+      mode: 'insensitive',
     },
   },
 });
@@ -350,13 +349,13 @@ const users = await prisma.user.findMany({
 export class MessageSanitizer {
   static sanitize(text: string): string {
     return text
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-      .replace(/[<>]/g, "")
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/[<>]/g, '')
       .substring(0, 4000); // Telegram limit
   }
 
   static sanitizeForMarkdown(text: string): string {
-    return text.replace(/[_*[\]()~`>#+=|{}.!-]/g, "\\$&");
+    return text.replace(/[_*[\]()~`>#+=|{}.!-]/g, '\\$&');
   }
 }
 ```
@@ -379,7 +378,7 @@ export class PerformanceMonitor {
       const duration = performance.now() - start;
 
       logger.info(`Operation completed: ${operationName}`, {
-        module: "PerformanceMonitor",
+        module: 'PerformanceMonitor',
         operation: operationName,
         duration: Math.round(duration),
         success: true,
@@ -392,7 +391,7 @@ export class PerformanceMonitor {
       logger.error(
         `Operation failed: ${operationName}`,
         {
-          module: "PerformanceMonitor",
+          module: 'PerformanceMonitor',
           operation: operationName,
           duration: Math.round(duration),
           success: false,
@@ -408,7 +407,7 @@ export class PerformanceMonitor {
 // Usage
 const races = await PerformanceMonitor.measureAsync(
   () => raceService.getAvailableRaces(),
-  "get_available_races"
+  'get_available_races'
 );
 ```
 
@@ -420,10 +419,10 @@ export class HealthChecker {
   async checkDatabase(): Promise<HealthStatus> {
     try {
       await prisma.$queryRaw`SELECT 1`;
-      return { status: "healthy", timestamp: new Date() };
+      return { status: 'healthy', timestamp: new Date() };
     } catch (error) {
       return {
-        status: "unhealthy",
+        status: 'unhealthy',
         error: error.message,
         timestamp: new Date(),
       };
@@ -434,13 +433,13 @@ export class HealthChecker {
     try {
       const me = await bot.getMe();
       return {
-        status: "healthy",
+        status: 'healthy',
         data: { botName: me.username },
         timestamp: new Date(),
       };
     } catch (error) {
       return {
-        status: "unhealthy",
+        status: 'unhealthy',
         error: error.message,
         timestamp: new Date(),
       };

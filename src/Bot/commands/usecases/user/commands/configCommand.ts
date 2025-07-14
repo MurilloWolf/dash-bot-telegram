@@ -1,5 +1,5 @@
-import { CommandInput, CommandOutput } from "@app-types/Command.ts";
-import { logger } from "../../../../../utils/Logger.ts";
+import { CommandInput, CommandOutput } from '@app-types/Command.ts';
+import { logger } from '../../../../../utils/Logger.ts';
 
 export async function configCommand(
   input: CommandInput
@@ -16,65 +16,65 @@ export async function configCommand(
           `🔔 <code>/config notificacoes on/off</code> - Ativar/desativar alertas\n` +
           `📅 <code>/config lembrete 3</code> - Dias de antecedência para lembretes\n\n` +
           `<i>💡 Configure suas preferências para receber recomendações personalizadas!</i>`,
-        format: "HTML",
+        format: 'HTML',
       };
     }
 
     const [setting, ...values] = args;
-    const value = values.join(" ");
+    const value = values.join(' ');
 
     switch (setting.toLowerCase()) {
-      case "distancias":
+      case 'distancias':
         return {
           text: `✅ <b>Distâncias favoritas configuradas!</b>\n\nVocê receberá recomendações para: ${value}km\n\n💡 Use /corridas para ver corridas com suas distâncias favoritas.`,
-          format: "HTML",
+          format: 'HTML',
         };
 
-      case "notificacoes": {
-        const isEnabled = value.toLowerCase() === "on";
+      case 'notificacoes': {
+        const isEnabled = value.toLowerCase() === 'on';
         return {
-          text: `${isEnabled ? "✅" : "❌"} <b>Notificações ${
-            isEnabled ? "ativadas" : "desativadas"
+          text: `${isEnabled ? '✅' : '❌'} <b>Notificações ${
+            isEnabled ? 'ativadas' : 'desativadas'
           }!</b>\n\n${
             isEnabled
-              ? "Você receberá alertas sobre novas corridas."
-              : "Você não receberá mais alertas automáticos."
+              ? 'Você receberá alertas sobre novas corridas.'
+              : 'Você não receberá mais alertas automáticos.'
           }`,
-          format: "HTML",
+          format: 'HTML',
         };
       }
 
-      case "lembrete": {
+      case 'lembrete': {
         const days = parseInt(value);
         if (isNaN(days)) {
           return {
-            text: "❌ Número de dias inválido. Use: /config lembrete 3",
-            format: "HTML",
+            text: '❌ Número de dias inválido. Use: /config lembrete 3',
+            format: 'HTML',
           };
         }
         return {
           text: `⏰ <b>Lembretes configurados!</b>\n\nVocê receberá lembretes ${days} dia(s) antes das corridas.`,
-          format: "HTML",
+          format: 'HTML',
         };
       }
 
       default:
         return {
-          text: "❌ Configuração não reconhecida. Use /config para ver as opções disponíveis.",
-          format: "HTML",
+          text: '❌ Configuração não reconhecida. Use /config para ver as opções disponíveis.',
+          format: 'HTML',
         };
     }
   } catch (error) {
-    logger.error("Failed to process config command", {
-      module: "UserCommands",
-      action: "configCommand",
-      userId: String(input.user?.id || "unknown"),
+    logger.error('Failed to process config command', {
+      module: 'UserCommands',
+      action: 'configCommand',
+      userId: String(input.user?.id || 'unknown'),
       args: input.args,
       error: String(error),
     });
     return {
-      text: "❌ Erro ao processar configuração. Tente novamente mais tarde.",
-      format: "HTML",
+      text: '❌ Erro ao processar configuração. Tente novamente mais tarde.',
+      format: 'HTML',
     };
   }
 }

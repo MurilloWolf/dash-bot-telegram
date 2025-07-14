@@ -41,7 +41,7 @@ src/core/domain/entities/
 
 ```typescript
 // ✅ Bom - camelCase
-const userName = "João";
+const userName = 'João';
 const isUserPremium = true;
 const userPreferences = {};
 
@@ -75,17 +75,17 @@ enum EMessageType {} // Enum
 
 ```typescript
 // 1. Node modules
-import dotenv from "dotenv";
-import TelegramBot from "node-telegram-bot-api";
+import dotenv from 'dotenv';
+import TelegramBot from 'node-telegram-bot-api';
 
 // 2. Internal modules (por camada)
-import { CommandInput, CommandOutput } from "@app-types/Command.ts";
-import { routeCommand } from "@bot/router/CommandRouter.ts";
-import { messageService } from "@core/infra/dependencies.ts";
-import { logger } from "../../utils/Logger.ts";
+import { CommandInput, CommandOutput } from '@app-types/Command.ts';
+import { routeCommand } from '@bot/router/CommandRouter.ts';
+import { messageService } from '@core/infra/dependencies.ts';
+import { logger } from '../../utils/Logger.ts';
 
 // 3. Relative imports (se necessário)
-import { validateInput } from "./validators.ts";
+import { validateInput } from './validators.ts';
 ```
 
 ### Function Structure
@@ -99,8 +99,8 @@ export async function listRacesCommand(
     // 1. Validação de entrada
     if (!input.user?.id) {
       return {
-        text: "❌ Erro: usuário não identificado",
-        format: "HTML",
+        text: '❌ Erro: usuário não identificado',
+        format: 'HTML',
       };
     }
 
@@ -108,22 +108,22 @@ export async function listRacesCommand(
     const races = await raceService.getAvailableRaces();
 
     // 3. Formatação da resposta
-    const buttons = races.map((race) => ({
+    const buttons = races.map(race => ({
       text: `🏃‍♂️ ${race.title}`,
       callbackData: CallbackDataSerializer.raceDetails(race.id),
     }));
 
     // 4. Retorno estruturado
     return {
-      text: "🏃‍♂️ **Corridas Disponíveis**",
-      format: "HTML",
+      text: '🏃‍♂️ **Corridas Disponíveis**',
+      format: 'HTML',
       keyboard: { buttons: [buttons], inline: true },
     };
   } catch (error) {
-    logger.commandError("listRaces", error as Error, input.user?.id);
+    logger.commandError('listRaces', error as Error, input.user?.id);
     return {
-      text: "❌ Erro interno. Tente novamente mais tarde.",
-      format: "HTML",
+      text: '❌ Erro interno. Tente novamente mais tarde.',
+      format: 'HTML',
     };
   }
 }
@@ -185,23 +185,23 @@ interface UserRepository {
 // ✅ Padrão para tratamento de erros
 try {
   const result = await riskyOperation();
-  logger.info("Operation completed", {
-    module: "UserService",
-    action: "create_user",
+  logger.info('Operation completed', {
+    module: 'UserService',
+    action: 'create_user',
     userId: result.id,
   });
   return result;
 } catch (error) {
   logger.error(
-    "Failed to create user",
+    'Failed to create user',
     {
-      module: "UserService",
-      action: "create_user_error",
+      module: 'UserService',
+      action: 'create_user_error',
       telegramId: data.telegramId,
     },
     error as Error
   );
-  throw new UserCreationError("Could not create user", { cause: error });
+  throw new UserCreationError('Could not create user', { cause: error });
 }
 ```
 
@@ -209,15 +209,15 @@ try {
 
 ```typescript
 // ✅ Sempre usar contexto estruturado
-logger.info("User registered successfully", {
-  module: "UserService",
-  action: "register_user",
+logger.info('User registered successfully', {
+  module: 'UserService',
+  action: 'register_user',
   userId: user.id,
   telegramId: user.telegramId,
 });
 
-logger.commandExecution("listRaces", input.user?.id);
-logger.commandError("searchRaces", error, input.user?.id);
+logger.commandExecution('listRaces', input.user?.id);
+logger.commandError('searchRaces', error, input.user?.id);
 ```
 
 ## 🧪 Testing Standards
@@ -226,7 +226,7 @@ logger.commandError("searchRaces", error, input.user?.id);
 
 ```typescript
 // ✅ Estrutura padrão para testes
-describe("UserService", () => {
+describe('UserService', () => {
   let userService: UserService;
   let mockUserRepository: UserRepository;
 
@@ -240,11 +240,11 @@ describe("UserService", () => {
     userService = new UserService(mockUserRepository);
   });
 
-  describe("registerUser", () => {
-    it("should create new user when user does not exist", async () => {
+  describe('registerUser', () => {
+    it('should create new user when user does not exist', async () => {
       // Arrange
-      const telegramId = "123456";
-      const name = "Test User";
+      const telegramId = '123456';
+      const name = 'Test User';
       mockUserRepository.findByTelegramId.mockResolvedValue(null);
       mockUserRepository.create.mockResolvedValue(mockUser);
 
@@ -276,10 +276,10 @@ describe("UserService", () => {
 // Exemplo com Prisma
 const races = await prisma.race.findMany({
   where: {
-    status: "OPEN",
+    status: 'OPEN',
     date: { gte: new Date() },
   },
-  orderBy: { date: "asc" },
+  orderBy: { date: 'asc' },
   take: 10, // Paginação
   include: {
     /* apenas relacionamentos necessários */
@@ -333,8 +333,8 @@ export class TelegramBotAdapter {
 const sanitizedText = MessageSanitizer.sanitize(userInput);
 
 // ✅ Validação de tipos
-if (typeof telegramId !== "string" || !telegramId.trim()) {
-  throw new InvalidInputError("Invalid telegram ID");
+if (typeof telegramId !== 'string' || !telegramId.trim()) {
+  throw new InvalidInputError('Invalid telegram ID');
 }
 
 // ✅ Rate limiting (futuro)

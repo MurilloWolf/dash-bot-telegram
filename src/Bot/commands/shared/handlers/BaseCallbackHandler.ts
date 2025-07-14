@@ -2,10 +2,10 @@ import {
   CommandInput,
   CommandOutput,
   InteractionButton,
-} from "../../../../types/Command.ts";
-import { CallbackHandler } from "@app-types/PlatformAdapter.ts";
-import { CallbackData } from "@app-types/callbacks/index.ts";
-import { logger } from "../../../../utils/Logger.ts";
+} from '../../../../types/Command.ts';
+import { CallbackHandler } from '@app-types/PlatformAdapter.ts';
+import { CallbackData } from '@app-types/callbacks/index.ts';
+import { logger } from '../../../../utils/Logger.ts';
 
 export abstract class BaseCallbackHandler implements CallbackHandler {
   abstract canHandle(callbackData: CallbackData): boolean;
@@ -14,7 +14,7 @@ export abstract class BaseCallbackHandler implements CallbackHandler {
   protected createErrorResponse(message: string): CommandOutput {
     return {
       text: `❌ ${message}`,
-      format: "HTML",
+      format: 'HTML',
       editMessage: true,
     };
   }
@@ -22,14 +22,14 @@ export abstract class BaseCallbackHandler implements CallbackHandler {
   protected createSuccessResponse(message: string): CommandOutput {
     return {
       text: `✅ ${message}`,
-      format: "HTML",
+      format: 'HTML',
       editMessage: true,
     };
   }
 
   protected createBackButton(callbackData: CallbackData): InteractionButton {
     return {
-      text: "⬅️ Voltar",
+      text: '⬅️ Voltar',
       callbackData: callbackData,
     };
   }
@@ -45,7 +45,7 @@ export abstract class BaseCallbackHandler implements CallbackHandler {
       `Error in ${context}`,
       {
         module: this.constructor.name,
-        action: "callback_error",
+        action: 'callback_error',
         context,
       },
       error as Error

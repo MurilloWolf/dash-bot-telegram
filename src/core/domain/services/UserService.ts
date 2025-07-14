@@ -1,8 +1,8 @@
-import { User, UserPreferences } from "../entities/User.ts";
+import { User, UserPreferences } from '../entities/User.ts';
 import {
   UserRepository,
   UserPreferencesRepository,
-} from "../repositories/UserRepository.ts";
+} from '../repositories/UserRepository.ts';
 
 export class UserService {
   constructor(
@@ -44,18 +44,20 @@ export class UserService {
     telegramId: string
   ): Promise<UserPreferences | null> {
     const user = await this.userRepository.findByTelegramId(telegramId);
-    if (!user) return null;
+    if (!user) {
+      return null;
+    }
 
     return this.userPreferencesRepository.findByUserId(user.id);
   }
 
   async updateUserPreferences(
     telegramId: string,
-    preferences: Partial<Omit<UserPreferences, "id" | "userId">>
+    preferences: Partial<Omit<UserPreferences, 'id' | 'userId'>>
   ): Promise<UserPreferences> {
     const user = await this.userRepository.findByTelegramId(telegramId);
     if (!user) {
-      throw new Error("Usuário não encontrado");
+      throw new Error('Usuário não encontrado');
     }
 
     const existingPreferences =
@@ -69,8 +71,8 @@ export class UserService {
         preferredDistances: preferences.preferredDistances || [],
         notificationsEnabled: preferences.notificationsEnabled ?? true,
         reminderDays: preferences.reminderDays ?? 3,
-        timezone: preferences.timezone ?? "America/Sao_Paulo",
-        language: preferences.language ?? "pt-BR",
+        timezone: preferences.timezone ?? 'America/Sao_Paulo',
+        language: preferences.language ?? 'pt-BR',
       });
     }
   }

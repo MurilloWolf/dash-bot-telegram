@@ -32,7 +32,7 @@ export class Logger {
 
   private constructor() {
     this.logLevel = this.getLogLevelFromEnv();
-    this.enableColors = process.env.NODE_ENV !== "production";
+    this.enableColors = process.env.NODE_ENV !== 'production';
   }
 
   static getInstance(): Logger {
@@ -45,13 +45,13 @@ export class Logger {
   private getLogLevelFromEnv(): LogLevel {
     const level = process.env.LOG_LEVEL?.toUpperCase();
     switch (level) {
-      case "DEBUG":
+      case 'DEBUG':
         return LogLevel.DEBUG;
-      case "INFO":
+      case 'INFO':
         return LogLevel.INFO;
-      case "WARN":
+      case 'WARN':
         return LogLevel.WARN;
-      case "ERROR":
+      case 'ERROR':
         return LogLevel.ERROR;
       default:
         return LogLevel.INFO;
@@ -59,53 +59,55 @@ export class Logger {
   }
 
   private getColorCode(level: LogLevel): string {
-    if (!this.enableColors) return "";
+    if (!this.enableColors) {
+      return '';
+    }
 
     switch (level) {
       case LogLevel.DEBUG:
-        return "\x1b[36m"; // Cyan
+        return '\x1b[36m'; // Cyan
       case LogLevel.INFO:
-        return "\x1b[32m"; // Green
+        return '\x1b[32m'; // Green
       case LogLevel.WARN:
-        return "\x1b[33m"; // Yellow
+        return '\x1b[33m'; // Yellow
       case LogLevel.ERROR:
-        return "\x1b[31m"; // Red
+        return '\x1b[31m'; // Red
       default:
-        return "";
+        return '';
     }
   }
 
   private getResetCode(): string {
-    return this.enableColors ? "\x1b[0m" : "";
+    return this.enableColors ? '\x1b[0m' : '';
   }
 
   private getLevelEmoji(level: LogLevel): string {
     switch (level) {
       case LogLevel.DEBUG:
-        return "🔍";
+        return '🔍';
       case LogLevel.INFO:
-        return "ℹ️";
+        return 'ℹ️';
       case LogLevel.WARN:
-        return "⚠️";
+        return '⚠️';
       case LogLevel.ERROR:
-        return "❌";
+        return '❌';
       default:
-        return "";
+        return '';
     }
   }
 
   private getLevelName(level: LogLevel): string {
     switch (level) {
       case LogLevel.DEBUG:
-        return "DEBUG";
+        return 'DEBUG';
       case LogLevel.INFO:
-        return "INFO";
+        return 'INFO';
       case LogLevel.WARN:
-        return "WARN";
+        return 'WARN';
       case LogLevel.ERROR:
-        return "ERROR";
+        return 'ERROR';
       default:
-        return "UNKNOWN";
+        return 'UNKNOWN';
     }
   }
 
@@ -127,7 +129,7 @@ export class Logger {
       const contextStr = Object.entries(context)
         .filter(([, value]) => value !== undefined)
         .map(([key, value]) => `${key}=${value}`)
-        .join(", ");
+        .join(', ');
 
       if (contextStr) {
         formattedMessage += ` | Context: {${contextStr}}`;
@@ -188,7 +190,7 @@ export class Logger {
 
   // Convenience methods for common use cases
   botStartup(message: string): void {
-    this.info(message, { module: "Bot", action: "startup" });
+    this.info(message, { module: 'Bot', action: 'startup' });
   }
 
   commandExecution(
@@ -197,8 +199,8 @@ export class Logger {
     chatId?: string
   ): void {
     this.info(`Executing command: ${commandName}`, {
-      module: "CommandRouter",
-      action: "execute_command",
+      module: 'CommandRouter',
+      action: 'execute_command',
       commandName,
       userId,
       chatId,
@@ -214,8 +216,8 @@ export class Logger {
     this.error(
       `Command execution failed: ${commandName}`,
       {
-        module: "CommandRouter",
-        action: "command_error",
+        module: 'CommandRouter',
+        action: 'command_error',
         commandName,
         userId,
         chatId,
@@ -230,8 +232,8 @@ export class Logger {
     chatId?: string
   ): void {
     this.info(`Handling callback: ${callbackType}`, {
-      module: "CallbackManager",
-      action: "execute_callback",
+      module: 'CallbackManager',
+      action: 'execute_callback',
       callbackType,
       userId,
       chatId,
@@ -247,8 +249,8 @@ export class Logger {
     this.error(
       `Callback execution failed: ${callbackType}`,
       {
-        module: "CallbackManager",
-        action: "callback_error",
+        module: 'CallbackManager',
+        action: 'callback_error',
         callbackType,
         userId,
         chatId,
@@ -263,7 +265,7 @@ export class Logger {
     context?: LogContext
   ): void {
     this.debug(`Database operation: ${operation}`, {
-      module: "Database",
+      module: 'Database',
       action: operation,
       table,
       ...context,
@@ -279,7 +281,7 @@ export class Logger {
     this.error(
       `Database operation failed: ${operation}`,
       {
-        module: "Database",
+        module: 'Database',
         action: operation,
         table,
         ...context,
@@ -289,12 +291,12 @@ export class Logger {
   }
 
   registryOperation(
-    type: "command" | "callback",
+    type: 'command' | 'callback',
     name: string,
     module: string
   ): void {
     this.info(`Registered ${type}: ${name}`, {
-      module: "Registry",
+      module: 'Registry',
       action: `register_${type}`,
       handlerName: name,
       handlerModule: module,
@@ -308,8 +310,8 @@ export class Logger {
     userId?: string
   ): void {
     this.debug(`Message intercepted`, {
-      module: "MessageInterceptor",
-      action: "intercept_message",
+      module: 'MessageInterceptor',
+      action: 'intercept_message',
       platform,
       messageType,
       chatId,
@@ -320,10 +322,10 @@ export class Logger {
   // Script-specific logging methods
   scriptStart(scriptName: string, description?: string): void {
     this.info(
-      `Starting script: ${scriptName}${description ? ` - ${description}` : ""}`,
+      `Starting script: ${scriptName}${description ? ` - ${description}` : ''}`,
       {
-        module: "Script",
-        action: "start",
+        module: 'Script',
+        action: 'start',
         scriptName,
       }
     );
@@ -331,8 +333,8 @@ export class Logger {
 
   scriptComplete(scriptName: string, results?: LogContext): void {
     this.info(`Script completed: ${scriptName}`, {
-      module: "Script",
-      action: "complete",
+      module: 'Script',
+      action: 'complete',
       scriptName,
       ...results,
     });
@@ -342,8 +344,8 @@ export class Logger {
     this.error(
       `Script failed: ${scriptName}`,
       {
-        module: "Script",
-        action: "error",
+        module: 'Script',
+        action: 'error',
         scriptName,
         ...context,
       },
@@ -359,7 +361,7 @@ export class Logger {
     context?: LogContext
   ): void {
     this.info(`Race ${operation}`, {
-      module: "RaceService",
+      module: 'RaceService',
       action: operation,
       raceId,
       raceTitle,
@@ -376,7 +378,7 @@ export class Logger {
     this.error(
       `Race operation failed: ${operation}`,
       {
-        module: "RaceService",
+        module: 'RaceService',
         action: operation,
         raceId,
         raceTitle,
@@ -393,8 +395,8 @@ export class Logger {
     messageType?: string
   ): void {
     this.debug(`Message received from ${platform}`, {
-      module: "MessageAdapter",
-      action: "receive_message",
+      module: 'MessageAdapter',
+      action: 'receive_message',
       platform,
       chatId,
       userId,
@@ -406,11 +408,11 @@ export class Logger {
     platform: string,
     chatId?: string,
     userId?: string,
-    success: boolean = true
+    success = true
   ): void {
     this.debug(`Message sent via ${platform}`, {
-      module: "MessageAdapter",
-      action: "send_message",
+      module: 'MessageAdapter',
+      action: 'send_message',
       platform,
       chatId,
       userId,
@@ -427,8 +429,8 @@ export class Logger {
     this.error(
       `Message handling failed on ${platform}`,
       {
-        module: "MessageAdapter",
-        action: "message_error",
+        module: 'MessageAdapter',
+        action: 'message_error',
         platform,
         chatId,
         userId,
@@ -440,12 +442,12 @@ export class Logger {
   // Registry logging
   moduleRegistration(
     moduleName: string,
-    type: "command" | "callback",
+    type: 'command' | 'callback',
     count?: number
   ): void {
     this.info(`Module ${moduleName} registered`, {
-      module: "Registry",
-      action: "module_registration",
+      module: 'Registry',
+      action: 'module_registration',
       moduleName,
       type,
       count,
@@ -453,13 +455,13 @@ export class Logger {
   }
 
   duplicateRegistration(
-    type: "command" | "callback",
+    type: 'command' | 'callback',
     name: string,
     module: string
   ): void {
     this.warn(`Duplicate ${type} registration: ${name}`, {
-      module: "Registry",
-      action: "duplicate_registration",
+      module: 'Registry',
+      action: 'duplicate_registration',
       type,
       name,
       handlerModule: module,
@@ -469,8 +471,8 @@ export class Logger {
   setLogLevel(level: LogLevel): void {
     this.logLevel = level;
     this.info(`Log level changed to: ${this.getLevelName(level)}`, {
-      module: "Logger",
-      action: "set_log_level",
+      module: 'Logger',
+      action: 'set_log_level',
     });
   }
 }

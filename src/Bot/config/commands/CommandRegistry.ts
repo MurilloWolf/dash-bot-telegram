@@ -1,5 +1,5 @@
-import { CommandInput, CommandOutput } from "@app-types/Command.ts";
-import { logger } from "../../../utils/Logger.ts";
+import { CommandInput, CommandOutput } from '@app-types/Command.ts';
+import { logger } from '../../../utils/Logger.ts';
 
 type CommandHandler = (
   input: CommandInput,
@@ -19,22 +19,22 @@ export class CommandRegistry {
   }
 
   async autoRegisterCommands(): Promise<void> {
-    logger.info("Registrando comandos automaticamente...", {
-      module: "CommandRegistry",
-      action: "auto_register_start",
+    logger.info('Registrando comandos automaticamente...', {
+      module: 'CommandRegistry',
+      action: 'auto_register_start',
     });
 
-    await this.registerCommandsFromModule("races");
-    await this.registerCommandsFromModule("user");
+    await this.registerCommandsFromModule('races');
+    await this.registerCommandsFromModule('user');
 
-    logger.moduleRegistration("CommandRegistry", "command", this.commands.size);
+    logger.moduleRegistration('CommandRegistry', 'command', this.commands.size);
   }
 
   private async registerCommandsFromModule(moduleName: string): Promise<void> {
     if (this.registeredModules.has(moduleName)) {
       logger.warn(`Módulo ${moduleName} já foi registrado`, {
-        module: "CommandRegistry",
-        action: "duplicate_module",
+        module: 'CommandRegistry',
+        action: 'duplicate_module',
         moduleName,
       });
       return;
@@ -42,24 +42,24 @@ export class CommandRegistry {
 
     try {
       switch (moduleName) {
-        case "races": {
+        case 'races': {
           const { raceCommands } = await import(
-            "../../commands/usecases/races/index.ts"
+            '../../commands/usecases/races/index.ts'
           );
-          this.registerCommands(raceCommands, "races");
+          this.registerCommands(raceCommands, 'races');
           break;
         }
-        case "user": {
+        case 'user': {
           const { userCommands } = await import(
-            "../../commands/usecases/user/index.ts"
+            '../../commands/usecases/user/index.ts'
           );
-          this.registerCommands(userCommands, "user");
+          this.registerCommands(userCommands, 'user');
           break;
         }
         default:
           logger.warn(`Módulo desconhecido: ${moduleName}`, {
-            module: "CommandRegistry",
-            action: "unknown_module",
+            module: 'CommandRegistry',
+            action: 'unknown_module',
             moduleName,
           });
           return;
@@ -70,8 +70,8 @@ export class CommandRegistry {
       logger.error(
         `Erro ao registrar comandos do módulo ${moduleName}`,
         {
-          module: "CommandRegistry",
-          action: "register_error",
+          module: 'CommandRegistry',
+          action: 'register_error',
           moduleName,
         },
         error as Error
@@ -86,9 +86,9 @@ export class CommandRegistry {
     Object.entries(commands).forEach(([commandName, handler]) => {
       if (!this.commands.has(commandName)) {
         this.commands.set(commandName, handler);
-        logger.registryOperation("command", commandName, module);
+        logger.registryOperation('command', commandName, module);
       } else {
-        logger.duplicateRegistration("command", commandName, module);
+        logger.duplicateRegistration('command', commandName, module);
       }
     });
   }
@@ -108,9 +108,9 @@ export class CommandRegistry {
   clearRegistry(): void {
     this.commands.clear();
     this.registeredModules.clear();
-    logger.info("Command registry limpo", {
-      module: "CommandRegistry",
-      action: "clear_registry",
+    logger.info('Command registry limpo', {
+      module: 'CommandRegistry',
+      action: 'clear_registry',
     });
   }
 }

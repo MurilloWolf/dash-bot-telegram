@@ -1,6 +1,6 @@
-import { CallbackHandler } from "../../../types/PlatformAdapter.ts";
-import { callbackManager } from "./CallbackManager.ts";
-import { logger } from "../../../utils/Logger.ts";
+import { CallbackHandler } from '../../../types/PlatformAdapter.ts';
+import { callbackManager } from './CallbackManager.ts';
+import { logger } from '../../../utils/Logger.ts';
 
 export class CallbackRegistry {
   private static instance: CallbackRegistry;
@@ -14,15 +14,15 @@ export class CallbackRegistry {
   }
 
   autoRegisterHandlers(): void {
-    this.registerHandlersFromModule("races");
-    this.registerHandlersFromModule("user");
-    this.registerHandlersFromModule("shared");
+    this.registerHandlersFromModule('races');
+    this.registerHandlersFromModule('user');
+    this.registerHandlersFromModule('shared');
 
     logger.info(
       `Total de ${this.registeredHandlers.size} callback handlers registrados automaticamente`,
       {
-        module: "CallbackRegistry",
-        action: "auto_register_complete",
+        module: 'CallbackRegistry',
+        action: 'auto_register_complete',
         handlerCount: this.registeredHandlers.size,
       }
     );
@@ -31,31 +31,31 @@ export class CallbackRegistry {
   private async registerHandlersFromModule(moduleName: string): Promise<void> {
     try {
       switch (moduleName) {
-        case "races": {
+        case 'races': {
           const { raceCallbackHandlers } = await import(
-            "../../commands/usecases/races/index.ts"
+            '../../commands/usecases/races/index.ts'
           );
-          this.registerHandlers(raceCallbackHandlers, "races");
+          this.registerHandlers(raceCallbackHandlers, 'races');
           break;
         }
-        case "user": {
+        case 'user': {
           const { userCallbackHandlers } = await import(
-            "../../commands/usecases/user/index.ts"
+            '../../commands/usecases/user/index.ts'
           );
-          this.registerHandlers(userCallbackHandlers, "user");
+          this.registerHandlers(userCallbackHandlers, 'user');
           break;
         }
-        case "shared": {
+        case 'shared': {
           const { sharedCallbackHandlers } = await import(
-            "../../commands/usecases/shared/index.ts"
+            '../../commands/usecases/shared/index.ts'
           );
-          this.registerHandlers(sharedCallbackHandlers, "shared");
+          this.registerHandlers(sharedCallbackHandlers, 'shared');
           break;
         }
         default:
           logger.warn(`Módulo desconhecido: ${moduleName}`, {
-            module: "CallbackRegistry",
-            action: "register_unknown_module",
+            module: 'CallbackRegistry',
+            action: 'register_unknown_module',
             moduleName,
           });
       }
@@ -63,8 +63,8 @@ export class CallbackRegistry {
       logger.error(
         `Erro ao registrar handlers do módulo ${moduleName}`,
         {
-          module: "CallbackRegistry",
-          action: "register_error",
+          module: 'CallbackRegistry',
+          action: 'register_error',
           moduleName,
         },
         error as Error
@@ -73,17 +73,17 @@ export class CallbackRegistry {
   }
 
   private registerHandlers(handlers: CallbackHandler[], module: string): void {
-    handlers.forEach((handler) => {
+    handlers.forEach(handler => {
       const handlerName = handler.constructor.name;
 
       if (!this.registeredHandlers.has(handlerName)) {
         callbackManager.registerHandler(handler);
         this.registeredHandlers.add(handlerName);
-        logger.registryOperation("callback", handlerName, module);
+        logger.registryOperation('callback', handlerName, module);
       } else {
         logger.warn(`Handler ${handlerName} já foi registrado`, {
-          module: "CallbackRegistry",
-          action: "duplicate_handler",
+          module: 'CallbackRegistry',
+          action: 'duplicate_handler',
           handlerName,
           handlerModule: module,
         });
@@ -97,9 +97,9 @@ export class CallbackRegistry {
 
   clearRegistry(): void {
     this.registeredHandlers.clear();
-    logger.info("Registry limpo", {
-      module: "CallbackRegistry",
-      action: "clear_registry",
+    logger.info('Registry limpo', {
+      module: 'CallbackRegistry',
+      action: 'clear_registry',
     });
   }
 }

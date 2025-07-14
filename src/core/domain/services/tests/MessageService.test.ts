@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
-import { MessageService } from "../MessageService.ts";
+import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
+import { MessageService } from '../MessageService.ts';
 import {
   Message,
   Chat,
@@ -9,15 +9,15 @@ import {
   MessageDirection,
   ChatType,
   MediaType,
-} from "../../entities/Message.ts";
+} from '../../entities/Message.ts';
 import {
   MessageRepository,
   ChatRepository,
   MediaRepository,
   LocationRepository,
-} from "../../repositories/MessageRepository.ts";
+} from '../../repositories/MessageRepository.ts';
 
-describe("MessageService", () => {
+describe('MessageService', () => {
   let messageService: MessageService;
   let mockMessageRepository: MessageRepository;
   let mockChatRepository: ChatRepository;
@@ -70,13 +70,13 @@ describe("MessageService", () => {
     );
   });
 
-  describe("getMessageById", () => {
-    it("should return message by id", async () => {
-      const messageId = "msg-123";
+  describe('getMessageById', () => {
+    it('should return message by id', async () => {
+      const messageId = 'msg-123';
       const message: Message = {
         id: messageId,
-        telegramId: BigInt("123456789"),
-        text: "Hello World",
+        telegramId: BigInt('123456789'),
+        text: 'Hello World',
         direction: MessageDirection.INCOMING,
         type: MessageType.TEXT,
         createdAt: new Date(),
@@ -92,8 +92,8 @@ describe("MessageService", () => {
       expect(result).toEqual(message);
     });
 
-    it("should return null when message does not exist", async () => {
-      const messageId = "msg-inexistente";
+    it('should return null when message does not exist', async () => {
+      const messageId = 'msg-inexistente';
 
       (mockMessageRepository.findById as Mock).mockResolvedValue(null);
 
@@ -104,14 +104,14 @@ describe("MessageService", () => {
     });
   });
 
-  describe("getMessagesByUserId", () => {
-    it("should return messages for a user", async () => {
-      const userId = "user-123";
+  describe('getMessagesByUserId', () => {
+    it('should return messages for a user', async () => {
+      const userId = 'user-123';
       const messages: Message[] = [
         {
-          id: "msg-1",
-          telegramId: BigInt("123456789"),
-          text: "Hello",
+          id: 'msg-1',
+          telegramId: BigInt('123456789'),
+          text: 'Hello',
           direction: MessageDirection.OUTGOING,
           type: MessageType.TEXT,
           createdAt: new Date(),
@@ -129,8 +129,8 @@ describe("MessageService", () => {
       expect(result).toEqual(messages);
     });
 
-    it("should return empty array when user has no messages", async () => {
-      const userId = "user-123";
+    it('should return empty array when user has no messages', async () => {
+      const userId = 'user-123';
 
       (mockMessageRepository.findByUserId as Mock).mockResolvedValue([]);
 
@@ -141,14 +141,14 @@ describe("MessageService", () => {
     });
   });
 
-  describe("getMessagesByChatId", () => {
-    it("should return messages for a chat", async () => {
-      const chatId = "chat-123";
+  describe('getMessagesByChatId', () => {
+    it('should return messages for a chat', async () => {
+      const chatId = 'chat-123';
       const messages: Message[] = [
         {
-          id: "msg-1",
-          telegramId: BigInt("123456789"),
-          text: "Hello chat",
+          id: 'msg-1',
+          telegramId: BigInt('123456789'),
+          text: 'Hello chat',
           direction: MessageDirection.INCOMING,
           type: MessageType.TEXT,
           createdAt: new Date(),
@@ -166,8 +166,8 @@ describe("MessageService", () => {
       expect(result).toEqual(messages);
     });
 
-    it("should return empty array when chat has no messages", async () => {
-      const chatId = "chat-123";
+    it('should return empty array when chat has no messages', async () => {
+      const chatId = 'chat-123';
 
       (mockMessageRepository.findByChatId as Mock).mockResolvedValue([]);
 
@@ -178,19 +178,19 @@ describe("MessageService", () => {
     });
   });
 
-  describe("createMessage", () => {
-    it("should create a new message", async () => {
-      const messageData: Omit<Message, "id" | "createdAt" | "updatedAt"> = {
-        telegramId: BigInt("123456789"),
-        text: "New message",
+  describe('createMessage', () => {
+    it('should create a new message', async () => {
+      const messageData: Omit<Message, 'id' | 'createdAt' | 'updatedAt'> = {
+        telegramId: BigInt('123456789'),
+        text: 'New message',
         direction: MessageDirection.INCOMING,
         type: MessageType.TEXT,
         isDeleted: false,
-        userId: "user-123",
+        userId: 'user-123',
       };
 
       const createdMessage: Message = {
-        id: "msg-123",
+        id: 'msg-123',
         ...messageData,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -205,18 +205,18 @@ describe("MessageService", () => {
     });
   });
 
-  describe("updateMessage", () => {
-    it("should update a message", async () => {
-      const messageId = "msg-123";
+  describe('updateMessage', () => {
+    it('should update a message', async () => {
+      const messageId = 'msg-123';
       const updateData: Partial<Message> = {
-        text: "Updated message",
+        text: 'Updated message',
         editedAt: new Date(),
       };
 
       const updatedMessage: Message = {
         id: messageId,
-        telegramId: BigInt("123456789"),
-        text: "Updated message",
+        telegramId: BigInt('123456789'),
+        text: 'Updated message',
         direction: MessageDirection.INCOMING,
         type: MessageType.TEXT,
         createdAt: new Date(),
@@ -237,14 +237,14 @@ describe("MessageService", () => {
     });
   });
 
-  describe("deleteMessage", () => {
-    it("should mark message as deleted", async () => {
-      const messageId = "msg-123";
+  describe('deleteMessage', () => {
+    it('should mark message as deleted', async () => {
+      const messageId = 'msg-123';
 
       const deletedMessage: Message = {
         id: messageId,
-        telegramId: BigInt("123456789"),
-        text: "Deleted message",
+        telegramId: BigInt('123456789'),
+        text: 'Deleted message',
         direction: MessageDirection.INCOMING,
         type: MessageType.TEXT,
         createdAt: new Date(),
@@ -266,14 +266,14 @@ describe("MessageService", () => {
     });
   });
 
-  describe("getChatById", () => {
-    it("should return chat by id", async () => {
-      const chatId = "chat-123";
+  describe('getChatById', () => {
+    it('should return chat by id', async () => {
+      const chatId = 'chat-123';
       const chat: Chat = {
         id: chatId,
-        telegramId: "123456789",
+        telegramId: '123456789',
         type: ChatType.PRIVATE,
-        title: "Private Chat",
+        title: 'Private Chat',
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -286,8 +286,8 @@ describe("MessageService", () => {
       expect(result).toEqual(chat);
     });
 
-    it("should return null when chat does not exist", async () => {
-      const chatId = "chat-inexistente";
+    it('should return null when chat does not exist', async () => {
+      const chatId = 'chat-inexistente';
 
       (mockChatRepository.findById as Mock).mockResolvedValue(null);
 
@@ -298,11 +298,11 @@ describe("MessageService", () => {
     });
   });
 
-  describe("getChatByTelegramId", () => {
-    it("should return chat by telegram id", async () => {
-      const telegramId = "123456789";
+  describe('getChatByTelegramId', () => {
+    it('should return chat by telegram id', async () => {
+      const telegramId = '123456789';
       const chat: Chat = {
-        id: "chat-123",
+        id: 'chat-123',
         telegramId,
         type: ChatType.PRIVATE,
         createdAt: new Date(),
@@ -319,8 +319,8 @@ describe("MessageService", () => {
       expect(result).toEqual(chat);
     });
 
-    it("should return null when chat does not exist", async () => {
-      const telegramId = "inexistente";
+    it('should return null when chat does not exist', async () => {
+      const telegramId = 'inexistente';
 
       (mockChatRepository.findByTelegramId as Mock).mockResolvedValue(null);
 
@@ -333,17 +333,17 @@ describe("MessageService", () => {
     });
   });
 
-  describe("createChat", () => {
-    it("should create a new chat", async () => {
-      const chatData: Omit<Chat, "id" | "createdAt" | "updatedAt"> = {
-        telegramId: "123456789",
+  describe('createChat', () => {
+    it('should create a new chat', async () => {
+      const chatData: Omit<Chat, 'id' | 'createdAt' | 'updatedAt'> = {
+        telegramId: '123456789',
         type: ChatType.GROUP,
-        title: "New Group Chat",
+        title: 'New Group Chat',
         memberCount: 5,
       };
 
       const createdChat: Chat = {
-        id: "chat-123",
+        id: 'chat-123',
         ...chatData,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -358,19 +358,19 @@ describe("MessageService", () => {
     });
   });
 
-  describe("updateChat", () => {
-    it("should update a chat", async () => {
-      const chatId = "chat-123";
+  describe('updateChat', () => {
+    it('should update a chat', async () => {
+      const chatId = 'chat-123';
       const updateData: Partial<Chat> = {
-        title: "Updated Chat Title",
+        title: 'Updated Chat Title',
         memberCount: 10,
       };
 
       const updatedChat: Chat = {
         id: chatId,
-        telegramId: "123456789",
+        telegramId: '123456789',
         type: ChatType.GROUP,
-        title: "Updated Chat Title",
+        title: 'Updated Chat Title',
         memberCount: 10,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -388,15 +388,15 @@ describe("MessageService", () => {
     });
   });
 
-  describe("getMediaByMessageId", () => {
-    it("should return media for a message", async () => {
-      const messageId = "msg-123";
+  describe('getMediaByMessageId', () => {
+    it('should return media for a message', async () => {
+      const messageId = 'msg-123';
       const media: Media[] = [
         {
-          id: "media-1",
-          telegramId: "123456789",
+          id: 'media-1',
+          telegramId: '123456789',
           type: MediaType.PHOTO,
-          url: "https://example.com/photo.jpg",
+          url: 'https://example.com/photo.jpg',
           messageId,
         },
       ];
@@ -411,8 +411,8 @@ describe("MessageService", () => {
       expect(result).toEqual(media);
     });
 
-    it("should return empty array when message has no media", async () => {
-      const messageId = "msg-123";
+    it('should return empty array when message has no media', async () => {
+      const messageId = 'msg-123';
 
       (mockMediaRepository.findByMessageId as Mock).mockResolvedValue([]);
 
@@ -425,20 +425,20 @@ describe("MessageService", () => {
     });
   });
 
-  describe("createMedia", () => {
-    it("should create media", async () => {
-      const mediaData: Omit<Media, "id"> = {
-        telegramId: "123456789",
+  describe('createMedia', () => {
+    it('should create media', async () => {
+      const mediaData: Omit<Media, 'id'> = {
+        telegramId: '123456789',
         type: MediaType.PHOTO,
-        url: "https://example.com/photo.jpg",
+        url: 'https://example.com/photo.jpg',
         fileSize: 1024,
         width: 800,
         height: 600,
-        messageId: "msg-123",
+        messageId: 'msg-123',
       };
 
       const createdMedia: Media = {
-        id: "media-123",
+        id: 'media-123',
         ...mediaData,
       };
 
@@ -451,11 +451,11 @@ describe("MessageService", () => {
     });
   });
 
-  describe("getLocationByMessageId", () => {
-    it("should return location for a message", async () => {
-      const messageId = "msg-123";
+  describe('getLocationByMessageId', () => {
+    it('should return location for a message', async () => {
+      const messageId = 'msg-123';
       const location: Location = {
-        id: "loc-1",
+        id: 'loc-1',
         latitude: -23.5505,
         longitude: -46.6333,
         messageId,
@@ -473,8 +473,8 @@ describe("MessageService", () => {
       expect(result).toEqual(location);
     });
 
-    it("should return null when message has no location", async () => {
-      const messageId = "msg-123";
+    it('should return null when message has no location', async () => {
+      const messageId = 'msg-123';
 
       (mockLocationRepository.findByMessageId as Mock).mockResolvedValue(null);
 
@@ -487,18 +487,18 @@ describe("MessageService", () => {
     });
   });
 
-  describe("createLocation", () => {
-    it("should create location", async () => {
-      const locationData: Omit<Location, "id"> = {
+  describe('createLocation', () => {
+    it('should create location', async () => {
+      const locationData: Omit<Location, 'id'> = {
         latitude: -23.5505,
         longitude: -46.6333,
         accuracy: 10.5,
         livePeriod: 3600,
-        messageId: "msg-123",
+        messageId: 'msg-123',
       };
 
       const createdLocation: Location = {
-        id: "loc-123",
+        id: 'loc-123',
         ...locationData,
       };
 

@@ -1,5 +1,5 @@
-import { CommandInput, CommandOutput } from "./Command.ts";
-import { CallbackData } from "./callbacks/index.ts";
+import { CommandInput, CommandOutput } from './Command.ts';
+import { CallbackData } from './callbacks/index.ts';
 
 export interface PlatformAdapter {
   sendMessage(chatId: string | number, output: CommandOutput): Promise<void>;

@@ -7,20 +7,20 @@ import {
   MessageTypeValue,
   ChatTypeValue,
   MediaTypeValue,
-} from "../../domain/entities/Message.ts";
+} from '../../domain/entities/Message.ts';
 import {
   MessageRepository,
   ChatRepository,
   MediaRepository,
   LocationRepository,
-} from "../../domain/repositories/MessageRepository.ts";
-import prisma from "./client.ts";
+} from '../../domain/repositories/MessageRepository.ts';
+import prisma from './client.ts';
 import type {
   Message as PrismaMessage,
   Chat as PrismaChat,
   Media as PrismaMedia,
   Location as PrismaLocation,
-} from "@prisma/client";
+} from '@prisma/client';
 
 export class PrismaMessageRepository implements MessageRepository {
   async findById(id: string): Promise<Message | null> {
@@ -42,23 +42,23 @@ export class PrismaMessageRepository implements MessageRepository {
   async findByUserId(userId: string): Promise<Message[]> {
     const messages = await prisma.message.findMany({
       where: { userId },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
     });
 
-    return messages.map((message) => this.mapToEntity(message));
+    return messages.map(message => this.mapToEntity(message));
   }
 
   async findByChatId(chatId: string): Promise<Message[]> {
     const messages = await prisma.message.findMany({
       where: { chatId },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
     });
 
-    return messages.map((message) => this.mapToEntity(message));
+    return messages.map(message => this.mapToEntity(message));
   }
 
   async create(
-    messageData: Omit<Message, "id" | "createdAt" | "updatedAt">
+    messageData: Omit<Message, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<Message> {
     const message = await prisma.message.create({
       data: messageData,
@@ -128,14 +128,14 @@ export class PrismaChatRepository implements ChatRepository {
 
   async findAll(): Promise<Chat[]> {
     const chats = await prisma.chat.findMany({
-      orderBy: { updatedAt: "desc" },
+      orderBy: { updatedAt: 'desc' },
     });
 
-    return chats.map((chat) => this.mapToEntity(chat));
+    return chats.map(chat => this.mapToEntity(chat));
   }
 
   async create(
-    chatData: Omit<Chat, "id" | "createdAt" | "updatedAt">
+    chatData: Omit<Chat, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<Chat> {
     const chat = await prisma.chat.create({
       data: chatData,
@@ -195,10 +195,10 @@ export class PrismaMediaRepository implements MediaRepository {
       where: { messageId },
     });
 
-    return medias.map((media) => this.mapToEntity(media));
+    return medias.map(media => this.mapToEntity(media));
   }
 
-  async create(mediaData: Omit<Media, "id">): Promise<Media> {
+  async create(mediaData: Omit<Media, 'id'>): Promise<Media> {
     const media = await prisma.media.create({
       data: mediaData,
     });
@@ -254,7 +254,7 @@ export class PrismaLocationRepository implements LocationRepository {
     return location ? this.mapToEntity(location) : null;
   }
 
-  async create(locationData: Omit<Location, "id">): Promise<Location> {
+  async create(locationData: Omit<Location, 'id'>): Promise<Location> {
     const location = await prisma.location.create({
       data: locationData,
     });

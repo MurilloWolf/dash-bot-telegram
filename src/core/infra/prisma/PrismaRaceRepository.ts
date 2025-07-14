@@ -3,10 +3,10 @@ import {
   RaceFilter,
   RaceStatus,
   RaceStatusValue,
-} from "../../domain/entities/Race.ts";
-import { RaceRepository } from "../../domain/repositories/RaceRepository.ts";
-import prisma from "./client.ts";
-import type { Race as PrismaRace, Prisma } from "@prisma/client";
+} from '../../domain/entities/Race.ts';
+import { RaceRepository } from '../../domain/repositories/RaceRepository.ts';
+import prisma from './client.ts';
+import type { Race as PrismaRace, Prisma } from '@prisma/client';
 
 export class PrismaRaceRepository implements RaceRepository {
   async findByTitle(title: string): Promise<Race[] | null> {
@@ -16,14 +16,14 @@ export class PrismaRaceRepository implements RaceRepository {
           contains: title,
         },
       },
-      orderBy: { date: "asc" },
+      orderBy: { date: 'asc' },
     });
 
     if (!races || races.length === 0) {
       return null;
     }
 
-    return races.map((races) => this.mapToEntity(races));
+    return races.map(races => this.mapToEntity(races));
   }
 
   async findByRange(
@@ -36,9 +36,9 @@ export class PrismaRaceRepository implements RaceRepository {
       return Promise.resolve([]);
     }
 
-    const fileteredRaces = races.filter((race) =>
+    const fileteredRaces = races.filter(race =>
       race.distancesNumbers.some(
-        (distance) => distance >= startDistance && distance <= endDistance
+        distance => distance >= startDistance && distance <= endDistance
       )
     );
 
@@ -61,21 +61,25 @@ export class PrismaRaceRepository implements RaceRepository {
 
     if (filter?.startDate || filter?.endDate) {
       where.date = {};
-      if (filter.startDate) where.date.gte = filter.startDate;
-      if (filter.endDate) where.date.lte = filter.endDate;
+      if (filter.startDate) {
+        where.date.gte = filter.startDate;
+      }
+      if (filter.endDate) {
+        where.date.lte = filter.endDate;
+      }
     }
 
     const races = await prisma.race.findMany({
       where,
-      orderBy: { date: "asc" },
+      orderBy: { date: 'asc' },
     });
 
-    let result = races.map((race) => this.mapToEntity(race));
+    let result = races.map(race => this.mapToEntity(race));
 
     // Filter by distances if specified
     if (filter?.distances && filter.distances.length > 0) {
-      result = result.filter((race) =>
-        race.distancesNumbers.some((distance) =>
+      result = result.filter(race =>
+        race.distancesNumbers.some(distance =>
           filter.distances!.includes(distance)
         )
       );
@@ -91,10 +95,10 @@ export class PrismaRaceRepository implements RaceRepository {
         date: { gte: today },
         status: RaceStatus.OPEN,
       },
-      orderBy: { date: "asc" },
+      orderBy: { date: 'asc' },
     });
 
-    return races.map((race) => this.mapToEntity(race));
+    return races.map(race => this.mapToEntity(race));
   }
 
   async findNextRace(): Promise<Race[] | null> {
@@ -104,7 +108,7 @@ export class PrismaRaceRepository implements RaceRepository {
       where: {
         date: { gte: today },
       },
-      orderBy: { date: "asc" },
+      orderBy: { date: 'asc' },
     });
 
     if (!nextRace) {
@@ -115,26 +119,26 @@ export class PrismaRaceRepository implements RaceRepository {
       where: {
         date: nextRace.date,
       },
-      orderBy: { date: "asc" },
+      orderBy: { date: 'asc' },
     });
 
-    return racesOnSameDate.map((race) => this.mapToEntity(race));
+    return racesOnSameDate.map(race => this.mapToEntity(race));
   }
 
   async findByDistances(distances: number[]): Promise<Race[]> {
     const races = await prisma.race.findMany({
-      orderBy: { date: "asc" },
+      orderBy: { date: 'asc' },
     });
 
     return races
-      .map((race) => this.mapToEntity(race))
-      .filter((race) =>
-        race.distancesNumbers.some((distance) => distances.includes(distance))
+      .map(race => this.mapToEntity(race))
+      .filter(race =>
+        race.distancesNumbers.some(distance => distances.includes(distance))
       );
   }
 
   async create(
-    raceData: Omit<Race, "id" | "createdAt" | "updatedAt">
+    raceData: Omit<Race, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<Race> {
     const race = await prisma.race.create({
       data: {
@@ -193,12 +197,12 @@ export class PrismaRaceRepository implements RaceRepository {
       title: race.title,
       organization: race.organization,
       distances: JSON.parse(
-        typeof race.distances === "string"
+        typeof race.distances === 'string'
           ? race.distances
           : JSON.stringify(race.distances || [])
       ),
       distancesNumbers: JSON.parse(
-        typeof race.distancesNumbers === "string"
+        typeof race.distancesNumbers === 'string'
           ? race.distancesNumbers
           : JSON.stringify(race.distancesNumbers || [])
       ),

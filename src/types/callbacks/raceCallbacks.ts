@@ -5,34 +5,34 @@ export interface BaseCallbackData {
 
 // Race-specific callbacks
 export interface RaceDetailsCallbackData extends BaseCallbackData {
-  type: "race_details";
+  type: 'race_details';
   raceId: string;
 }
 
 export interface RaceListCallbackData extends BaseCallbackData {
-  type: "races_list";
+  type: 'races_list';
   distance?: number;
 }
 
 export interface RaceSearchCallbackData extends BaseCallbackData {
-  type: "races_search";
+  type: 'races_search';
   startDistance: number;
   endDistance: number;
 }
 
 export interface RaceReminderCallbackData extends BaseCallbackData {
-  type: "race_reminder";
+  type: 'race_reminder';
   raceId: string;
-  action: "set" | "cancel";
+  action: 'set' | 'cancel';
 }
 
 export interface RaceLocationCallbackData extends BaseCallbackData {
-  type: "race_location";
+  type: 'race_location';
   raceId: string;
 }
 
 export interface RaceFilterCallbackData extends BaseCallbackData {
-  type: "races_filter";
+  type: 'races_filter';
   distance: number;
 }
 

@@ -1,4 +1,4 @@
-import { CallbackData } from "./callbacks/index.ts";
+import { CallbackData } from './callbacks/index.ts';
 
 export interface CommandInput {
   user?: { id?: number | string; name?: string };
@@ -22,7 +22,7 @@ export interface InteractionKeyboard {
 
 export interface CommandOutput {
   text: string;
-  format?: "markdown" | "html" | "markdownV2" | string;
+  format?: 'markdown' | 'html' | 'markdownV2' | string;
   messages?: string[];
   keyboard?: InteractionKeyboard; // Keyboard/buttons for interaction
   editMessage?: boolean; // Whether to edit existing message instead of sending new one

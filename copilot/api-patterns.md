@@ -94,10 +94,10 @@ export interface CommandOutput {
 
 // ✅ Message formatting enum
 export enum MessageFormat {
-  PLAIN = "plain",
-  MARKDOWN = "markdown",
-  HTML = "html",
-  MARKDOWN_V2 = "markdownV2",
+  PLAIN = 'plain',
+  MARKDOWN = 'markdown',
+  HTML = 'html',
+  MARKDOWN_V2 = 'markdownV2',
 }
 ```
 
@@ -340,13 +340,13 @@ export interface CallbackData {
 
 // ✅ Race-related callback interfaces
 export interface RaceDetailsCallbackData extends CallbackData {
-  type: "race_details";
+  type: 'race_details';
   raceId: string;
-  source?: "list" | "search" | "recommendation";
+  source?: 'list' | 'search' | 'recommendation';
 }
 
 export interface RaceFilterCallbackData extends CallbackData {
-  type: "races_filter";
+  type: 'races_filter';
   distance: number;
   location?: string;
   dateRange?: {
@@ -356,37 +356,37 @@ export interface RaceFilterCallbackData extends CallbackData {
 }
 
 export interface RaceReminderCallbackData extends CallbackData {
-  type: "race_reminder";
+  type: 'race_reminder';
   raceId: string;
-  action: "set" | "cancel" | "modify";
+  action: 'set' | 'cancel' | 'modify';
   reminderDays?: number;
 }
 
 // ✅ User-related callback interfaces
 export interface UserPreferencesCallbackData extends CallbackData {
-  type: "user_preferences";
-  action: "view" | "edit" | "save";
-  field?: "distances" | "notifications" | "timezone" | "language";
+  type: 'user_preferences';
+  action: 'view' | 'edit' | 'save';
+  field?: 'distances' | 'notifications' | 'timezone' | 'language';
   value?: unknown;
 }
 
 export interface UserSubscriptionCallbackData extends CallbackData {
-  type: "user_subscription";
-  action: "upgrade" | "downgrade" | "cancel" | "renew";
+  type: 'user_subscription';
+  action: 'upgrade' | 'downgrade' | 'cancel' | 'renew';
   productId?: string;
 }
 
 // ✅ Navigation callback interfaces
 export interface NavigationCallbackData extends CallbackData {
-  type: "navigation";
-  action: "back" | "forward" | "home" | "menu";
+  type: 'navigation';
+  action: 'back' | 'forward' | 'home' | 'menu';
   target: string;
   context?: Record<string, unknown>;
 }
 
 export interface PaginationCallbackData extends CallbackData {
-  type: "pagination";
-  action: "next" | "prev" | "goto";
+  type: 'pagination';
+  action: 'next' | 'prev' | 'goto';
   page: number;
   target: string; // What we're paginating
   filters?: Record<string, unknown>;
@@ -622,10 +622,10 @@ export interface ErrorResponse {
 }
 
 export enum ErrorSeverity {
-  LOW = "low",
-  MEDIUM = "medium",
-  HIGH = "high",
-  CRITICAL = "critical",
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical',
 }
 ```
 

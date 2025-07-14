@@ -3,12 +3,12 @@ import {
   Payment,
   Subscription,
   PaymentStatusValue,
-} from "../entities/Payment.ts";
+} from '../entities/Payment.ts';
 import {
   ProductRepository,
   PaymentRepository,
   SubscriptionRepository,
-} from "../repositories/PaymentRepository.ts";
+} from '../repositories/PaymentRepository.ts';
 
 export class PaymentService {
   constructor(
@@ -26,7 +26,7 @@ export class PaymentService {
   }
 
   async createPayment(
-    paymentData: Omit<Payment, "id" | "createdAt">
+    paymentData: Omit<Payment, 'id' | 'createdAt'>
   ): Promise<Payment> {
     return this.paymentRepository.create(paymentData);
   }
@@ -55,7 +55,7 @@ export class PaymentService {
   }
 
   async createSubscription(
-    subscriptionData: Omit<Subscription, "id" | "startDate">
+    subscriptionData: Omit<Subscription, 'id' | 'startDate'>
   ): Promise<Subscription> {
     return this.subscriptionRepository.create(subscriptionData);
   }

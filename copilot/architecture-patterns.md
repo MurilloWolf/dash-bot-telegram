@@ -248,23 +248,23 @@ export class TelegramPlatformAdapter implements PlatformAdapter {
 export class CallbackDataSerializer {
   static raceDetails(raceId: string): RaceDetailsCallbackData {
     return {
-      type: "race_details",
+      type: 'race_details',
       raceId,
     };
   }
 
   static racesFilter(distance: number): RaceFilterCallbackData {
     return {
-      type: "races_filter",
+      type: 'races_filter',
       distance,
     };
   }
 
   static serialize(data: CallbackData): string {
     switch (data.type) {
-      case "race_details":
+      case 'race_details':
         return `rd:${data.raceId}`;
-      case "races_filter":
+      case 'races_filter':
         return `rf:${data.distance}`;
       // ...
     }
@@ -302,12 +302,12 @@ class WhatsAppMessageStrategy implements MessageExtractionStrategy {
 // Uso no MessageInterceptor
 export class MessageInterceptor {
   private strategies = new Map<string, MessageExtractionStrategy>([
-    ["telegram", new TelegramMessageStrategy()],
-    ["whatsapp", new WhatsAppMessageStrategy()],
+    ['telegram', new TelegramMessageStrategy()],
+    ['whatsapp', new WhatsAppMessageStrategy()],
   ]);
 
   private extractMessageData(input: CommandInput): MessageData | null {
-    const strategy = this.strategies.get(input.platform || "");
+    const strategy = this.strategies.get(input.platform || '');
     return strategy?.extractMessageData(input.raw) || null;
   }
 }

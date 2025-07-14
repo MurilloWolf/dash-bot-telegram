@@ -1,4 +1,4 @@
-import { CommandOutput } from "@app-types/Command.ts";
+import { CommandOutput } from '@app-types/Command.ts';
 
 export async function helpCommand(): Promise<CommandOutput> {
   return {
@@ -23,6 +23,6 @@ export async function helpCommand(): Promise<CommandOutput> {
       `🎯 Use filtros para encontrar corridas do seu perfil rapidamente\n` +
       `⚡ Ative notificações para nunca perder uma inscrição\n\n` +
       `🔥 <i>Bora correr? Escolha seu comando e vamos nessa!</i> 🔥`,
-    format: "HTML",
+    format: 'HTML',
   };
 }

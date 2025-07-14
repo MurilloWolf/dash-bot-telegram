@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import { spawn } from "child_process";
-import { readdir, readFile, writeFile, mkdir, copyFile } from "fs/promises";
-import { join, extname, dirname, relative } from "path";
-import { fileURLToPath } from "url";
+import { spawn } from 'child_process';
+import { readdir, readFile, writeFile, mkdir, copyFile } from 'fs/promises';
+import { join, extname, dirname, relative } from 'path';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -14,12 +14,12 @@ const __dirname = dirname(__filename);
 function runCommand(command, args = [], options = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
-      stdio: "inherit",
+      stdio: 'inherit',
       shell: true,
       ...options,
     });
 
-    child.on("close", (code) => {
+    child.on('close', code => {
       if (code === 0) {
         resolve();
       } else {
@@ -27,7 +27,7 @@ function runCommand(command, args = [], options = {}) {
       }
     });
 
-    child.on("error", (error) => {
+    child.on('error', error => {
       reject(error);
     });
   });
@@ -49,8 +49,8 @@ async function getAllTsFiles(dir) {
         await walk(fullPath);
       } else if (
         entry.isFile() &&
-        extname(entry.name) === ".ts" &&
-        !entry.name.endsWith(".d.ts")
+        extname(entry.name) === '.ts' &&
+        !entry.name.endsWith('.d.ts')
       ) {
         files.push(fullPath);
       }
@@ -78,17 +78,17 @@ function removeTypeScriptExtensions(content) {
  * Processes TypeScript files to remove .ts extensions
  */
 async function processTypeScriptFile(filePath, buildDir) {
-  const content = await readFile(filePath, "utf8");
+  const content = await readFile(filePath, 'utf8');
   const processedContent = removeTypeScriptExtensions(content);
 
-  const relativePath = relative(join(process.cwd(), "src"), filePath);
+  const relativePath = relative(join(process.cwd(), 'src'), filePath);
   const targetPath = join(buildDir, relativePath);
 
   // Ensure directory exists
   await mkdir(dirname(targetPath), { recursive: true });
 
   // Write processed file
-  await writeFile(targetPath, processedContent, "utf8");
+  await writeFile(targetPath, processedContent, 'utf8');
 
   if (content !== processedContent) {
     console.log(`✅ Processed: ${relativePath}`);
@@ -102,23 +102,23 @@ async function processTypeScriptFile(filePath, buildDir) {
  * Main build function
  */
 async function build() {
-  const projectRoot = join(__dirname, "..");
-  const srcDir = join(projectRoot, "src");
-  const buildDir = join(projectRoot, ".build");
-  const distDir = join(projectRoot, "dist");
+  const projectRoot = join(__dirname, '..');
+  const srcDir = join(projectRoot, 'src');
+  const buildDir = join(projectRoot, '.build');
+  const distDir = join(projectRoot, 'dist');
 
   try {
-    console.log("🏗️  Building TypeScript project...");
+    console.log('🏗️  Building TypeScript project...');
 
     // Step 1: Clean build and dist directories
-    console.log("🧹 Cleaning build directories...");
-    await runCommand("rm", ["-rf", ".build", "dist"], { cwd: projectRoot });
+    console.log('🧹 Cleaning build directories...');
+    await runCommand('rm', ['-rf', '.build', 'dist'], { cwd: projectRoot });
 
     // Step 2: Create build directory
     await mkdir(buildDir, { recursive: true });
 
     // Step 3: Process TypeScript files
-    console.log("🔧 Processing TypeScript files...");
+    console.log('🔧 Processing TypeScript files...');
     const tsFiles = await getAllTsFiles(srcDir);
     let processedCount = 0;
 
@@ -132,55 +132,55 @@ async function build() {
     console.log(`📝 Processed ${processedCount} TypeScript files`);
 
     // Step 4: Copy package.json to build directory for compilation
-    const packageJsonPath = join(projectRoot, "package.json");
-    const buildPackageJsonPath = join(buildDir, "package.json");
+    const packageJsonPath = join(projectRoot, 'package.json');
+    const buildPackageJsonPath = join(buildDir, 'package.json');
     await copyFile(packageJsonPath, buildPackageJsonPath);
 
     // Step 5: Create temporary tsconfig for build
     const tempTsConfig = {
       compilerOptions: {
-        module: "NodeNext",
-        moduleResolution: "NodeNext",
-        target: "ES2020",
+        module: 'NodeNext',
+        moduleResolution: 'NodeNext',
+        target: 'ES2020',
         esModuleInterop: true,
         skipLibCheck: true,
         strict: true,
-        outDir: "../dist",
+        outDir: '../dist',
         allowImportingTsExtensions: false,
         noEmit: false,
         declaration: false,
         declarationMap: false,
         sourceMap: false,
         removeComments: true,
-        baseUrl: ".",
+        baseUrl: '.',
         paths: {
-          "@bot/*": ["./Bot/*"],
-          "@app-types/*": ["./types/*"],
-          "@core/*": ["./core/*"],
+          '@bot/*': ['./Bot/*'],
+          '@app-types/*': ['./types/*'],
+          '@core/*': ['./core/*'],
         },
       },
-      include: ["."],
-      exclude: ["node_modules", "**/*.test.ts", "**/*.spec.ts"],
+      include: ['.'],
+      exclude: ['node_modules', '**/*.test.ts', '**/*.spec.ts'],
     };
 
-    const tempTsConfigPath = join(buildDir, "tsconfig.json");
+    const tempTsConfigPath = join(buildDir, 'tsconfig.json');
     await writeFile(tempTsConfigPath, JSON.stringify(tempTsConfig, null, 2));
 
     // Step 6: Compile TypeScript
-    console.log("🔨 Compiling TypeScript...");
-    await runCommand("tsc", ["-p", "tsconfig.json"], { cwd: buildDir });
+    console.log('🔨 Compiling TypeScript...');
+    await runCommand('tsc', ['-p', 'tsconfig.json'], { cwd: buildDir });
 
     // Step 7: Resolve path aliases
-    console.log("🔗 Resolving path aliases...");
-    await runCommand("tsc-alias", ["-p", "tsconfig.json"], { cwd: buildDir });
+    console.log('🔗 Resolving path aliases...');
+    await runCommand('tsc-alias', ['-p', 'tsconfig.json'], { cwd: buildDir });
 
     // Step 8: Clean up build directory
-    await runCommand("rm", ["-rf", ".build"], { cwd: projectRoot });
+    await runCommand('rm', ['-rf', '.build'], { cwd: projectRoot });
 
     console.log(`✅ Build completed successfully!`);
     console.log(`📁 Output directory: ${distDir}`);
   } catch (error) {
-    console.error("❌ Build failed:", error.message);
+    console.error('❌ Build failed:', error.message);
     process.exit(1);
   }
 }

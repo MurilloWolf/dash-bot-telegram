@@ -4,18 +4,18 @@ import {
   Subscription,
   BillingTypeValue,
   PaymentStatusValue,
-} from "../../domain/entities/Payment.ts";
+} from '../../domain/entities/Payment.ts';
 import {
   ProductRepository,
   PaymentRepository,
   SubscriptionRepository,
-} from "../../domain/repositories/PaymentRepository.ts";
-import prisma from "./client.ts";
+} from '../../domain/repositories/PaymentRepository.ts';
+import prisma from './client.ts';
 import type {
   Product as PrismaProduct,
   Payment as PrismaPayment,
   Subscription as PrismaSubscription,
-} from "@prisma/client";
+} from '@prisma/client';
 
 export class PrismaProductRepository implements ProductRepository {
   async findById(id: string): Promise<Product | null> {
@@ -28,23 +28,23 @@ export class PrismaProductRepository implements ProductRepository {
 
   async findAll(): Promise<Product[]> {
     const products = await prisma.product.findMany({
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
     });
 
-    return products.map((product) => this.mapToEntity(product));
+    return products.map(product => this.mapToEntity(product));
   }
 
   async findActiveProducts(): Promise<Product[]> {
     const products = await prisma.product.findMany({
       where: { isActive: true },
-      orderBy: { price: "asc" },
+      orderBy: { price: 'asc' },
     });
 
-    return products.map((product) => this.mapToEntity(product));
+    return products.map(product => this.mapToEntity(product));
   }
 
   async create(
-    productData: Omit<Product, "id" | "createdAt">
+    productData: Omit<Product, 'id' | 'createdAt'>
   ): Promise<Product> {
     const product = await prisma.product.create({
       data: {
@@ -88,7 +88,7 @@ export class PrismaProductRepository implements ProductRepository {
       interval: product.interval || undefined,
       isActive: product.isActive,
       features: JSON.parse(
-        typeof product.features === "string"
+        typeof product.features === 'string'
           ? product.features
           : JSON.stringify(product.features || {})
       ),
@@ -109,10 +109,10 @@ export class PrismaPaymentRepository implements PaymentRepository {
   async findByUserId(userId: string): Promise<Payment[]> {
     const payments = await prisma.payment.findMany({
       where: { userId },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
     });
 
-    return payments.map((payment) => this.mapToEntity(payment));
+    return payments.map(payment => this.mapToEntity(payment));
   }
 
   async findByTelegramChargeId(
@@ -126,7 +126,7 @@ export class PrismaPaymentRepository implements PaymentRepository {
   }
 
   async create(
-    paymentData: Omit<Payment, "id" | "createdAt">
+    paymentData: Omit<Payment, 'id' | 'createdAt'>
   ): Promise<Payment> {
     const payment = await prisma.payment.create({
       data: paymentData,
@@ -182,10 +182,10 @@ export class PrismaSubscriptionRepository implements SubscriptionRepository {
   async findByUserId(userId: string): Promise<Subscription[]> {
     const subscriptions = await prisma.subscription.findMany({
       where: { userId },
-      orderBy: { startDate: "desc" },
+      orderBy: { startDate: 'desc' },
     });
 
-    return subscriptions.map((subscription) => this.mapToEntity(subscription));
+    return subscriptions.map(subscription => this.mapToEntity(subscription));
   }
 
   async findActiveByUserId(userId: string): Promise<Subscription[]> {
@@ -195,14 +195,14 @@ export class PrismaSubscriptionRepository implements SubscriptionRepository {
         isActive: true,
         OR: [{ endDate: null }, { endDate: { gt: new Date() } }],
       },
-      orderBy: { startDate: "desc" },
+      orderBy: { startDate: 'desc' },
     });
 
-    return subscriptions.map((subscription) => this.mapToEntity(subscription));
+    return subscriptions.map(subscription => this.mapToEntity(subscription));
   }
 
   async create(
-    subscriptionData: Omit<Subscription, "id" | "startDate">
+    subscriptionData: Omit<Subscription, 'id' | 'startDate'>
   ): Promise<Subscription> {
     const subscription = await prisma.subscription.create({
       data: subscriptionData,
