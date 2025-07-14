@@ -8,6 +8,7 @@ import {
   ChatTypeValue,
 } from "@core/domain/entities/Message.ts";
 import { logger } from "../../utils/Logger.ts";
+import { MessageSanitizer } from "../../utils/MessageSanitizer.ts";
 
 // Types for Telegram messages
 interface TelegramMessage {
@@ -205,17 +206,20 @@ export class MessageInterceptor {
         });
       }
 
-      // Generate a temporary ID for the outgoing message
-      const temporaryMessageId = Date.now();
+      const originalCommand = messageData.text || "";
+      const commandSummary =
+        MessageSanitizer.createCommandSummary(originalCommand);
 
-      // Save the sent response
+      const outgoingMessageId = BigInt(`${Date.now()}${messageData.messageId}`);
+
       await messageService.createMessage({
-        telegramId: BigInt(temporaryMessageId),
-        text: output.text,
+        telegramId: outgoingMessageId,
+        text: commandSummary, // Resumo ao invés do texto completo
         direction: MessageDirection.OUTGOING,
         type: MessageType.TEXT,
-        userId: userId, // Now includes the userId of the response
+        userId: userId,
         chatId: chat.id,
+        replyToId: messageData.messageId.toString(), // Referencia a mensagem original
         isDeleted: false,
       });
 
