@@ -1,0 +1,96 @@
+name: 💅 Code Quality
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  code-quality:
+    name: 🔍 Code Quality Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+
+    steps:
+      - name: 📦 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🏗️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 🔍 Run ESLint
+        run: |
+          npm run lint:report
+        continue-on-error: true
+
+      - name: 💅 Check Prettier formatting
+        run: |
+          npm run format:check
+        continue-on-error: true
+
+      - name: 📊 ESLint Report
+        uses: ataylorme/eslint-annotate-action@v2
+        if: always()
+        with:
+          repo-token: '${{ secrets.GITHUB_TOKEN }}'
+          report-json: 'eslint-report.json'
+
+      - name: 💅 Prettier Report
+        if: failure()
+        run: |
+          echo "## 💅 Prettier Formatting Issues" >> $GITHUB_STEP_SUMMARY
+          echo "The following files need formatting:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          npm run format:check >> $GITHUB_STEP_SUMMARY || true
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "Run \`npm run format\` to fix formatting issues." >> $GITHUB_STEP_SUMMARY
+
+  auto-format:
+    name: 🤖 Auto Format
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: 📦 Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.head_ref }}
+
+      - name: 🏗️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 💅 Run Prettier
+        run: npm run format
+
+      - name: 🔧 Run ESLint --fix
+        run: npm run lint:fix
+
+      - name: 📝 Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: '🤖 Auto-fix code formatting and linting issues'
+          branch: ${{ github.head_ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

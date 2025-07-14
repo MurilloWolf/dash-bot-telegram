@@ -1,0 +1,65 @@
+# Labels for different areas of the codebase
+'area/bot':
+  - 'src/Bot/**/*'
+  - 'src/adapters/**/*'
+
+'area/core':
+  - 'src/core/**/*'
+
+'area/infrastructure':
+  - 'src/core/infra/**/*'
+  - 'prisma/**/*'
+  - 'docker-compose.yml'
+  - 'Dockerfile'
+
+'area/config':
+  - 'src/Bot/config/**/*'
+  - '*.config.js'
+  - '*.config.ts'
+  - 'tsconfig.json'
+
+'area/tests':
+  - '**/*.test.ts'
+  - '**/*.spec.ts'
+  - '**/tests/**/*'
+  - 'vitest.config.ts'
+
+'area/docs':
+  - '**/*.md'
+  - 'docs/**/*'
+  - 'copilot/**/*'
+
+'area/ci-cd':
+  - '.github/**/*'
+  - 'scripts/**/*'
+
+'area/dependencies':
+  - 'package.json'
+  - 'package-lock.json'
+  - 'npm-shrinkwrap.json'
+
+# Type of changes
+'type/feature':
+  - any: ['src/**/*']
+
+'type/bugfix':
+  - any: ['src/**/*']
+
+'type/documentation':
+  - any: ['**/*.md', 'docs/**/*']
+
+'type/refactor':
+  - any: ['src/**/*']
+
+'type/performance':
+  - any: ['src/**/*']
+
+# Priority labels
+'priority/high':
+  - any: ['src/core/**/*', 'src/Bot/config/**/*']
+
+'priority/medium':
+  - any: ['src/Bot/**/*', 'src/adapters/**/*']
+
+'priority/low':
+  - any: ['docs/**/*', '**/*.md']

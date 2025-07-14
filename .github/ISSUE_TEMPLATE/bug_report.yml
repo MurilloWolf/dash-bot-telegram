@@ -1,0 +1,78 @@
+name: 🐛 Bug Report
+description: Relatar um bug ou problema
+title: '[BUG] '
+labels: ['bug', 'needs-triage']
+assignees:
+  - murillowolfcavalheiro
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar um bug! Por favor, preencha o máximo de informações possível.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 📋 Descrição do Bug
+      description: Descreva claramente o que está acontecendo
+      placeholder: Ex. O bot não responde ao comando /start
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 🔄 Passos para Reproduzir
+      description: Como reproduzir o problema
+      placeholder: |
+        1. Envie o comando /start
+        2. Aguarde resposta
+        3. Não recebe resposta
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: ✅ Comportamento Esperado
+      description: O que deveria acontecer
+      placeholder: O bot deveria responder com a mensagem de boas-vindas
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: ❌ Comportamento Atual
+      description: O que está acontecendo na verdade
+      placeholder: O bot não responde nada
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 🌍 Ambiente
+      description: Informações sobre o ambiente
+      value: |
+        - OS: 
+        - Node.js version: 
+        - Bot version: 
+        - Telegram client:
+      render: markdown
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 📋 Logs/Erros
+      description: Cole logs relevantes ou mensagens de erro
+      render: shell
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 📝 Informações Adicionais
+      description: Qualquer outra informação relevante

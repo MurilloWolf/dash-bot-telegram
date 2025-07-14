@@ -1,0 +1,105 @@
+name: 📝 Changelog
+
+on:
+  push:
+    branches: [main]
+  release:
+    types: [published]
+
+jobs:
+  changelog:
+    name: 📝 Generate Changelog
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: 📦 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🏗️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 📝 Generate Changelog
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          output-file: 'CHANGELOG.md'
+          version-file: 'package.json'
+          version-path: 'version'
+          create-summary: true
+          skip-on-empty: false
+          skip-version-file: false
+          skip-commit: false
+          git-message: 'chore(release): {version} [skip ci]'
+          git-user-name: 'github-actions[bot]'
+          git-user-email: 'github-actions[bot]@users.noreply.github.com'
+          preset: 'conventionalcommits'
+          tag-prefix: 'v'
+          release-count: 10
+
+      - name: 🚀 Create Release
+        if: steps.changelog.outputs.skipped == 'false'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.changelog.outputs.tag }}
+          release_name: Release ${{ steps.changelog.outputs.tag }}
+          body: ${{ steps.changelog.outputs.clean_changelog }}
+          draft: false
+          prerelease: false
+
+  update-version:
+    name: 🔢 Update Version
+    runs-on: ubuntu-latest
+    needs: changelog
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+
+    steps:
+      - name: 📦 Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🏗️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 🔢 Bump version
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          # Determine version bump based on commit messages
+          if git log --format="%s" -n 1 | grep -q "BREAKING CHANGE\|!:"; then
+            npm version major --no-git-tag-version
+          elif git log --format="%s" -n 1 | grep -q "^feat"; then
+            npm version minor --no-git-tag-version
+          else
+            npm version patch --no-git-tag-version
+          fi
+
+      - name: 📝 Commit version bump
+        run: |
+          git add package.json package-lock.json
+          git commit -m "chore: bump version [skip ci]" || exit 0
+          git push

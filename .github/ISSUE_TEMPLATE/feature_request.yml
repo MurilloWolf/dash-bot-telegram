@@ -1,0 +1,83 @@
+name: ✨ Feature Request
+description: Sugerir uma nova funcionalidade
+title: '[FEATURE] '
+labels: ['enhancement', 'needs-review']
+assignees:
+  - murillowolfcavalheiro
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por sugerir uma nova funcionalidade! Por favor, forneça o máximo de detalhes possível.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 🎯 Problema/Necessidade
+      description: Que problema esta funcionalidade resolveria?
+      placeholder: Ex. É frustrante quando... / Seria útil se...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 💡 Solução Proposta
+      description: Descreva a funcionalidade que você gostaria de ver
+      placeholder: Ex. Adicionar um comando /help que...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 🔄 Alternativas Consideradas
+      description: Outras soluções que você considerou
+      placeholder: Ex. Também pensei em usar...
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 🎯 Prioridade
+      description: Qual a importância desta funcionalidade?
+      options:
+        - 🔥 Alta - Crítica para o funcionamento
+        - 📈 Média - Importante mas não urgente
+        - 💡 Baixa - Nice to have
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: ⚡ Complexidade Estimada
+      description: Como você avalia a complexidade de implementação?
+      options:
+        - 🟢 Baixa - Algumas horas
+        - 🟡 Média - Alguns dias
+        - 🔴 Alta - Várias semanas
+        - ❓ Não sei avaliar
+
+  - type: textarea
+    id: details
+    attributes:
+      label: 📋 Detalhes Técnicos
+      description: Detalhes técnicos, mockups, exemplos de uso
+      placeholder: |
+        - Como deveria funcionar
+        - Exemplos de comandos
+        - Fluxo de interação
+
+  - type: checkboxes
+    id: requirements
+    attributes:
+      label: 📋 Requisitos
+      description: Marque os itens relevantes
+      options:
+        - label: Esta funcionalidade afeta a API
+        - label: Esta funcionalidade precisa de novas dependências
+        - label: Esta funcionalidade afeta o banco de dados
+        - label: Esta funcionalidade precisa de documentação
+        - label: Estou disponível para implementar
+        - label: Estou disponível para testar

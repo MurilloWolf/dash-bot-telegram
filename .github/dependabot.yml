@@ -1,0 +1,72 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    commit-message:
+      prefix: 'chore(deps):'
+      include: 'scope'
+    reviewers:
+      - 'murillowolfcavalheiro'
+    assignees:
+      - 'murillowolfcavalheiro'
+    labels:
+      - 'dependencies'
+      - 'auto-merge'
+    open-pull-requests-limit: 5
+    target-branch: 'develop'
+
+    # Group minor and patch updates
+    groups:
+      minor-patch-updates:
+        patterns:
+          - '*'
+        update-types:
+          - 'minor'
+          - 'patch'
+
+    # Ignore major updates for certain packages
+    ignore:
+      - dependency-name: '@types/*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'eslint'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    commit-message:
+      prefix: 'chore(ci):'
+      include: 'scope'
+    reviewers:
+      - 'murillowolfcavalheiro'
+    labels:
+      - 'ci/cd'
+      - 'auto-merge'
+    open-pull-requests-limit: 3
+
+  # Enable version updates for Docker
+  - package-ecosystem: 'docker'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    commit-message:
+      prefix: 'chore(docker):'
+      include: 'scope'
+    reviewers:
+      - 'murillowolfcavalheiro'
+    labels:
+      - 'docker'
+    open-pull-requests-limit: 2
