@@ -1,4 +1,11 @@
-## 0.1.0 (2025-07-14)
+## [0.2.0](https://github.com/MurilloWolf/dash-bot-telegram/compare/v0.1.0...v0.2.0) (2025-07-14)
+
+
+### Features
+
+* fix lint errors ([074e049](https://github.com/MurilloWolf/dash-bot-telegram/commit/074e04982335f01f8514d2ad9cc7bf344fb7c937))
+
+## [0.1.0](https://github.com/MurilloWolf/dash-bot-telegram/compare/d6b0207c54638d0f92cce03bdc0790005f36dd32...v0.1.0) (2025-07-14)
 
 
 ### Features
