@@ -31,7 +31,7 @@ export class NavigationCallbackHandler extends BaseCallbackHandler {
   }
 
   private handleBack(target: string): CommandOutput {
-    // Implementar lógica de navegação para trás baseada no target
+    // Implement backward navigation logic based on target
     return {
       text: `⬅️ Voltando para: ${target}`,
       format: "HTML",
@@ -40,7 +40,7 @@ export class NavigationCallbackHandler extends BaseCallbackHandler {
   }
 
   private handleNext(target: string): CommandOutput {
-    // Implementar lógica de navegação para frente baseada no target
+    // Implement forward navigation logic based on target
     return {
       text: `➡️ Navegando para: ${target}`,
       format: "HTML",

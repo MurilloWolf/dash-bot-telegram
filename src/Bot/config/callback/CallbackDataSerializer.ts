@@ -133,7 +133,7 @@ export class CallbackDataSerializer {
     return Buffer.byteLength(serialized, "utf8");
   }
 
-  // Action creators para facilitar a criação de callbacks
+  // Action creators to facilitate callback creation
   static raceDetails(raceId: string): RaceDetailsCallbackData {
     return { type: "race_details", raceId };
   }

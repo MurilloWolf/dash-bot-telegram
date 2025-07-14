@@ -5,7 +5,7 @@ async function clearDatabase() {
 
   try {
     const allRaces = await raceService.getAllRaces();
-    console.log(`Encontradas ${allRaces.length} corridas para remover.`);
+    console.log(`Found ${allRaces.length} races to remove.`);
 
     let deletedCount = 0;
     for (const race of allRaces) {
@@ -20,7 +20,7 @@ async function clearDatabase() {
       }
     }
 
-    console.log(`\n🎉 Limpeza concluída! ${deletedCount} corridas removidas.`);
+    console.log(`\n🎉 Cleanup completed! ${deletedCount} races removed.`);
   } catch (error) {
     console.error("❌ Erro ao limpar banco:", error);
     process.exit(1);

@@ -1,4 +1,4 @@
-// Tipos base para callbacks
+// Base types for callbacks
 export interface BaseCallbackData {
   type: string;
 }

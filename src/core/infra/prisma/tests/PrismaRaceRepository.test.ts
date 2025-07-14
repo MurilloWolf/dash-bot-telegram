@@ -33,13 +33,13 @@ describe("PrismaRaceRepository", () => {
       id: "race-id",
       title: "Test Race",
       organization: "Test Organization",
-      distances: JSON.stringify(["5K", "10K"]), // Mantenha como string para compatibilidade
-      distancesNumbers: JSON.stringify([5, 10]), // Mantenha como string para compatibilidade
+      distances: JSON.stringify(["5K", "10K"]), // Keep as string for compatibility
+      distancesNumbers: JSON.stringify([5, 10]), // Keep as string for compatibility
       date: new Date("2024-01-15"),
       location: "Test Location",
       link: "https://test.com",
       time: "08:00",
-      status: "OPEN" as PrismaRaceStatus, // Type assertion para compatibilidade com enum
+      status: "OPEN" as PrismaRaceStatus, // Type assertion for enum compatibility
       createdAt: new Date("2024-01-01"),
       updatedAt: new Date("2024-01-01"),
     } as PrismaRace;

@@ -125,9 +125,9 @@ async function seedRaces() {
     const totalRaces = await raceService.getAllRaces();
     const openRaces = await raceService.getAvailableRaces();
 
-    console.log(`\n📊 Estatísticas do banco:`);
-    console.log(`   Total de corridas: ${totalRaces.length}`);
-    console.log(`   Corridas abertas: ${openRaces.length}`);
+    console.log(`\n📊 Database statistics:`);
+    console.log(`   Total races: ${totalRaces.length}`);
+    console.log(`   Open races: ${openRaces.length}`);
   } catch (error) {
     console.error("❌ Erro ao executar seed:", error);
     process.exit(1);

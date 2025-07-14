@@ -8,7 +8,7 @@ import {
   ChatTypeValue,
 } from "@core/domain/entities/Message.ts";
 
-// Tipos para mensagens do Telegram
+// Types for Telegram messages
 interface TelegramMessage {
   message_id: number;
   chat: {
@@ -16,8 +16,8 @@ interface TelegramMessage {
     type: string;
     title?: string;
     username?: string;
-    first_name?: string; // Para chats privados
-    last_name?: string; // Para chats privados
+    first_name?: string; // For private chats
+    last_name?: string; // For private chats
     all_members_are_administrators?: boolean;
   };
   from?: {
@@ -41,7 +41,7 @@ interface TelegramMessage {
   edit_date?: number;
 }
 
-// Tipos para mensagens do WhatsApp (estrutura exemplo)
+// Types for WhatsApp messages (example structure)
 interface WhatsAppMessage {
   id: string;
   from: string;
@@ -59,24 +59,24 @@ export class MessageInterceptor {
    */
   async interceptIncomingMessage(input: CommandInput): Promise<void> {
     try {
-      // Só processa se tiver informações suficientes da mensagem
+      // Only process if we have sufficient message information
       if (!input.raw || !input.platform) {
         return;
       }
 
-      // Determina o tipo de plataforma e extrai dados relevantes
+      // Determine the platform type and extract relevant data
       const messageData = this.extractMessageData(input);
 
       if (!messageData) {
-        console.warn("⚠️ Não foi possível extrair dados da mensagem recebida");
+        console.warn("⚠️ Could not extract data from received message");
         return;
       }
 
-      // Buscar ou criar o usuário se necessário
+      // Find or create user if necessary
       let userId: string | undefined;
       if (messageData.telegramUserId) {
         try {
-          // Usar o método registerUser que já faz a busca e criação
+          // Use the registerUser method that already handles search and creation
           const user = await userService.registerUser(
             messageData.telegramUserId,
             messageData.userName || `User ${messageData.telegramUserId}`,
@@ -85,14 +85,14 @@ export class MessageInterceptor {
           userId = user.id;
         } catch (error) {
           console.warn(
-            `⚠️ Erro ao buscar/criar usuário ${messageData.telegramUserId}:`,
+            `⚠️ Error finding/creating user ${messageData.telegramUserId}:`,
             error
           );
-          // Continua sem userId se não conseguir criar/buscar
+          // Continue without userId if unable to create/find
         }
       }
 
-      // Salva ou atualiza o chat
+      // Save or update the chat
       let chat = await messageService.getChatByTelegramId(messageData.chatId);
       if (!chat) {
         chat = await messageService.createChat({
@@ -104,13 +104,13 @@ export class MessageInterceptor {
         });
       }
 
-      // Salva a mensagem recebida
+      // Save the received message
       await messageService.createMessage({
         telegramId: BigInt(messageData.messageId),
         text: messageData.text,
         direction: MessageDirection.INCOMING,
         type: messageData.messageType,
-        userId: userId, // Agora usa o ID interno do usuário, não o telegramId
+        userId: userId, // Now uses the internal user ID, not the telegramId
         chatId: chat.id,
         replyToId: messageData.replyToId,
         editedAt: messageData.editedAt,
@@ -136,7 +136,7 @@ export class MessageInterceptor {
     output: CommandOutput
   ): Promise<void> {
     try {
-      // Só processa se tiver informações suficientes
+      // Only process if we have sufficient information
       if (!input.raw || !input.platform || !output.text) {
         return;
       }
@@ -147,11 +147,11 @@ export class MessageInterceptor {
         return;
       }
 
-      // Buscar ou criar o usuário se necessário (mesmo código da mensagem incoming)
+      // Find or create user if necessary (same code as incoming message)
       let userId: string | undefined;
       if (messageData.telegramUserId) {
         try {
-          // Usar o método registerUser que já faz a busca e criação
+          // Use the registerUser method that already handles search and creation
           const user = await userService.registerUser(
             messageData.telegramUserId,
             messageData.userName || `User ${messageData.telegramUserId}`,
@@ -160,35 +160,35 @@ export class MessageInterceptor {
           userId = user.id;
         } catch (error) {
           console.warn(
-            `⚠️ Erro ao buscar/criar usuário ${messageData.telegramUserId}:`,
+            `⚠️ Error finding/creating user ${messageData.telegramUserId}:`,
             error
           );
-          // Continua sem userId se não conseguir criar/buscar
+          // Continue without userId if unable to create/find
         }
       }
 
-      // Salva ou atualiza o chat se necessário
+      // Save or update the chat if necessary
       let chat = await messageService.getChatByTelegramId(messageData.chatId);
       if (!chat) {
         chat = await messageService.createChat({
           telegramId: messageData.chatId,
-          type: messageData.chatType, // Usa o tipo extraído da mensagem
+          type: messageData.chatType, // Uses the type extracted from the message
           title: messageData.chatTitle,
           username: messageData.chatUsername,
           memberCount: messageData.memberCount,
         });
       }
 
-      // Gera um ID temporário para a mensagem outgoing
+      // Generate a temporary ID for the outgoing message
       const temporaryMessageId = Date.now();
 
-      // Salva a resposta enviada
+      // Save the sent response
       await messageService.createMessage({
         telegramId: BigInt(temporaryMessageId),
         text: output.text,
         direction: MessageDirection.OUTGOING,
         type: MessageType.TEXT,
-        userId: userId, // Agora inclui o userId da resposta
+        userId: userId, // Now includes the userId of the response
         chatId: chat.id,
         isDeleted: false,
       });
@@ -197,7 +197,7 @@ export class MessageInterceptor {
         `📤 [${input.platform}] Resposta salva: ${temporaryMessageId} para chat ${messageData.chatId} (userId: ${userId})`
       );
     } catch (error) {
-      console.error("❌ Erro ao interceptar mensagem enviada:", error);
+      console.error("❌ Error intercepting sent message:", error);
     }
   }
 
@@ -259,10 +259,10 @@ export class MessageInterceptor {
       return null;
     }
 
-    // Constrói o título do chat baseado no tipo
+    // Build the chat title based on the type
     let chatTitle: string | undefined;
     if (msg.chat.type === "private") {
-      // Para chats privados, usa first_name + last_name do chat
+      // For private chats, use first_name + last_name from chat
       const firstName = msg.chat.first_name || "";
       const lastName = msg.chat.last_name || "";
       chatTitle = lastName ? `${firstName} ${lastName}` : firstName;
@@ -270,12 +270,12 @@ export class MessageInterceptor {
         `🏷️ Título do chat privado construído: "${chatTitle}" (firstName: "${firstName}", lastName: "${lastName}")`
       );
     } else {
-      // Para grupos/canais, usa o título fornecido
+      // For groups/channels, use the provided title
       chatTitle = msg.chat.title;
       console.log(`🏷️ Título do grupo/canal: "${chatTitle}"`);
     }
 
-    // Constrói o nome completo do usuário
+    // Build the user's full name
     const userFirstName = msg.from?.first_name || "";
     const userLastName = msg.from?.last_name || "";
     const fullUserName = userLastName
@@ -322,10 +322,10 @@ export class MessageInterceptor {
     replyToId?: string;
     editedAt?: Date;
   } | null {
-    // TODO: Implementar extração de dados do WhatsApp
-    // _msg será usado quando implementarmos esta função
+    // TODO: Implement WhatsApp data extraction
+    // _msg will be used when we implement this function
     console.log(_msg);
-    console.warn("⚠️ Extração de dados do WhatsApp ainda não implementada");
+    console.warn("⚠️ WhatsApp data extraction not yet implemented");
     return null;
   }
 
@@ -364,5 +364,5 @@ export class MessageInterceptor {
   }
 }
 
-// Instância singleton para uso em todo o sistema
+// Singleton instance for use throughout the system
 export const messageInterceptor = new MessageInterceptor();

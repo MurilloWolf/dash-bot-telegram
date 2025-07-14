@@ -3,7 +3,7 @@ export * from "./races/index.ts";
 export * from "./user/index.ts";
 export * from "./shared/index.ts";
 
-// Manter exports antigos para compatibilidade
+// Keep old exports for compatibility
 import { helpCommand, startCommand } from "./user/index.ts";
 import {
   listRacesCommand as corridasCommand,

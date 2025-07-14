@@ -22,19 +22,19 @@ async function clearCompleteDatabase() {
     await prisma.payment.deleteMany({});
     console.log("✅ Pagamentos removidos");
 
-    console.log("📦 Removendo produtos...");
+    console.log("📦 Removing products...");
     await prisma.product.deleteMany({});
-    console.log("✅ Produtos removidos");
+    console.log("✅ Products removed");
 
-    console.log("⚙️ Removendo preferências de usuários...");
+    console.log("⚙️ Removing user preferences...");
     await prisma.userPreferences.deleteMany({});
     console.log("✅ Preferências removidas");
 
-    console.log("👥 Removendo usuários...");
+    console.log("👥 Removing users...");
     await prisma.user.deleteMany({});
-    console.log("✅ Usuários removidos");
+    console.log("✅ Users removed");
 
-    console.log("🏃‍♂️ Removendo corridas...");
+    console.log("🏃‍♂️ Removing races...");
     const allRaces = await raceService.getAllRaces();
     let deletedCount = 0;
     for (const race of allRaces) {
@@ -45,7 +45,7 @@ async function clearCompleteDatabase() {
         console.log(`⚠️  Erro ao remover corrida "${race.title}": ${error}`);
       }
     }
-    console.log(`✅ ${deletedCount} corridas removidas`);
+    console.log(`✅ ${deletedCount} races removed`);
 
     console.log("\n🎉 Limpeza completa concluída!");
     console.log("📊 Banco de dados totalmente limpo");

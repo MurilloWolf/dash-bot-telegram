@@ -13,7 +13,7 @@ async function seedCompleteDatabase() {
 
   try {
     // 1. Criar produtos
-    console.log("📦 Criando produtos...");
+    console.log("📦 Creating products...");
     const products = await Promise.all([
       prisma.product.create({
         data: {
@@ -69,10 +69,10 @@ async function seedCompleteDatabase() {
       }),
     ]);
 
-    console.log(`✅ ${products.length} produtos criados`);
+    console.log(`✅ ${products.length} products created`);
 
-    // 2. Criar usuários
-    console.log("👥 Criando usuários...");
+    // 2. Create users
+    console.log("👥 Creating users...");
     const users = await Promise.all([
       prisma.user.create({
         data: {
@@ -93,7 +93,7 @@ async function seedCompleteDatabase() {
           username: "maria_santos",
           isActive: true,
           isPremium: false,
-          lastSeenAt: new Date(Date.now() - 3600000), // 1 hora atrás
+          lastSeenAt: new Date(Date.now() - 3600000), // 1 hour ago
         },
       }),
       prisma.user.create({
@@ -105,7 +105,7 @@ async function seedCompleteDatabase() {
           isPremium: true,
           premiumSince: new Date("2024-06-01"),
           premiumEndsAt: new Date("2024-12-01"),
-          lastSeenAt: new Date(Date.now() - 7200000), // 2 horas atrás
+          lastSeenAt: new Date(Date.now() - 7200000), // 2 hours ago
         },
       }),
       prisma.user.create({
@@ -115,7 +115,7 @@ async function seedCompleteDatabase() {
           username: "ana_fitness",
           isActive: true,
           isPremium: false,
-          lastSeenAt: new Date(Date.now() - 86400000), // 1 dia atrás
+          lastSeenAt: new Date(Date.now() - 86400000), // 1 day ago
         },
       }),
       prisma.user.create({
@@ -126,15 +126,15 @@ async function seedCompleteDatabase() {
           isPremium: true,
           premiumSince: new Date("2024-03-20"),
           premiumEndsAt: new Date("2025-03-20"),
-          lastSeenAt: new Date(Date.now() - 1800000), // 30 minutos atrás
+          lastSeenAt: new Date(Date.now() - 1800000), // 30 minutes ago
         },
       }),
     ]);
 
-    console.log(`✅ ${users.length} usuários criados`);
+    console.log(`✅ ${users.length} users created`);
 
-    // 3. Criar preferências dos usuários
-    console.log("⚙️ Criando preferências dos usuários...");
+    // 3. Create user preferences
+    console.log("⚙️ Creating user preferences...");
     const preferences = await Promise.all([
       prisma.userPreferences.create({
         data: {
@@ -191,7 +191,7 @@ async function seedCompleteDatabase() {
     console.log(`✅ ${preferences.length} preferências criadas`);
 
     // 4. Criar pagamentos
-    console.log("💳 Criando pagamentos...");
+    console.log("💳 Creating payments...");
     const payments = await Promise.all([
       prisma.payment.create({
         data: {
@@ -257,10 +257,10 @@ async function seedCompleteDatabase() {
       }),
     ]);
 
-    console.log(`✅ ${payments.length} pagamentos criados`);
+    console.log(`✅ ${payments.length} payments created`);
 
     // 5. Criar assinaturas
-    console.log("📅 Criando assinaturas...");
+    console.log("📅 Creating subscriptions...");
     const subscriptions = await Promise.all([
       prisma.subscription.create({
         data: {
@@ -300,7 +300,7 @@ async function seedCompleteDatabase() {
     console.log(`✅ ${subscriptions.length} assinaturas criadas`);
 
     // 6. Criar chats
-    console.log("💬 Criando chats...");
+    console.log("💬 Creating chats...");
     const chats = await Promise.all([
       prisma.chat.create({
         data: {
@@ -337,10 +337,10 @@ async function seedCompleteDatabase() {
       }),
     ]);
 
-    console.log(`✅ ${chats.length} chats criados`);
+    console.log(`✅ ${chats.length} chats created`);
 
     // 7. Criar mensagens
-    console.log("📝 Criando mensagens...");
+    console.log("📝 Creating messages...");
     const messages = await Promise.all([
       prisma.message.create({
         data: {
@@ -426,8 +426,8 @@ async function seedCompleteDatabase() {
 
     console.log(`✅ ${messages.length} mensagens criadas`);
 
-    // 8. Criar corridas (usando o sistema existente)
-    console.log("🏃‍♂️ Criando corridas...");
+    // 8. Create races (using existing system)
+    console.log("🏃‍♂️ Creating races...");
     const races = [
       {
         title: "Corrida de São Paulo",
@@ -529,20 +529,20 @@ async function seedCompleteDatabase() {
       }
     }
 
-    console.log(`✅ ${createdRacesCount} corridas criadas`);
+    console.log(`✅ ${createdRacesCount} races created`);
 
-    // 9. Estatísticas finais
-    console.log("\n📊 Estatísticas do seed completo:");
-    console.log(`   👥 Usuários: ${users.length}`);
+    // 9. Final statistics
+    console.log("\n📊 Complete seed statistics:");
+    console.log(`   👥 Users: ${users.length}`);
     console.log(
       `   🏆 Usuários Premium: ${users.filter((u) => u.isPremium).length}`
     );
-    console.log(`   📦 Produtos: ${products.length}`);
+    console.log(`   📦 Products: ${products.length}`);
     console.log(`   💳 Pagamentos: ${payments.length}`);
     console.log(`   📅 Assinaturas: ${subscriptions.length}`);
     console.log(`   💬 Chats: ${chats.length}`);
     console.log(`   📝 Mensagens: ${messages.length}`);
-    console.log(`   🏃‍♂️ Corridas: ${createdRacesCount}`);
+    console.log(`   🏃‍♂️ Races: ${createdRacesCount}`);
 
     const totalRaces = await raceService.getAllRaces();
     const openRaces = await raceService.getAvailableRaces();

@@ -118,7 +118,7 @@ export class WhatsAppPlatformAdapter implements PlatformAdapter {
     );
 
     // Here you would implement WhatsApp-specific callback logic
-    // usando o callbackManager da mesma forma que no Telegram
+    // using the callbackManager the same way as in Telegram
   }
 }
 

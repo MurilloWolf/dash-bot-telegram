@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MessageInterceptor } from "../MessageInterceptor.ts";
 import { CommandInput, CommandOutput } from "@app-types/Command.ts";
 
-// Mock do messageService e userService
+// Mock for messageService and userService
 vi.mock("@core/infra/dependencies", () => ({
   messageService: {
     getChatByTelegramId: vi.fn(),
@@ -103,8 +103,8 @@ describe("MessageInterceptor", () => {
           chat: {
             id: 456,
             type: "private",
-            first_name: "Test", // Para chats privados, o título vem destes campos
-            last_name: "Chat", // O título será "Test Chat"
+            first_name: "Test", // For private chats, the title comes from these fields
+            last_name: "Chat", // The title will be "Test Chat"
             username: "testuser",
           },
           from: {
@@ -121,7 +121,7 @@ describe("MessageInterceptor", () => {
       expect(mockMessageService.createChat).toHaveBeenCalledWith({
         telegramId: "456",
         type: "PRIVATE",
-        title: "Test Chat", // Agora será construído a partir de first_name + last_name
+        title: "Test Chat", // Now will be built from first_name + last_name
         username: "testuser",
         memberCount: undefined,
       });
@@ -184,7 +184,7 @@ describe("MessageInterceptor", () => {
           from: {
             id: 12345,
             first_name: "Test",
-            last_name: "User", // Adicionado para que o nome completo seja "Test User"
+            last_name: "User", // Added so the full name will be "Test User"
             username: "testuser",
           },
           chat: {
@@ -206,7 +206,7 @@ describe("MessageInterceptor", () => {
 
       expect(mockUserService.registerUser).toHaveBeenCalledWith(
         "12345",
-        "Test User", // Agora espera o nome completo
+        "Test User", // Now expects the full name
         "testuser"
       );
 
@@ -215,7 +215,7 @@ describe("MessageInterceptor", () => {
         text: "Response message",
         direction: "OUTGOING",
         type: "TEXT",
-        userId: "user-123", // Agora espera o userId
+        userId: "user-123", // Now expects the userId
         chatId: "chat-123",
         isDeleted: false,
       });

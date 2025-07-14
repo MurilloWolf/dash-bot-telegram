@@ -4,7 +4,7 @@ export * from "./callbacks/index.ts";
 import { UserConfigCallbackHandler } from "./callbacks/index.ts";
 import { startCommand, helpCommand, configCommand } from "./commands/index.ts";
 
-// Registro automático de callbacks
+// Automatic callback registration
 export const userCallbackHandlers = [new UserConfigCallbackHandler()];
 
 // Registro automático de comandos
