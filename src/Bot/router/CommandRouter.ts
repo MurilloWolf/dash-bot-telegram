@@ -1,5 +1,6 @@
 import { CommandRegistry } from "@bot/config/commands/CommandRegistry.ts";
 import { CommandInput, CommandOutput } from "@app-types/Command.ts";
+import { messageInterceptor } from "@bot/middleware/MessageInterceptor.ts";
 
 import { listRacesByDistanceCommand as corridasDistanciaCommand } from "@bot/commands/usecases/races/index.ts";
 
@@ -22,6 +23,8 @@ export async function routeCommand(
   input: CommandInput
 ): Promise<CommandOutput> {
   try {
+    await messageInterceptor.interceptIncomingMessage(input);
+
     const runDistanceMatch = command.match(/^corridas_(.+)$/);
     if (runDistanceMatch) {
       const distanceStr = runDistanceMatch[1];
@@ -31,7 +34,9 @@ export async function routeCommand(
         .filter((d) => !isNaN(d));
 
       if (distances.length > 0) {
-        return corridasDistanciaCommand(input, distances);
+        const output = await corridasDistanciaCommand(input, distances);
+        await messageInterceptor.interceptOutgoingMessage(input, output);
+        return output;
       }
     }
 
@@ -40,20 +45,26 @@ export async function routeCommand(
 
     if (handler) {
       console.log(`🎯 [registry] Executando comando: /${command}`);
-      return handler(input);
+      const output = await handler(input);
+      await messageInterceptor.interceptOutgoingMessage(input, output);
+      return output;
     }
 
     console.warn(`❌ Comando não encontrado: /${command}`);
-    return {
+    const output = {
       text: "❌ Comando não reconhecido. Use /help para ver os comandos disponíveis.",
       format: "HTML",
     };
+    await messageInterceptor.interceptOutgoingMessage(input, output);
+    return output;
   } catch (error) {
     console.error(`❌ Erro ao executar comando /${command}:`, error);
-    return {
+    const output = {
       text: "❌ Erro interno. Tente novamente mais tarde.",
       format: "HTML",
     };
+    await messageInterceptor.interceptOutgoingMessage(input, output);
+    return output;
   }
 }
 

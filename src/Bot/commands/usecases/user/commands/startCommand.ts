@@ -1,15 +1,9 @@
 import { CommandInput, CommandOutput } from "@app-types/Command.ts";
-import { userService } from "@core/infra/dependencies.ts";
 
 export async function startCommand(
   input: CommandInput
 ): Promise<CommandOutput> {
   try {
-    if (input.user?.id && input.user?.name) {
-      const telegramId = String(input.user.id);
-      await userService.registerUser(telegramId, input.user.name);
-    }
-
     const userName = input.user?.name ?? "Corredor";
     return {
       text:
