@@ -1,4 +1,5 @@
 import { CommandInput, CommandOutput } from "@app-types/Command.ts";
+import { logger } from "../../../../../utils/Logger.ts";
 
 export async function configCommand(
   input: CommandInput
@@ -64,7 +65,13 @@ export async function configCommand(
         };
     }
   } catch (error) {
-    console.error("Erro no comando config:", error);
+    logger.error("Failed to process config command", {
+      module: "UserCommands",
+      action: "configCommand",
+      userId: String(input.user?.id || "unknown"),
+      args: input.args,
+      error: String(error),
+    });
     return {
       text: "❌ Erro ao processar configuração. Tente novamente mais tarde.",
       format: "HTML",

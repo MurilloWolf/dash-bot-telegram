@@ -16,6 +16,7 @@ import { CallbackDataSerializer } from "@bot/config/callback/CallbackDataSeriali
 import { callbackManager } from "@bot/config/callback/CallbackManager.ts";
 import parseCommand from "../../../utils/parseCommand.ts";
 import { stripFormatting } from "../../../utils/markdownUtils.ts";
+import { logger } from "../../../utils/Logger.ts";
 
 export class TelegramPlatformAdapter implements PlatformAdapter {
   constructor(private bot: TelegramBot) {}
@@ -71,7 +72,15 @@ export class TelegramPlatformAdapter implements PlatformAdapter {
         });
       }
     } catch (error) {
-      console.error("Failed to send formatted message:", error);
+      logger.error(
+        "Failed to send formatted message",
+        {
+          module: "TelegramBotAdapter",
+          action: "send_message_error",
+          chatId: chatId.toString(),
+        },
+        error as Error
+      );
       await this.bot.sendMessage(chatId, stripFormatting(output.text));
     }
   }
@@ -91,7 +100,7 @@ export class TelegramPlatformAdapter implements PlatformAdapter {
         reply_markup: keyboard as InlineKeyboardMarkup,
       });
     } catch (error) {
-      console.error("Failed to edit message:", error);
+      logger.messageError("telegram", error as Error, chatId.toString());
       // Fallback: send new message
       await this.sendMessage(chatId, output);
     }
@@ -127,7 +136,12 @@ export class TelegramPlatformAdapter implements PlatformAdapter {
         }
       }
     } catch (error) {
-      console.error("Error handling callback:", error);
+      logger.callbackError(
+        "unknown",
+        error as Error,
+        userId.toString(),
+        chatId.toString()
+      );
       await this.sendMessage(chatId, {
         text: "❌ Erro ao processar ação.",
         format: "HTML",
@@ -138,17 +152,25 @@ export class TelegramPlatformAdapter implements PlatformAdapter {
 
 export async function handleTelegramMessage(bot: TelegramBot, msg: Message) {
   if (!msg.text) return;
-  console.log("Message received:", JSON.stringify(msg, null, 2));
+
+  logger.messageReceived(
+    "telegram",
+    msg.chat.id.toString(),
+    msg.from?.id?.toString(),
+    "text"
+  );
 
   const { command, args } = parseCommand(msg.text);
 
   if (!command) return;
 
-  console.log(
-    `Received command: ${command} with args: ${args.join(", ")} from user: ${
-      msg.from?.id
-    }`
-  );
+  logger.debug(`Command parsed: ${command} with args: ${args.join(", ")}`, {
+    module: "TelegramBotAdapter",
+    action: "parse_command",
+    commandName: command,
+    userId: msg.from?.id?.toString(),
+    chatId: msg.chat.id.toString(),
+  });
 
   const input: CommandInput = {
     user: { id: msg.from?.id, name: msg.from?.first_name },
@@ -159,14 +181,21 @@ export async function handleTelegramMessage(bot: TelegramBot, msg: Message) {
 
   const output = await routeCommand(command, input);
 
-  console.log(
-    `Sending response for user ${msg.from?.id}, command: ${command}\n`
-  );
+  logger.debug(`Sending response for command: ${command}`, {
+    module: "TelegramBotAdapter",
+    action: "send_response",
+    commandName: command,
+    userId: msg.from?.id?.toString(),
+    chatId: msg.chat.id.toString(),
+  });
 
   if (!output || !output.text) {
-    console.warn(
-      `No output text for command ${command} from user ${msg.from?.id}. Skipping message.`
-    );
+    logger.warn(`No output text for command ${command}. Skipping message.`, {
+      module: "TelegramBotAdapter",
+      action: "no_output",
+      commandName: command,
+      userId: msg.from?.id?.toString(),
+    });
     return;
   }
 
@@ -185,7 +214,7 @@ export async function handleTelegramCallback(
 
   if (!chatId || !messageId || !callbackData) return;
 
-  console.log(`Received callback: ${callbackData} from user: ${userId}`);
+  logger.callbackExecution(callbackData, userId.toString(), chatId.toString());
 
   const adapter = new TelegramPlatformAdapter(bot);
   await adapter.handleCallback(callbackData, chatId, messageId, userId);

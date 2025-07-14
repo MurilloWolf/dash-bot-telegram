@@ -1,28 +1,34 @@
 import { raceService } from "../infra/dependencies.ts";
+import { logger } from "../../utils/Logger.ts";
 
 async function clearDatabase() {
-  console.log("🗑️  Limpando banco de dados...");
+  logger.scriptStart("clearDatabase", "Limpando banco de dados");
 
   try {
     const allRaces = await raceService.getAllRaces();
-    console.log(`Found ${allRaces.length} races to remove.`);
+    logger.info(`Found ${allRaces.length} races to remove`, {
+      module: "ClearDatabase",
+      action: "found_races",
+      count: allRaces.length,
+    });
 
     let deletedCount = 0;
     for (const race of allRaces) {
       try {
         await raceService.deleteRace(race.id);
-        console.log(`✅ Removida: ${race.title}`);
+        logger.raceOperation("deleted", race.id, race.title);
         deletedCount++;
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
-        console.log(`⚠️  Erro ao remover "${race.title}": ${errorMessage}`);
+        logger.raceError("delete", error as Error, race.id, race.title);
       }
     }
 
-    console.log(`\n🎉 Cleanup completed! ${deletedCount} races removed.`);
+    logger.scriptComplete("clearDatabase", {
+      deletedCount,
+      totalRaces: allRaces.length,
+    });
   } catch (error) {
-    console.error("❌ Erro ao limpar banco:", error);
+    logger.scriptError("clearDatabase", error as Error);
     process.exit(1);
   }
 }

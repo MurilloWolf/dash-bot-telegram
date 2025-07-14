@@ -1,6 +1,7 @@
 import { CommandRegistry } from "@bot/config/commands/CommandRegistry.ts";
 import { CommandInput, CommandOutput } from "@app-types/Command.ts";
 import { messageInterceptor } from "@bot/middleware/MessageInterceptor.ts";
+import { logger } from "../../utils/Logger.ts";
 
 import { listRacesByDistanceCommand as corridasDistanciaCommand } from "@bot/commands/usecases/races/index.ts";
 
@@ -12,7 +13,14 @@ async function getCommandRegistry(): Promise<CommandRegistry> {
     try {
       await commandRegistry.autoRegisterCommands();
     } catch (error) {
-      console.error("❌ Erro ao inicializar registry de comandos:", error);
+      logger.error(
+        "Erro ao inicializar registry de comandos",
+        {
+          module: "CommandRouter",
+          action: "initialize_registry",
+        },
+        error as Error
+      );
     }
   }
   return commandRegistry;
@@ -34,6 +42,7 @@ export async function routeCommand(
         .filter((d) => !isNaN(d));
 
       if (distances.length > 0) {
+        logger.commandExecution(command, input.user?.id?.toString());
         const output = await corridasDistanciaCommand(input, distances);
         await messageInterceptor.interceptOutgoingMessage(input, output);
         return output;
@@ -44,13 +53,18 @@ export async function routeCommand(
     const handler = registry.getHandler(command);
 
     if (handler) {
-      console.log(`🎯 [registry] Executando comando: /${command}`);
+      logger.commandExecution(command, input.user?.id?.toString());
       const output = await handler(input);
       await messageInterceptor.interceptOutgoingMessage(input, output);
       return output;
     }
 
-    console.warn(`❌ Comando não encontrado: /${command}`);
+    logger.warn(`Comando não encontrado: /${command}`, {
+      module: "CommandRouter",
+      action: "command_not_found",
+      commandName: command,
+      userId: input.user?.id?.toString(),
+    });
     const output = {
       text: "❌ Comando não reconhecido. Use /help para ver os comandos disponíveis.",
       format: "HTML",
@@ -58,7 +72,7 @@ export async function routeCommand(
     await messageInterceptor.interceptOutgoingMessage(input, output);
     return output;
   } catch (error) {
-    console.error(`❌ Erro ao executar comando /${command}:`, error);
+    logger.commandError(command, error as Error, input.user?.id?.toString());
     const output = {
       text: "❌ Erro interno. Tente novamente mais tarde.",
       format: "HTML",
@@ -76,7 +90,14 @@ export async function getAvailableCommands(): Promise<string[]> {
     const allCommands = [...new Set([...registryCommands])];
     return allCommands.sort();
   } catch (error) {
-    console.error("❌ Erro ao obter comandos disponíveis:", error);
+    logger.error(
+      "Erro ao obter comandos disponíveis",
+      {
+        module: "CommandRouter",
+        action: "get_available_commands",
+      },
+      error as Error
+    );
     return [];
   }
 }

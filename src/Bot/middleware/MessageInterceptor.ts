@@ -7,6 +7,7 @@ import {
   MessageTypeValue,
   ChatTypeValue,
 } from "@core/domain/entities/Message.ts";
+import { logger } from "../../utils/Logger.ts";
 
 // Types for Telegram messages
 interface TelegramMessage {
@@ -68,7 +69,11 @@ export class MessageInterceptor {
       const messageData = this.extractMessageData(input);
 
       if (!messageData) {
-        console.warn("⚠️ Could not extract data from received message");
+        logger.warn("Could not extract data from received message", {
+          module: "MessageInterceptor",
+          action: "extract_message_data",
+          platform: input.platform,
+        });
         return;
       }
 
@@ -84,9 +89,14 @@ export class MessageInterceptor {
           );
           userId = user.id;
         } catch (error) {
-          console.warn(
-            `⚠️ Error finding/creating user ${messageData.telegramUserId}:`,
-            error
+          logger.warn(
+            `Error finding/creating user ${messageData.telegramUserId}`,
+            {
+              module: "MessageInterceptor",
+              action: "register_user",
+              telegramUserId: messageData.telegramUserId,
+            },
+            error as Error
           );
           // Continue without userId if unable to create/find
         }
@@ -117,11 +127,22 @@ export class MessageInterceptor {
         isDeleted: false,
       });
 
-      console.log(
-        `📥 [${input.platform}] Mensagem salva: ${messageData.messageId} de ${messageData.telegramUserId} (userId: ${userId})`
+      logger.messageIntercept(
+        input.platform || "unknown",
+        "received",
+        messageData.chatId?.toString(),
+        messageData.telegramUserId?.toString()
       );
     } catch (error) {
-      console.error("❌ Erro ao interceptar mensagem recebida:", error);
+      logger.error(
+        "Erro ao interceptar mensagem recebida",
+        {
+          module: "MessageInterceptor",
+          action: "intercept_incoming",
+          platform: input.platform,
+        },
+        error as Error
+      );
     }
   }
 
@@ -159,9 +180,14 @@ export class MessageInterceptor {
           );
           userId = user.id;
         } catch (error) {
-          console.warn(
-            `⚠️ Error finding/creating user ${messageData.telegramUserId}:`,
-            error
+          logger.warn(
+            `Error finding/creating user for outgoing message ${messageData.telegramUserId}`,
+            {
+              module: "MessageInterceptor",
+              action: "register_user_outgoing",
+              telegramUserId: messageData.telegramUserId,
+            },
+            error as Error
           );
           // Continue without userId if unable to create/find
         }
@@ -193,11 +219,22 @@ export class MessageInterceptor {
         isDeleted: false,
       });
 
-      console.log(
-        `📤 [${input.platform}] Resposta salva: ${temporaryMessageId} para chat ${messageData.chatId} (userId: ${userId})`
+      logger.messageIntercept(
+        input.platform || "unknown",
+        "sent",
+        messageData.chatId?.toString(),
+        userId
       );
     } catch (error) {
-      console.error("❌ Error intercepting sent message:", error);
+      logger.error(
+        "Error intercepting sent message",
+        {
+          module: "MessageInterceptor",
+          action: "intercept_outgoing",
+          platform: input.platform,
+        },
+        error as Error
+      );
     }
   }
 
@@ -228,11 +265,23 @@ export class MessageInterceptor {
         case "whatsapp":
           return this.extractWhatsAppMessageData(input.raw as WhatsAppMessage);
         default:
-          console.warn(`⚠️ Plataforma não suportada: ${input.platform}`);
+          logger.warn(`Plataforma não suportada: ${input.platform}`, {
+            module: "MessageInterceptor",
+            action: "extract_message_data",
+            platform: input.platform,
+          });
           return null;
       }
     } catch (error) {
-      console.error("❌ Erro ao extrair dados da mensagem:", error);
+      logger.error(
+        "Erro ao extrair dados da mensagem",
+        {
+          module: "MessageInterceptor",
+          action: "extract_message_data",
+          platform: input.platform,
+        },
+        error as Error
+      );
       return null;
     }
   }
@@ -266,13 +315,21 @@ export class MessageInterceptor {
       const firstName = msg.chat.first_name || "";
       const lastName = msg.chat.last_name || "";
       chatTitle = lastName ? `${firstName} ${lastName}` : firstName;
-      console.log(
-        `🏷️ Título do chat privado construído: "${chatTitle}" (firstName: "${firstName}", lastName: "${lastName}")`
-      );
+      logger.debug(`Título do chat privado construído`, {
+        module: "MessageInterceptor",
+        action: "build_chat_title",
+        chatTitle,
+        firstName,
+        lastName,
+      });
     } else {
       // For groups/channels, use the provided title
       chatTitle = msg.chat.title;
-      console.log(`🏷️ Título do grupo/canal: "${chatTitle}"`);
+      logger.debug(`Título do grupo/canal`, {
+        module: "MessageInterceptor",
+        action: "get_group_title",
+        chatTitle,
+      });
     }
 
     // Build the user's full name
@@ -324,8 +381,15 @@ export class MessageInterceptor {
   } | null {
     // TODO: Implement WhatsApp data extraction
     // _msg will be used when we implement this function
-    console.log(_msg);
-    console.warn("⚠️ WhatsApp data extraction not yet implemented");
+    logger.debug("WhatsApp message received", {
+      module: "MessageInterceptor",
+      action: "extract_whatsapp_data",
+      message: JSON.stringify(_msg),
+    });
+    logger.warn("WhatsApp data extraction not yet implemented", {
+      module: "MessageInterceptor",
+      action: "extract_whatsapp_data",
+    });
     return null;
   }
 

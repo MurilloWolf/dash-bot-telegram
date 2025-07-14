@@ -3,33 +3,57 @@ dotenv.config();
 
 import startTelegramBot from "./adapters/in/telegram/TelegramBotAdapter.ts";
 import { initializeCallbacks } from "./Bot/config/callback/CallbackInitializer.ts";
+import { logger } from "./utils/Logger.ts";
 
 async function main() {
-  console.log("🚀 Iniciando DashBot...");
+  logger.botStartup("Iniciando DashBot...");
 
   // Initialize callbacks before starting the bots
-  console.log("📋 Inicializando sistema de callbacks...");
+  logger.info("Inicializando sistema de callbacks...", {
+    module: "Bot",
+    action: "initialize_callbacks",
+  });
   await initializeCallbacks();
 
   const BOT_PLATFORM = process.env.BOT_PLATFORM;
   try {
     switch (BOT_PLATFORM) {
       case "telegram":
-        console.log("🤖 Telegram bot is running...");
+        logger.info("Telegram bot is running...", {
+          module: "Bot",
+          action: "start_telegram_bot",
+          platform: "telegram",
+        });
         startTelegramBot();
         break;
       case "whatsapp":
-        console.log("📱 WhatsApp bot is running...");
+        logger.info("WhatsApp bot is running...", {
+          module: "Bot",
+          action: "start_whatsapp_bot",
+          platform: "whatsapp",
+        });
         break;
       default:
-        console.error(
-          "❌ Unsupported BOT_PLATFORM. Bot supported ['Telegram', 'Whatsapp']."
+        logger.error(
+          "Unsupported BOT_PLATFORM. Bot supported ['Telegram', 'Whatsapp'].",
+          {
+            module: "Bot",
+            action: "unsupported_platform",
+            platform: BOT_PLATFORM,
+          }
         );
     }
 
-    console.log("✅ DashBot inicializado com sucesso!");
+    logger.botStartup("DashBot inicializado com sucesso!");
   } catch (error) {
-    console.error("❌ Error initializing bot:", error);
+    logger.error(
+      "Error initializing bot",
+      {
+        module: "Bot",
+        action: "initialize_error",
+      },
+      error as Error
+    );
   }
 }
 

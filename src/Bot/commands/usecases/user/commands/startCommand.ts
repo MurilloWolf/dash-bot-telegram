@@ -1,4 +1,5 @@
 import { CommandInput, CommandOutput } from "@app-types/Command.ts";
+import { logger } from "../../../../../utils/Logger.ts";
 
 export async function startCommand(
   input: CommandInput
@@ -20,7 +21,7 @@ export async function startCommand(
       format: "HTML",
     };
   } catch (error) {
-    console.error("Erro no comando start:", error);
+    logger.commandError("start", error as Error, input.user?.id?.toString());
     const userName = input.user?.name ?? "Corredor";
     return {
       text:

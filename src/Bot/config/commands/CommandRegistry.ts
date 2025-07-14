@@ -1,4 +1,5 @@
 import { CommandInput, CommandOutput } from "@app-types/Command.ts";
+import { logger } from "../../../utils/Logger.ts";
 
 type CommandHandler = (
   input: CommandInput,
@@ -18,19 +19,24 @@ export class CommandRegistry {
   }
 
   async autoRegisterCommands(): Promise<void> {
-    console.log("🚀 Registrando comandos automaticamente...");
+    logger.info("Registrando comandos automaticamente...", {
+      module: "CommandRegistry",
+      action: "auto_register_start",
+    });
 
     await this.registerCommandsFromModule("races");
     await this.registerCommandsFromModule("user");
 
-    console.log(
-      `✅ Total de ${this.commands.size} comandos registrados automaticamente`
-    );
+    logger.moduleRegistration("CommandRegistry", "command", this.commands.size);
   }
 
   private async registerCommandsFromModule(moduleName: string): Promise<void> {
     if (this.registeredModules.has(moduleName)) {
-      console.log(`⚠️ Módulo ${moduleName} já foi registrado`);
+      logger.warn(`Módulo ${moduleName} já foi registrado`, {
+        module: "CommandRegistry",
+        action: "duplicate_module",
+        moduleName,
+      });
       return;
     }
 
@@ -51,15 +57,24 @@ export class CommandRegistry {
           break;
         }
         default:
-          console.warn(`⚠️ Módulo desconhecido: ${moduleName}`);
+          logger.warn(`Módulo desconhecido: ${moduleName}`, {
+            module: "CommandRegistry",
+            action: "unknown_module",
+            moduleName,
+          });
           return;
       }
 
       this.registeredModules.add(moduleName);
     } catch (error) {
-      console.error(
-        `❌ Erro ao registrar comandos do módulo ${moduleName}:`,
-        error
+      logger.error(
+        `Erro ao registrar comandos do módulo ${moduleName}`,
+        {
+          module: "CommandRegistry",
+          action: "register_error",
+          moduleName,
+        },
+        error as Error
       );
     }
   }
@@ -71,9 +86,9 @@ export class CommandRegistry {
     Object.entries(commands).forEach(([commandName, handler]) => {
       if (!this.commands.has(commandName)) {
         this.commands.set(commandName, handler);
-        console.log(`✅ [${module}] Command registered: /${commandName}`);
+        logger.registryOperation("command", commandName, module);
       } else {
-        console.warn(`⚠️ Comando /${commandName} já foi registrado`);
+        logger.duplicateRegistration("command", commandName, module);
       }
     });
   }
@@ -93,6 +108,9 @@ export class CommandRegistry {
   clearRegistry(): void {
     this.commands.clear();
     this.registeredModules.clear();
-    console.log("🧹 Command registry limpo");
+    logger.info("Command registry limpo", {
+      module: "CommandRegistry",
+      action: "clear_registry",
+    });
   }
 }

@@ -1,6 +1,7 @@
 import { CommandInput, CommandOutput } from "@app-types/Command.ts";
 import { CallbackDataSerializer } from "@bot/config/callback/CallbackDataSerializer.ts";
 import { raceService } from "@core/infra/dependencies.ts";
+import { logger } from "../../../../../utils/Logger.ts";
 
 export async function listRacesCommand(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -53,7 +54,11 @@ export async function listRacesCommand(
       },
     };
   } catch (error) {
-    console.error("Erro ao buscar corridas:", error);
+    logger.error("Failed to fetch races", {
+      module: "RaceCommands",
+      action: "listRaces",
+      error: String(error),
+    });
     return {
       text: "❌ Erro ao buscar corridas. Tente novamente mais tarde.",
       format: "HTML",
@@ -87,7 +92,12 @@ export async function listRacesByDistanceCommand(
       format: "HTML",
     };
   } catch (error) {
-    console.error("Erro ao buscar corridas por distância:", error);
+    logger.error("Failed to fetch races by distance", {
+      module: "RaceCommands",
+      action: "listRacesByDistance",
+      distance: input.args?.[0] || "unknown",
+      error: String(error),
+    });
     return {
       text: "❌ Erro ao buscar corridas. Tente novamente mais tarde.",
       format: "HTML",

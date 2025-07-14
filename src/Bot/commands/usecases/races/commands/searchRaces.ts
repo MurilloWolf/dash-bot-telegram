@@ -1,6 +1,7 @@
 import { CommandInput, CommandOutput } from "@app-types/Command.ts";
 import { CallbackDataSerializer } from "@bot/config/callback/CallbackDataSerializer.ts";
 import { raceService } from "@core/infra/dependencies.ts";
+import { logger } from "../../../../../utils/Logger.ts";
 
 export async function searchRacesCommand(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -48,7 +49,11 @@ export async function searchRacesCommand(
       },
     };
   } catch (error) {
-    console.error("Erro ao buscar corridas:", error);
+    logger.error("Failed to search races", {
+      module: "RaceCommands",
+      action: "searchRaces",
+      error: String(error),
+    });
     return {
       text: "❌ Erro ao buscar corridas. Tente novamente mais tarde.",
       format: "HTML",

@@ -1,14 +1,28 @@
 import { CallbackRegistry } from "./CallbackRegistry.ts";
+import { logger } from "../../../utils/Logger.ts";
 
 export async function initializeCallbacks(): Promise<void> {
-  console.log("🚀 Inicializando sistema de callbacks...");
+  logger.info("Inicializando sistema de callbacks...", {
+    module: "CallbackInitializer",
+    action: "initialize",
+  });
 
   try {
     const registry = CallbackRegistry.getInstance();
     await registry.autoRegisterHandlers();
 
-    console.log("🎯 Sistema modular de callbacks inicializado com sucesso!");
+    logger.info("Sistema modular de callbacks inicializado com sucesso!", {
+      module: "CallbackInitializer",
+      action: "initialize_success",
+    });
   } catch (error) {
-    console.error("❌ Erro ao inicializar callbacks:", error);
+    logger.error(
+      "Erro ao inicializar callbacks",
+      {
+        module: "CallbackInitializer",
+        action: "initialize_error",
+      },
+      error as Error
+    );
   }
 }

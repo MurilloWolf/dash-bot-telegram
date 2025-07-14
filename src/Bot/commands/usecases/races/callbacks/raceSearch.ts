@@ -6,6 +6,7 @@ import {
 import { raceService } from "@core/infra/dependencies.ts";
 import { CallbackDataSerializer } from "@bot/config/callback/CallbackDataSerializer.ts";
 import { BaseCallbackHandler } from "@bot/commands/shared/handlers/BaseCallbackHandler.ts";
+import { logger } from "../../../../../utils/Logger.ts";
 
 /**
  * Handler para busca de corridas por distância
@@ -70,7 +71,11 @@ export class RaceSearchCallbackHandler extends BaseCallbackHandler {
         },
       };
     } catch (error) {
-      console.error("Erro ao buscar corridas:", error);
+      logger.error("Failed to search races in callback", {
+        module: "RaceCallbacks",
+        action: "raceSearchCallback",
+        error: String(error),
+      });
       return {
         text: "❌ Erro ao buscar corridas.",
         format: "HTML",

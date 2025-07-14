@@ -1,5 +1,6 @@
 import { CallbackHandler } from "../../../types/PlatformAdapter.ts";
 import { callbackManager } from "./CallbackManager.ts";
+import { logger } from "../../../utils/Logger.ts";
 
 export class CallbackRegistry {
   private static instance: CallbackRegistry;
@@ -17,8 +18,13 @@ export class CallbackRegistry {
     this.registerHandlersFromModule("user");
     this.registerHandlersFromModule("shared");
 
-    console.log(
-      `✅ Total de ${this.registeredHandlers.size} callback handlers registrados automaticamente`
+    logger.info(
+      `Total de ${this.registeredHandlers.size} callback handlers registrados automaticamente`,
+      {
+        module: "CallbackRegistry",
+        action: "auto_register_complete",
+        handlerCount: this.registeredHandlers.size,
+      }
     );
   }
 
@@ -47,12 +53,21 @@ export class CallbackRegistry {
           break;
         }
         default:
-          console.warn(`⚠️ Módulo desconhecido: ${moduleName}`);
+          logger.warn(`Módulo desconhecido: ${moduleName}`, {
+            module: "CallbackRegistry",
+            action: "register_unknown_module",
+            moduleName,
+          });
       }
     } catch (error) {
-      console.error(
-        `❌ Erro ao registrar handlers do módulo ${moduleName}:`,
-        error
+      logger.error(
+        `Erro ao registrar handlers do módulo ${moduleName}`,
+        {
+          module: "CallbackRegistry",
+          action: "register_error",
+          moduleName,
+        },
+        error as Error
       );
     }
   }
@@ -64,11 +79,14 @@ export class CallbackRegistry {
       if (!this.registeredHandlers.has(handlerName)) {
         callbackManager.registerHandler(handler);
         this.registeredHandlers.add(handlerName);
-        console.log(
-          `✅ [${module}] Callback handler registered: ${handlerName}`
-        );
+        logger.registryOperation("callback", handlerName, module);
       } else {
-        console.warn(`⚠️ Handler ${handlerName} já foi registrado`);
+        logger.warn(`Handler ${handlerName} já foi registrado`, {
+          module: "CallbackRegistry",
+          action: "duplicate_handler",
+          handlerName,
+          handlerModule: module,
+        });
       }
     });
   }
@@ -79,6 +97,9 @@ export class CallbackRegistry {
 
   clearRegistry(): void {
     this.registeredHandlers.clear();
-    console.log("🧹 Registry limpo");
+    logger.info("Registry limpo", {
+      module: "CallbackRegistry",
+      action: "clear_registry",
+    });
   }
 }

@@ -1,6 +1,7 @@
 import { CommandInput, CommandOutput } from "@app-types/Command.ts";
 import { CallbackHandler } from "@app-types/PlatformAdapter.ts";
 import { CallbackData } from "@app-types/callbacks/index.ts";
+import { logger } from "../../../utils/Logger.ts";
 
 class CallbackManager {
   private handlers: CallbackHandler[] = [];
@@ -16,7 +17,12 @@ class CallbackManager {
     const handler = this.handlers.find((h) => h.canHandle(callbackData));
 
     if (!handler) {
-      console.warn(`No handler found for callback type: ${callbackData.type}`);
+      logger.warn(`No handler found for callback type: ${callbackData.type}`, {
+        module: "CallbackManager",
+        action: "no_handler_found",
+        callbackType: callbackData.type,
+        userId: input.user?.id?.toString(),
+      });
       return {
         text: "❌ Ação não encontrada ou expirada.",
         format: "HTML",

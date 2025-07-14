@@ -1,5 +1,6 @@
 import { CommandOutput, InteractionKeyboard } from "@app-types/Command.ts";
 import { PlatformAdapter } from "../../../types/PlatformAdapter.ts";
+import { logger } from "../../../utils/Logger.ts";
 
 interface WhatsAppMessage {
   type: string;
@@ -83,7 +84,15 @@ export class WhatsAppPlatformAdapter implements PlatformAdapter {
         });
       }
     } catch (error) {
-      console.error("Failed to send WhatsApp message:", error);
+      logger.error(
+        "Failed to send WhatsApp message",
+        {
+          module: "WhatsAppBotAdapter",
+          action: "send_message_error",
+          chatId: chatId.toString(),
+        },
+        error as Error
+      );
       // Fallback to simple text
       await this.whatsAppClient.sendMessage(chatId, {
         type: "text",
@@ -101,7 +110,12 @@ export class WhatsAppPlatformAdapter implements PlatformAdapter {
   ): Promise<void> {
     // WhatsApp doesn't support message editing
     // As fallback, we send a new message
-    console.log(`WhatsApp doesn't support editing message ${messageId}`);
+    logger.warn("WhatsApp doesn't support message editing", {
+      module: "WhatsAppBotAdapter",
+      action: "edit_message_fallback",
+      chatId: chatId.toString(),
+      messageId: messageId.toString(),
+    });
     await this.sendMessage(chatId, output);
   }
 
@@ -113,8 +127,10 @@ export class WhatsAppPlatformAdapter implements PlatformAdapter {
   ): Promise<void> {
     // Implementation similar to Telegram, but adapted for WhatsApp
     // The callbackData would come from interactive buttons or quick commands
-    console.log(
-      `WhatsApp callback received: ${callbackData} from user ${userId} in chat ${chatId} for message ${messageId}`
+    logger.callbackExecution(
+      callbackData,
+      userId.toString(),
+      chatId.toString()
     );
 
     // Here you would implement WhatsApp-specific callback logic
@@ -128,5 +144,8 @@ export function startWhatsAppBot() {
   // const whatsAppClient = new WhatsAppClient(config);
   // const adapter = new WhatsAppPlatformAdapter(whatsAppClient);
 
-  console.log("WhatsApp bot adapter created (example implementation)");
+  logger.info("WhatsApp bot adapter created (example implementation)", {
+    module: "WhatsAppBotAdapter",
+    action: "initialize",
+  });
 }
