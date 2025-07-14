@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
-import { UserService } from "../UserService.ts";
-import { User, UserPreferences } from "../../entities/User.ts";
+import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
+import { UserService } from '../UserService.ts';
+import { User, UserPreferences } from '../../entities/User.ts';
 import {
   UserRepository,
   UserPreferencesRepository,
-} from "../../repositories/UserRepository.ts";
+} from '../../repositories/UserRepository.ts';
 
-describe("UserService", () => {
+describe('UserService', () => {
   let userService: UserService;
   let mockUserRepository: UserRepository;
   let mockUserPreferencesRepository: UserPreferencesRepository;
@@ -33,14 +33,14 @@ describe("UserService", () => {
     );
   });
 
-  describe("registerUser", () => {
-    it("should create a new user when user does not exist", async () => {
-      const telegramId = "123456789";
-      const name = "João Silva";
-      const username = "joao_silva";
+  describe('registerUser', () => {
+    it('should create a new user when user does not exist', async () => {
+      const telegramId = '123456789';
+      const name = 'João Silva';
+      const username = 'joao_silva';
 
       const newUser: User = {
-        id: "user-123",
+        id: 'user-123',
         telegramId,
         name,
         username,
@@ -68,13 +68,13 @@ describe("UserService", () => {
       expect(result).toEqual(newUser);
     });
 
-    it("should return existing user when user already exists and data matches", async () => {
-      const telegramId = "123456789";
-      const name = "João Silva";
-      const username = "joao_silva";
+    it('should return existing user when user already exists and data matches', async () => {
+      const telegramId = '123456789';
+      const name = 'João Silva';
+      const username = 'joao_silva';
 
       const existingUser: User = {
-        id: "user-123",
+        id: 'user-123',
         telegramId,
         name,
         username,
@@ -98,16 +98,16 @@ describe("UserService", () => {
       expect(result).toEqual(existingUser);
     });
 
-    it("should update existing user when data differs", async () => {
-      const telegramId = "123456789";
-      const name = "João Silva Updated";
-      const username = "joao_silva_new";
+    it('should update existing user when data differs', async () => {
+      const telegramId = '123456789';
+      const name = 'João Silva Updated';
+      const username = 'joao_silva_new';
 
       const existingUser: User = {
-        id: "user-123",
+        id: 'user-123',
         telegramId,
-        name: "João Silva",
-        username: "joao_silva",
+        name: 'João Silva',
+        username: 'joao_silva',
         isActive: true,
         isPremium: false,
         createdAt: new Date(),
@@ -138,12 +138,12 @@ describe("UserService", () => {
       expect(result).toEqual(updatedUser);
     });
 
-    it("should register user without username", async () => {
-      const telegramId = "123456789";
-      const name = "João Silva";
+    it('should register user without username', async () => {
+      const telegramId = '123456789';
+      const name = 'João Silva';
 
       const newUser: User = {
-        id: "user-123",
+        id: 'user-123',
         telegramId,
         name,
         isActive: true,
@@ -168,13 +168,13 @@ describe("UserService", () => {
     });
   });
 
-  describe("deactivateUser", () => {
-    it("should deactivate user when user exists", async () => {
-      const telegramId = "123456789";
+  describe('deactivateUser', () => {
+    it('should deactivate user when user exists', async () => {
+      const telegramId = '123456789';
       const existingUser: User = {
-        id: "user-123",
+        id: 'user-123',
         telegramId,
-        name: "João Silva",
+        name: 'João Silva',
         isActive: true,
         isPremium: false,
         createdAt: new Date(),
@@ -202,8 +202,8 @@ describe("UserService", () => {
       });
     });
 
-    it("should not fail when user does not exist", async () => {
-      const telegramId = "123456789";
+    it('should not fail when user does not exist', async () => {
+      const telegramId = '123456789';
 
       (mockUserRepository.findByTelegramId as Mock).mockResolvedValue(null);
 
@@ -216,13 +216,13 @@ describe("UserService", () => {
     });
   });
 
-  describe("getUserPreferences", () => {
-    it("should return user preferences when user and preferences exist", async () => {
-      const telegramId = "123456789";
+  describe('getUserPreferences', () => {
+    it('should return user preferences when user and preferences exist', async () => {
+      const telegramId = '123456789';
       const user: User = {
-        id: "user-123",
+        id: 'user-123',
         telegramId,
-        name: "João Silva",
+        name: 'João Silva',
         isActive: true,
         isPremium: false,
         createdAt: new Date(),
@@ -230,13 +230,13 @@ describe("UserService", () => {
       };
 
       const preferences: UserPreferences = {
-        id: "pref-123",
+        id: 'pref-123',
         userId: user.id,
         preferredDistances: [5, 10, 21],
         notificationsEnabled: true,
         reminderDays: 3,
-        timezone: "America/Sao_Paulo",
-        language: "pt-BR",
+        timezone: 'America/Sao_Paulo',
+        language: 'pt-BR',
       };
 
       (mockUserRepository.findByTelegramId as Mock).mockResolvedValue(user);
@@ -255,8 +255,8 @@ describe("UserService", () => {
       expect(result).toEqual(preferences);
     });
 
-    it("should return null when user does not exist", async () => {
-      const telegramId = "123456789";
+    it('should return null when user does not exist', async () => {
+      const telegramId = '123456789';
 
       (mockUserRepository.findByTelegramId as Mock).mockResolvedValue(null);
 
@@ -269,12 +269,12 @@ describe("UserService", () => {
       expect(result).toBeNull();
     });
 
-    it("should return null when user exists but preferences do not", async () => {
-      const telegramId = "123456789";
+    it('should return null when user exists but preferences do not', async () => {
+      const telegramId = '123456789';
       const user: User = {
-        id: "user-123",
+        id: 'user-123',
         telegramId,
-        name: "João Silva",
+        name: 'João Silva',
         isActive: true,
         isPremium: false,
         createdAt: new Date(),
@@ -298,13 +298,13 @@ describe("UserService", () => {
     });
   });
 
-  describe("updateUserPreferences", () => {
-    it("should update existing preferences", async () => {
-      const telegramId = "123456789";
+  describe('updateUserPreferences', () => {
+    it('should update existing preferences', async () => {
+      const telegramId = '123456789';
       const user: User = {
-        id: "user-123",
+        id: 'user-123',
         telegramId,
-        name: "João Silva",
+        name: 'João Silva',
         isActive: true,
         isPremium: false,
         createdAt: new Date(),
@@ -312,13 +312,13 @@ describe("UserService", () => {
       };
 
       const existingPreferences: UserPreferences = {
-        id: "pref-123",
+        id: 'pref-123',
         userId: user.id,
         preferredDistances: [5, 10],
         notificationsEnabled: true,
         reminderDays: 3,
-        timezone: "America/Sao_Paulo",
-        language: "pt-BR",
+        timezone: 'America/Sao_Paulo',
+        language: 'pt-BR',
       };
 
       const updatedPreferences: UserPreferences = {
@@ -356,12 +356,12 @@ describe("UserService", () => {
       expect(result).toEqual(updatedPreferences);
     });
 
-    it("should create new preferences when they do not exist", async () => {
-      const telegramId = "123456789";
+    it('should create new preferences when they do not exist', async () => {
+      const telegramId = '123456789';
       const user: User = {
-        id: "user-123",
+        id: 'user-123',
         telegramId,
-        name: "João Silva",
+        name: 'João Silva',
         isActive: true,
         isPremium: false,
         createdAt: new Date(),
@@ -369,13 +369,13 @@ describe("UserService", () => {
       };
 
       const newPreferences: UserPreferences = {
-        id: "pref-123",
+        id: 'pref-123',
         userId: user.id,
         preferredDistances: [5, 10],
         notificationsEnabled: true,
         reminderDays: 3,
-        timezone: "America/Sao_Paulo",
-        language: "pt-BR",
+        timezone: 'America/Sao_Paulo',
+        language: 'pt-BR',
       };
 
       (mockUserRepository.findByTelegramId as Mock).mockResolvedValue(user);
@@ -402,14 +402,14 @@ describe("UserService", () => {
         preferredDistances: [5, 10],
         reminderDays: 3,
         notificationsEnabled: true,
-        timezone: "America/Sao_Paulo",
-        language: "pt-BR",
+        timezone: 'America/Sao_Paulo',
+        language: 'pt-BR',
       });
       expect(result).toEqual(newPreferences);
     });
 
-    it("should throw error when user does not exist", async () => {
-      const telegramId = "123456789";
+    it('should throw error when user does not exist', async () => {
+      const telegramId = '123456789';
 
       (mockUserRepository.findByTelegramId as Mock).mockResolvedValue(null);
 
@@ -417,7 +417,7 @@ describe("UserService", () => {
         userService.updateUserPreferences(telegramId, {
           preferredDistances: [5, 10],
         })
-      ).rejects.toThrow("Usuário não encontrado");
+      ).rejects.toThrow('Usuário não encontrado');
 
       expect(mockUserRepository.findByTelegramId).toHaveBeenCalledWith(
         telegramId
@@ -425,12 +425,12 @@ describe("UserService", () => {
       expect(mockUserPreferencesRepository.findByUserId).not.toHaveBeenCalled();
     });
 
-    it("should create new preferences with default values when minimal data is provided", async () => {
-      const telegramId = "123456789";
+    it('should create new preferences with default values when minimal data is provided', async () => {
+      const telegramId = '123456789';
       const user: User = {
-        id: "user-123",
+        id: 'user-123',
         telegramId,
-        name: "João Silva",
+        name: 'João Silva',
         isActive: true,
         isPremium: false,
         createdAt: new Date(),
@@ -438,13 +438,13 @@ describe("UserService", () => {
       };
 
       const newPreferences: UserPreferences = {
-        id: "pref-123",
+        id: 'pref-123',
         userId: user.id,
         preferredDistances: [],
         notificationsEnabled: true,
         reminderDays: 3,
-        timezone: "America/Sao_Paulo",
-        language: "pt-BR",
+        timezone: 'America/Sao_Paulo',
+        language: 'pt-BR',
       };
 
       (mockUserRepository.findByTelegramId as Mock).mockResolvedValue(user);
@@ -468,18 +468,18 @@ describe("UserService", () => {
         preferredDistances: [],
         notificationsEnabled: true,
         reminderDays: 3,
-        timezone: "America/Sao_Paulo",
-        language: "pt-BR",
+        timezone: 'America/Sao_Paulo',
+        language: 'pt-BR',
       });
       expect(result).toEqual(newPreferences);
     });
 
-    it("should create new preferences with custom values when provided", async () => {
-      const telegramId = "123456789";
+    it('should create new preferences with custom values when provided', async () => {
+      const telegramId = '123456789';
       const user: User = {
-        id: "user-123",
+        id: 'user-123',
         telegramId,
-        name: "João Silva",
+        name: 'João Silva',
         isActive: true,
         isPremium: false,
         createdAt: new Date(),
@@ -487,13 +487,13 @@ describe("UserService", () => {
       };
 
       const newPreferences: UserPreferences = {
-        id: "pref-123",
+        id: 'pref-123',
         userId: user.id,
         preferredDistances: [21, 42],
         notificationsEnabled: false,
         reminderDays: 7,
-        timezone: "America/New_York",
-        language: "en-US",
+        timezone: 'America/New_York',
+        language: 'en-US',
       };
 
       (mockUserRepository.findByTelegramId as Mock).mockResolvedValue(user);
@@ -508,8 +508,8 @@ describe("UserService", () => {
         preferredDistances: [21, 42],
         notificationsEnabled: false,
         reminderDays: 7,
-        timezone: "America/New_York",
-        language: "en-US",
+        timezone: 'America/New_York',
+        language: 'en-US',
       });
 
       expect(mockUserRepository.findByTelegramId).toHaveBeenCalledWith(
@@ -523,8 +523,8 @@ describe("UserService", () => {
         preferredDistances: [21, 42],
         notificationsEnabled: false,
         reminderDays: 7,
-        timezone: "America/New_York",
-        language: "en-US",
+        timezone: 'America/New_York',
+        language: 'en-US',
       });
       expect(result).toEqual(newPreferences);
     });

@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { PrismaClient } from "@prisma/client";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { PrismaClient } from '@prisma/client';
 
 // Mock the PrismaClient
-vi.mock("@prisma/client", () => ({
+vi.mock('@prisma/client', () => ({
   PrismaClient: vi.fn(),
 }));
 
@@ -11,7 +11,7 @@ declare global {
   var __prisma: PrismaClient | undefined;
 }
 
-describe("Prisma Client", () => {
+describe('Prisma Client', () => {
   let mockPrismaClient: PrismaClient;
 
   beforeEach(() => {
@@ -20,15 +20,15 @@ describe("Prisma Client", () => {
     vi.mocked(PrismaClient).mockReturnValue(mockPrismaClient);
   });
 
-  describe("in production environment", () => {
-    it("should create a new PrismaClient instance", async () => {
-      vi.stubEnv("NODE_ENV", "production");
+  describe('in production environment', () => {
+    it('should create a new PrismaClient instance', async () => {
+      vi.stubEnv('NODE_ENV', 'production');
 
       // Clear the module cache and re-import
       vi.resetModules();
       vi.clearAllMocks();
 
-      const { default: client } = await import("../client.ts");
+      const { default: client } = await import('../client.ts');
 
       expect(PrismaClient).toHaveBeenCalled();
       expect(client).toBeDefined();
@@ -37,9 +37,9 @@ describe("Prisma Client", () => {
     });
   });
 
-  describe("in development environment", () => {
-    it("should reuse global PrismaClient instance if exists", async () => {
-      vi.stubEnv("NODE_ENV", "development");
+  describe('in development environment', () => {
+    it('should reuse global PrismaClient instance if exists', async () => {
+      vi.stubEnv('NODE_ENV', 'development');
 
       // Set up global instance
       const globalPrisma = new PrismaClient();
@@ -48,7 +48,7 @@ describe("Prisma Client", () => {
       // Clear the module cache and re-import
       vi.resetModules();
 
-      const { default: client } = await import("../client.ts");
+      const { default: client } = await import('../client.ts');
 
       expect(client).toBe(globalPrisma);
 
@@ -56,8 +56,8 @@ describe("Prisma Client", () => {
       delete global.__prisma;
     });
 
-    it("should create and store global PrismaClient instance if none exists", async () => {
-      vi.stubEnv("NODE_ENV", "development");
+    it('should create and store global PrismaClient instance if none exists', async () => {
+      vi.stubEnv('NODE_ENV', 'development');
 
       // Ensure no global instance exists
       delete global.__prisma;
@@ -65,7 +65,7 @@ describe("Prisma Client", () => {
       // Clear the module cache and re-import
       vi.resetModules();
 
-      const { default: client } = await import("../client.ts");
+      const { default: client } = await import('../client.ts');
 
       expect(PrismaClient).toHaveBeenCalled();
       expect(client).toBeDefined();

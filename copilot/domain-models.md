@@ -51,10 +51,10 @@ export interface Race {
 }
 
 export enum RaceStatus {
-  OPEN = "OPEN", // Registration open
-  CLOSED = "CLOSED", // Registration closed
-  COMING_SOON = "COMING_SOON", // Announced but not open
-  CANCELLED = "CANCELLED", // Event cancelled
+  OPEN = 'OPEN', // Registration open
+  CLOSED = 'CLOSED', // Registration closed
+  COMING_SOON = 'COMING_SOON', // Announced but not open
+  CANCELLED = 'CANCELLED', // Event cancelled
 }
 ```
 
@@ -92,29 +92,29 @@ export interface Chat {
 }
 
 export enum MessageDirection {
-  INCOMING = "INCOMING", // User to bot
-  OUTGOING = "OUTGOING", // Bot to user
+  INCOMING = 'INCOMING', // User to bot
+  OUTGOING = 'OUTGOING', // Bot to user
 }
 
 export enum MessageType {
-  TEXT = "TEXT",
-  PHOTO = "PHOTO",
-  VIDEO = "VIDEO",
-  DOCUMENT = "DOCUMENT",
-  AUDIO = "AUDIO",
-  VOICE = "VOICE",
-  LOCATION = "LOCATION",
-  CONTACT = "CONTACT",
-  POLL = "POLL",
-  OTHER = "OTHER",
+  TEXT = 'TEXT',
+  PHOTO = 'PHOTO',
+  VIDEO = 'VIDEO',
+  DOCUMENT = 'DOCUMENT',
+  AUDIO = 'AUDIO',
+  VOICE = 'VOICE',
+  LOCATION = 'LOCATION',
+  CONTACT = 'CONTACT',
+  POLL = 'POLL',
+  OTHER = 'OTHER',
 }
 
 export enum ChatType {
-  PRIVATE = "PRIVATE",
-  GROUP = "GROUP",
-  SUPERGROUP = "SUPERGROUP",
-  CHANNEL = "CHANNEL",
-  BOT = "BOT",
+  PRIVATE = 'PRIVATE',
+  GROUP = 'GROUP',
+  SUPERGROUP = 'SUPERGROUP',
+  CHANNEL = 'CHANNEL',
+  BOT = 'BOT',
 }
 ```
 
@@ -144,12 +144,12 @@ export interface Location {
 }
 
 export enum MediaType {
-  PHOTO = "PHOTO",
-  VIDEO = "VIDEO",
-  DOCUMENT = "DOCUMENT",
-  AUDIO = "AUDIO",
-  VOICE = "VOICE",
-  STICKER = "STICKER",
+  PHOTO = 'PHOTO',
+  VIDEO = 'VIDEO',
+  DOCUMENT = 'DOCUMENT',
+  AUDIO = 'AUDIO',
+  VOICE = 'VOICE',
+  STICKER = 'STICKER',
 }
 ```
 
@@ -203,16 +203,16 @@ export interface Subscription {
 }
 
 export enum BillingType {
-  ONE_TIME = "ONE_TIME",
-  RECURRING = "RECURRING",
+  ONE_TIME = 'ONE_TIME',
+  RECURRING = 'RECURRING',
 }
 
 export enum PaymentStatus {
-  PENDING = "PENDING",
-  PAID = "PAID",
-  FAILED = "FAILED",
-  REFUNDED = "REFUNDED",
-  EXPIRED = "EXPIRED",
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  FAILED = 'FAILED',
+  REFUNDED = 'REFUNDED',
+  EXPIRED = 'EXPIRED',
 }
 ```
 
@@ -232,7 +232,7 @@ export interface CommandInput {
 
 export interface CommandOutput {
   text: string; // Response text
-  format?: "markdown" | "html" | "markdownV2" | string;
+  format?: 'markdown' | 'html' | 'markdownV2' | string;
   messages?: string[]; // Multiple messages
   keyboard?: InteractionKeyboard; // Interactive buttons
   editMessage?: boolean; // Edit vs new message
@@ -260,31 +260,31 @@ export interface CallbackData {
 
 // Race-related callbacks
 export interface RaceDetailsCallbackData extends CallbackData {
-  type: "race_details";
+  type: 'race_details';
   raceId: string;
 }
 
 export interface RaceFilterCallbackData extends CallbackData {
-  type: "races_filter";
+  type: 'races_filter';
   distance: number;
 }
 
 export interface RaceReminderCallbackData extends CallbackData {
-  type: "race_reminder";
+  type: 'race_reminder';
   raceId: string;
-  action: "set" | "cancel";
+  action: 'set' | 'cancel';
 }
 
 // User-related callbacks
 export interface UserCallbackData extends CallbackData {
-  type: "user_config";
-  action: "distances" | "notifications" | "reminder";
+  type: 'user_config';
+  action: 'distances' | 'notifications' | 'reminder';
   value?: string;
 }
 
 // Navigation callbacks
 export interface SharedCallbackData extends CallbackData {
-  type: "navigation" | "pagination";
+  type: 'navigation' | 'pagination';
   action: string;
   target: string;
   page?: number;
@@ -319,7 +319,7 @@ const isValidRaceDate = (date: Date): boolean => {
 
 // Distances must be positive numbers
 const areValidDistances = (distances: number[]): boolean => {
-  return distances.every((d) => d > 0 && d <= 100);
+  return distances.every(d => d > 0 && d <= 100);
 };
 ```
 

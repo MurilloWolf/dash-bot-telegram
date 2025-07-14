@@ -38,6 +38,7 @@ fly auth token
 ### 3️⃣ Configurar Secret no GitHub
 
 #### Via Interface Web:
+
 1. Vá para seu repositório no GitHub
 2. **Settings** → **Secrets and variables** → **Actions**
 3. **New repository secret**
@@ -46,6 +47,7 @@ fly auth token
 6. **Add secret**
 
 #### Via GitHub CLI:
+
 ```bash
 gh auth login
 gh secret set FLY_API_TOKEN --body "FlyV1_seu_token_aqui"
@@ -85,16 +87,17 @@ git push origin main
 
 ## 🆘 Problemas Comuns
 
-| Problema | Solução |
-|----------|---------|
-| "fly command not found" | `brew install flyctl` |
-| "Invalid token" | Gerar novo token: `fly auth token` |
-| "App not found" | Criar app: `fly launch --no-deploy` |
+| Problema                    | Solução                                  |
+| --------------------------- | ---------------------------------------- |
+| "fly command not found"     | `brew install flyctl`                    |
+| "Invalid token"             | Gerar novo token: `fly auth token`       |
+| "App not found"             | Criar app: `fly launch --no-deploy`      |
 | "GitHub secret not working" | Verificar nome: deve ser `FLY_API_TOKEN` |
 
 ## 📞 Suporte
 
 Se precisar de ajuda:
+
 1. 📖 Leia: `docs/setup-secrets.md`
 2. 🤖 Execute: `./scripts/setup-secrets.sh`
 3. 🌐 Acesse: [fly.io/docs](https://fly.io/docs)

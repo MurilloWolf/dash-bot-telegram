@@ -47,45 +47,45 @@ export interface Location {
 }
 
 export const ChatType = {
-  PRIVATE: "PRIVATE",
-  GROUP: "GROUP",
-  SUPERGROUP: "SUPERGROUP",
-  CHANNEL: "CHANNEL",
-  BOT: "BOT",
+  PRIVATE: 'PRIVATE',
+  GROUP: 'GROUP',
+  SUPERGROUP: 'SUPERGROUP',
+  CHANNEL: 'CHANNEL',
+  BOT: 'BOT',
 } as const;
 
 export type ChatTypeValue = (typeof ChatType)[keyof typeof ChatType];
 
 export const MessageDirection = {
-  INCOMING: "INCOMING",
-  OUTGOING: "OUTGOING",
+  INCOMING: 'INCOMING',
+  OUTGOING: 'OUTGOING',
 } as const;
 
 export type MessageDirectionValue =
   (typeof MessageDirection)[keyof typeof MessageDirection];
 
 export const MessageType = {
-  TEXT: "TEXT",
-  PHOTO: "PHOTO",
-  VIDEO: "VIDEO",
-  DOCUMENT: "DOCUMENT",
-  AUDIO: "AUDIO",
-  VOICE: "VOICE",
-  LOCATION: "LOCATION",
-  CONTACT: "CONTACT",
-  POLL: "POLL",
-  OTHER: "OTHER",
+  TEXT: 'TEXT',
+  PHOTO: 'PHOTO',
+  VIDEO: 'VIDEO',
+  DOCUMENT: 'DOCUMENT',
+  AUDIO: 'AUDIO',
+  VOICE: 'VOICE',
+  LOCATION: 'LOCATION',
+  CONTACT: 'CONTACT',
+  POLL: 'POLL',
+  OTHER: 'OTHER',
 } as const;
 
 export type MessageTypeValue = (typeof MessageType)[keyof typeof MessageType];
 
 export const MediaType = {
-  PHOTO: "PHOTO",
-  VIDEO: "VIDEO",
-  DOCUMENT: "DOCUMENT",
-  AUDIO: "AUDIO",
-  VOICE: "VOICE",
-  STICKER: "STICKER",
+  PHOTO: 'PHOTO',
+  VIDEO: 'VIDEO',
+  DOCUMENT: 'DOCUMENT',
+  AUDIO: 'AUDIO',
+  VOICE: 'VOICE',
+  STICKER: 'STICKER',
 } as const;
 
 export type MediaTypeValue = (typeof MediaType)[keyof typeof MediaType];

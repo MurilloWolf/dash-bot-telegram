@@ -1,16 +1,16 @@
 export const BillingType = {
-  ONE_TIME: "ONE_TIME",
-  RECURRING: "RECURRING",
+  ONE_TIME: 'ONE_TIME',
+  RECURRING: 'RECURRING',
 } as const;
 
 export type BillingTypeValue = (typeof BillingType)[keyof typeof BillingType];
 
 export const PaymentStatus = {
-  PENDING: "PENDING",
-  PAID: "PAID",
-  FAILED: "FAILED",
-  REFUNDED: "REFUNDED",
-  EXPIRED: "EXPIRED",
+  PENDING: 'PENDING',
+  PAID: 'PAID',
+  FAILED: 'FAILED',
+  REFUNDED: 'REFUNDED',
+  EXPIRED: 'EXPIRED',
 } as const;
 
 export type PaymentStatusValue =
@@ -59,9 +59,9 @@ export interface Subscription {
 }
 
 export const ProductType = {
-  BASIC: "BASIC",
-  PREMIUM: "PREMIUM",
-  ENTERPRISE: "ENTERPRISE",
+  BASIC: 'BASIC',
+  PREMIUM: 'PREMIUM',
+  ENTERPRISE: 'ENTERPRISE',
 } as const;
 
 export type ProductTypeValue = (typeof ProductType)[keyof typeof ProductType];

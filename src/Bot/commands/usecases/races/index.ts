@@ -1,5 +1,5 @@
-export * from "./commands/index.ts";
-export * from "./callbacks/index.ts";
+export * from './commands/index.ts';
+export * from './callbacks/index.ts';
 
 import {
   RaceDetailsCallbackHandler,
@@ -8,14 +8,14 @@ import {
   RaceLocationCallbackHandler,
   RaceReminderCallbackHandler,
   RaceSearchCallbackHandler,
-} from "./callbacks/index.ts";
+} from './callbacks/index.ts';
 
 import {
   listRacesCommand,
   listRacesByDistanceCommand,
   nextRacesCommand,
   searchRacesCommand,
-} from "./commands/index.ts";
+} from './commands/index.ts';
 
 // Automatic registration of callback handlers
 export const raceCallbackHandlers = [

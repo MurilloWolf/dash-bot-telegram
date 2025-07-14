@@ -1,13 +1,13 @@
-import { CommandInput, CommandOutput } from "../../../../../types/Command.ts";
+import { CommandInput, CommandOutput } from '../../../../../types/Command.ts';
 import {
   UserConfigCallbackData,
   CallbackData,
-} from "../../../../../types/callbacks/index.ts";
-import { BaseCallbackHandler } from "@bot/commands/shared/handlers/BaseCallbackHandler.ts";
+} from '../../../../../types/callbacks/index.ts';
+import { BaseCallbackHandler } from '@bot/commands/shared/handlers/BaseCallbackHandler.ts';
 
 export class UserConfigCallbackHandler extends BaseCallbackHandler {
   canHandle(callbackData: CallbackData): boolean {
-    return callbackData.type === "user_config";
+    return callbackData.type === 'user_config';
   }
 
   async handle(input: CommandInput): Promise<CommandOutput> {
@@ -15,20 +15,20 @@ export class UserConfigCallbackHandler extends BaseCallbackHandler {
       const data = input.callbackData as UserConfigCallbackData;
 
       switch (data.action) {
-        case "distances":
+        case 'distances':
           return this.handleDistancesConfig(data.value);
-        case "notifications":
+        case 'notifications':
           return this.handleNotificationsConfig(data.value);
-        case "reminder":
+        case 'reminder':
           return this.handleReminderConfig(data.value);
         default:
           return this.createErrorResponse(
-            "Ação de configuração não reconhecida."
+            'Ação de configuração não reconhecida.'
           );
       }
     } catch (error) {
-      this.logError(error, "UserConfigCallbackHandler");
-      return this.createErrorResponse("Erro ao processar configuração.");
+      this.logError(error, 'UserConfigCallbackHandler');
+      return this.createErrorResponse('Erro ao processar configuração.');
     }
   }
 
@@ -36,43 +36,43 @@ export class UserConfigCallbackHandler extends BaseCallbackHandler {
     if (!value) {
       return {
         text: `📏 <b>Configurar Distâncias Favoritas</b>\n\nEscolha suas distâncias preferidas para receber recomendações personalizadas:`,
-        format: "HTML",
+        format: 'HTML',
         editMessage: true,
         keyboard: {
           buttons: [
             [
               {
-                text: "5km",
+                text: '5km',
                 callbackData: {
-                  type: "user_config",
-                  action: "distances",
-                  value: "5",
+                  type: 'user_config',
+                  action: 'distances',
+                  value: '5',
                 } as UserConfigCallbackData,
               },
               {
-                text: "10km",
+                text: '10km',
                 callbackData: {
-                  type: "user_config",
-                  action: "distances",
-                  value: "10",
+                  type: 'user_config',
+                  action: 'distances',
+                  value: '10',
                 } as UserConfigCallbackData,
               },
             ],
             [
               {
-                text: "21km",
+                text: '21km',
                 callbackData: {
-                  type: "user_config",
-                  action: "distances",
-                  value: "21",
+                  type: 'user_config',
+                  action: 'distances',
+                  value: '21',
                 } as UserConfigCallbackData,
               },
               {
-                text: "42km",
+                text: '42km',
                 callbackData: {
-                  type: "user_config",
-                  action: "distances",
-                  value: "42",
+                  type: 'user_config',
+                  action: 'distances',
+                  value: '42',
                 } as UserConfigCallbackData,
               },
             ],
@@ -88,16 +88,16 @@ export class UserConfigCallbackHandler extends BaseCallbackHandler {
   }
 
   private handleNotificationsConfig(value?: string): CommandOutput {
-    const enabled = value === "on";
+    const enabled = value === 'on';
     return this.createSuccessResponse(
-      `Notificações ${enabled ? "ativadas" : "desativadas"} com sucesso!`
+      `Notificações ${enabled ? 'ativadas' : 'desativadas'} com sucesso!`
     );
   }
 
   private handleReminderConfig(value?: string): CommandOutput {
     if (!value || isNaN(parseInt(value))) {
       return this.createErrorResponse(
-        "Número de dias inválido para lembretes."
+        'Número de dias inválido para lembretes.'
       );
     }
 

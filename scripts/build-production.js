@@ -17,24 +17,24 @@
  * - Optimizes for production
  */
 
-import { spawn } from "child_process";
-import { readdir, readFile, writeFile, mkdir } from "fs/promises";
-import { join, extname, dirname, relative } from "path";
-import { fileURLToPath } from "url";
+import { spawn } from 'child_process';
+import { readdir, readFile, writeFile, mkdir } from 'fs/promises';
+import { join, extname, dirname, relative } from 'path';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // ANSI color codes for better console output
 const colors = {
-  reset: "\x1b[0m",
-  red: "\x1b[31m",
-  green: "\x1b[32m",
-  yellow: "\x1b[33m",
-  blue: "\x1b[34m",
-  magenta: "\x1b[35m",
-  cyan: "\x1b[36m",
-  white: "\x1b[37m",
+  reset: '\x1b[0m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  magenta: '\x1b[35m',
+  cyan: '\x1b[36m',
+  white: '\x1b[37m',
 };
 
 function log(message, color = colors.white) {
@@ -47,12 +47,12 @@ function log(message, color = colors.white) {
 function runCommand(command, args = [], options = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
-      stdio: "inherit",
+      stdio: 'inherit',
       shell: true,
       ...options,
     });
 
-    child.on("close", (code) => {
+    child.on('close', code => {
       if (code === 0) {
         resolve();
       } else {
@@ -60,7 +60,7 @@ function runCommand(command, args = [], options = {}) {
       }
     });
 
-    child.on("error", (error) => {
+    child.on('error', error => {
       reject(error);
     });
   });
@@ -82,10 +82,10 @@ async function getAllTsFiles(dir) {
         await walk(fullPath);
       } else if (
         entry.isFile() &&
-        extname(entry.name) === ".ts" &&
-        !entry.name.endsWith(".d.ts") &&
-        !entry.name.includes(".test.") &&
-        !entry.name.includes(".spec.")
+        extname(entry.name) === '.ts' &&
+        !entry.name.endsWith('.d.ts') &&
+        !entry.name.includes('.test.') &&
+        !entry.name.includes('.spec.')
       ) {
         files.push(fullPath);
       }
@@ -141,7 +141,7 @@ function fixImportPaths(content) {
  * Copy file structure to build directory and fix import paths
  */
 async function copyAndProcessFile(srcPath, srcDir, buildDir) {
-  const content = await readFile(srcPath, "utf8");
+  const content = await readFile(srcPath, 'utf8');
   const processedContent = fixImportPaths(content);
 
   const relativePath = relative(srcDir, srcPath);
@@ -151,7 +151,7 @@ async function copyAndProcessFile(srcPath, srcDir, buildDir) {
   await mkdir(dirname(targetPath), { recursive: true });
 
   // Write processed file
-  await writeFile(targetPath, processedContent, "utf8");
+  await writeFile(targetPath, processedContent, 'utf8');
 
   return content !== processedContent;
 }
@@ -160,28 +160,28 @@ async function copyAndProcessFile(srcPath, srcDir, buildDir) {
  * Main build function
  */
 async function build() {
-  const projectRoot = join(__dirname, "..");
-  const srcDir = join(projectRoot, "src");
-  const buildDir = join(projectRoot, ".build-src");
-  const distDir = join(projectRoot, "dist");
+  const projectRoot = join(__dirname, '..');
+  const srcDir = join(projectRoot, 'src');
+  const buildDir = join(projectRoot, '.build-src');
+  const distDir = join(projectRoot, 'dist');
 
   try {
-    log("\n🏗️  DashBot Production Build", colors.cyan);
-    log("==============================", colors.cyan);
+    log('\n🏗️  DashBot Production Build', colors.cyan);
+    log('==============================', colors.cyan);
 
     // Step 1: Generate Prisma Client
-    log("\n🔧 Generating Prisma Client...", colors.blue);
-    await runCommand("npx", ["prisma", "generate"], { cwd: projectRoot });
+    log('\n🔧 Generating Prisma Client...', colors.blue);
+    await runCommand('npx', ['prisma', 'generate'], { cwd: projectRoot });
 
     // Step 2: Clean directories
-    log("\n🧹 Cleaning build directories...", colors.yellow);
-    await runCommand("rm", ["-rf", ".build-src", "dist"], { cwd: projectRoot });
+    log('\n🧹 Cleaning build directories...', colors.yellow);
+    await runCommand('rm', ['-rf', '.build-src', 'dist'], { cwd: projectRoot });
 
     // Step 2: Create build directory
     await mkdir(buildDir, { recursive: true });
 
     // Step 3: Copy and process TypeScript files
-    log("\n🔧 Processing TypeScript files...", colors.blue);
+    log('\n🔧 Processing TypeScript files...', colors.blue);
     const tsFiles = await getAllTsFiles(srcDir);
     let processedCount = 0;
 
@@ -200,62 +200,62 @@ async function build() {
     // Step 4: Create optimized tsconfig for build
     const buildTsConfig = {
       compilerOptions: {
-        module: "ESNext",
-        moduleResolution: "Bundler",
-        target: "ES2020",
+        module: 'ESNext',
+        moduleResolution: 'Bundler',
+        target: 'ES2020',
         esModuleInterop: true,
         allowSyntheticDefaultImports: true,
         skipLibCheck: true,
         strict: true,
-        outDir: "../dist",
+        outDir: '../dist',
         allowImportingTsExtensions: false,
         noEmit: false,
         declaration: false,
         declarationMap: false,
         sourceMap: false,
         removeComments: true,
-        baseUrl: ".",
+        baseUrl: '.',
         paths: {
-          "@bot/*": ["./Bot/*"],
-          "@app-types/*": ["./types/*"],
-          "@core/*": ["./core/*"],
+          '@bot/*': ['./Bot/*'],
+          '@app-types/*': ['./types/*'],
+          '@core/*': ['./core/*'],
         },
       },
-      include: ["./**/*.ts"],
-      exclude: ["node_modules"],
+      include: ['./**/*.ts'],
+      exclude: ['node_modules'],
     };
 
-    const buildTsConfigPath = join(buildDir, "tsconfig.json");
+    const buildTsConfigPath = join(buildDir, 'tsconfig.json');
     await writeFile(buildTsConfigPath, JSON.stringify(buildTsConfig, null, 2));
 
     // Step 5: Compile TypeScript
-    log("\n🔨 Compiling TypeScript...", colors.magenta);
-    await runCommand("tsc", ["-p", "tsconfig.json"], { cwd: buildDir });
+    log('\n🔨 Compiling TypeScript...', colors.magenta);
+    await runCommand('tsc', ['-p', 'tsconfig.json'], { cwd: buildDir });
 
     // Step 6: Resolve path aliases
-    log("\n🔗 Resolving path aliases...", colors.blue);
-    await runCommand("tsc-alias", ["-p", "tsconfig.json"], { cwd: buildDir });
+    log('\n🔗 Resolving path aliases...', colors.blue);
+    await runCommand('tsc-alias', ['-p', 'tsconfig.json'], { cwd: buildDir });
 
     // Step 7: Clean up build directory
-    log("\n🧹 Cleaning up...", colors.yellow);
-    await runCommand("rm", ["-rf", ".build-src"], { cwd: projectRoot });
+    log('\n🧹 Cleaning up...', colors.yellow);
+    await runCommand('rm', ['-rf', '.build-src'], { cwd: projectRoot });
 
-    log("\n✅ Build completed successfully!", colors.green);
+    log('\n✅ Build completed successfully!', colors.green);
     log(
       `📁 Output directory: ${relative(process.cwd(), distDir)}`,
       colors.green
     );
-    log("📦 Ready for production deployment", colors.green);
-    log("\n🚀 Next steps:", colors.cyan);
-    log("   • npm run start:prod  - Start in production mode", colors.white);
-    log("   • npm run prod:deploy - Deploy to production", colors.white);
-    log("");
+    log('📦 Ready for production deployment', colors.green);
+    log('\n🚀 Next steps:', colors.cyan);
+    log('   • npm run start:prod  - Start in production mode', colors.white);
+    log('   • npm run prod:deploy - Deploy to production', colors.white);
+    log('');
   } catch (error) {
     log(`\n❌ Build failed: ${error.message}`, colors.red);
 
     // Clean up on failure
     try {
-      await runCommand("rm", ["-rf", ".build-src"], { cwd: projectRoot });
+      await runCommand('rm', ['-rf', '.build-src'], { cwd: projectRoot });
     } catch {
       // Ignore cleanup errors
     }

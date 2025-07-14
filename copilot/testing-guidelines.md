@@ -28,9 +28,9 @@
 ### Unit Test Template
 
 ```typescript
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-describe("ComponentName", () => {
+describe('ComponentName', () => {
   // Setup and teardown
   beforeEach(() => {
     // Reset mocks, initialize test data
@@ -41,34 +41,34 @@ describe("ComponentName", () => {
     // Cleanup if needed
   });
 
-  describe("methodName", () => {
-    it("should do something when conditions are met", async () => {
+  describe('methodName', () => {
+    it('should do something when conditions are met', async () => {
       // Arrange - Setup test data and mocks
-      const mockData = { id: "123", name: "Test" };
+      const mockData = { id: '123', name: 'Test' };
       const mockRepository = {
         findById: vi.fn().mockResolvedValue(mockData),
       };
 
       // Act - Execute the code under test
-      const result = await service.methodName("123");
+      const result = await service.methodName('123');
 
       // Assert - Verify the outcome
       expect(result).toEqual(mockData);
-      expect(mockRepository.findById).toHaveBeenCalledWith("123");
+      expect(mockRepository.findById).toHaveBeenCalledWith('123');
       expect(mockRepository.findById).toHaveBeenCalledTimes(1);
     });
 
-    it("should handle error case when something fails", async () => {
+    it('should handle error case when something fails', async () => {
       // Arrange
       const mockRepository = {
-        findById: vi.fn().mockRejectedValue(new Error("Database error")),
+        findById: vi.fn().mockRejectedValue(new Error('Database error')),
       };
 
       // Act & Assert
-      await expect(service.methodName("invalid")).rejects.toThrow(
-        "Database error"
+      await expect(service.methodName('invalid')).rejects.toThrow(
+        'Database error'
       );
-      expect(mockRepository.findById).toHaveBeenCalledWith("invalid");
+      expect(mockRepository.findById).toHaveBeenCalledWith('invalid');
     });
   });
 });
@@ -78,14 +78,14 @@ describe("ComponentName", () => {
 
 ```typescript
 // UserService.test.ts
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { UserService } from "../UserService.ts";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { UserService } from '../UserService.ts';
 import {
   UserRepository,
   UserPreferencesRepository,
-} from "../../repositories/UserRepository.ts";
+} from '../../repositories/UserRepository.ts';
 
-describe("UserService", () => {
+describe('UserService', () => {
   let userService: UserService;
   let mockUserRepository: UserRepository;
   let mockUserPreferencesRepository: UserPreferencesRepository;
@@ -114,15 +114,15 @@ describe("UserService", () => {
     );
   });
 
-  describe("registerUser", () => {
-    it("should create new user when user does not exist", async () => {
+  describe('registerUser', () => {
+    it('should create new user when user does not exist', async () => {
       // Arrange
-      const telegramId = "123456789";
-      const name = "João Silva";
-      const username = "joao_silva";
+      const telegramId = '123456789';
+      const name = 'João Silva';
+      const username = 'joao_silva';
 
       const expectedUser = {
-        id: "user-123",
+        id: 'user-123',
         telegramId,
         name,
         username,
@@ -152,14 +152,14 @@ describe("UserService", () => {
       });
     });
 
-    it("should return existing user when user already exists", async () => {
+    it('should return existing user when user already exists', async () => {
       // Arrange
-      const telegramId = "123456789";
-      const name = "João Silva";
+      const telegramId = '123456789';
+      const name = 'João Silva';
       const existingUser = {
-        id: "user-123",
+        id: 'user-123',
         telegramId,
-        name: "João Silva Existing",
+        name: 'João Silva Existing',
         isActive: true,
         isPremium: false,
         createdAt: new Date(),
@@ -179,19 +179,19 @@ describe("UserService", () => {
       expect(mockUserRepository.create).not.toHaveBeenCalled();
     });
 
-    it("should throw error when create fails", async () => {
+    it('should throw error when create fails', async () => {
       // Arrange
-      const telegramId = "123456789";
-      const name = "João Silva";
+      const telegramId = '123456789';
+      const name = 'João Silva';
 
       mockUserRepository.findByTelegramId.mockResolvedValue(null);
       mockUserRepository.create.mockRejectedValue(
-        new Error("Database connection failed")
+        new Error('Database connection failed')
       );
 
       // Act & Assert
       await expect(userService.registerUser(telegramId, name)).rejects.toThrow(
-        "Database connection failed"
+        'Database connection failed'
       );
     });
   });
@@ -202,94 +202,94 @@ describe("UserService", () => {
 
 ```typescript
 // listRacesCommand.test.ts
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { listRacesCommand } from "../listRacesCommand.ts";
-import { CommandInput } from "@app-types/Command.ts";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { listRacesCommand } from '../listRacesCommand.ts';
+import { CommandInput } from '@app-types/Command.ts';
 
 // Mock dependencies
-vi.mock("@core/infra/dependencies", () => ({
+vi.mock('@core/infra/dependencies', () => ({
   raceService: {
     getAvailableRaces: vi.fn(),
   },
 }));
 
-describe("listRacesCommand", () => {
+describe('listRacesCommand', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("should return races list when races are available", async () => {
+  it('should return races list when races are available', async () => {
     // Arrange
     const mockRaces = [
       {
-        id: "race-1",
-        title: "Corrida do Ibirapuera",
-        distances: ["5km", "10km"],
-        date: new Date("2024-03-15"),
-        location: "São Paulo",
+        id: 'race-1',
+        title: 'Corrida do Ibirapuera',
+        distances: ['5km', '10km'],
+        date: new Date('2024-03-15'),
+        location: 'São Paulo',
       },
       {
-        id: "race-2",
-        title: "Maratona de São Paulo",
-        distances: ["21km", "42km"],
-        date: new Date("2024-04-20"),
-        location: "São Paulo",
+        id: 'race-2',
+        title: 'Maratona de São Paulo',
+        distances: ['21km', '42km'],
+        date: new Date('2024-04-20'),
+        location: 'São Paulo',
       },
     ];
 
     const input: CommandInput = {
-      user: { id: 12345, name: "Test User" },
-      platform: "telegram",
+      user: { id: 12345, name: 'Test User' },
+      platform: 'telegram',
     };
 
-    const { raceService } = await import("@core/infra/dependencies");
+    const { raceService } = await import('@core/infra/dependencies');
     vi.mocked(raceService.getAvailableRaces).mockResolvedValue(mockRaces);
 
     // Act
     const result = await listRacesCommand(input);
 
     // Assert
-    expect(result.text).toContain("Corridas Disponíveis");
-    expect(result.format).toBe("HTML");
+    expect(result.text).toContain('Corridas Disponíveis');
+    expect(result.format).toBe('HTML');
     expect(result.keyboard).toBeDefined();
     expect(result.keyboard?.buttons).toHaveLength(3); // 2 races + filter buttons
     expect(raceService.getAvailableRaces).toHaveBeenCalledTimes(1);
   });
 
-  it("should return empty message when no races available", async () => {
+  it('should return empty message when no races available', async () => {
     // Arrange
     const input: CommandInput = {
-      user: { id: 12345, name: "Test User" },
-      platform: "telegram",
+      user: { id: 12345, name: 'Test User' },
+      platform: 'telegram',
     };
 
-    const { raceService } = await import("@core/infra/dependencies");
+    const { raceService } = await import('@core/infra/dependencies');
     vi.mocked(raceService.getAvailableRaces).mockResolvedValue([]);
 
     // Act
     const result = await listRacesCommand(input);
 
     // Assert
-    expect(result.text).toBe("❌ Nenhuma corrida disponível no momento!");
-    expect(result.format).toBe("HTML");
+    expect(result.text).toBe('❌ Nenhuma corrida disponível no momento!');
+    expect(result.format).toBe('HTML');
     expect(result.keyboard).toBeUndefined();
   });
 
-  it("should handle service errors gracefully", async () => {
+  it('should handle service errors gracefully', async () => {
     // Arrange
     const input: CommandInput = {
-      user: { id: 12345, name: "Test User" },
-      platform: "telegram",
+      user: { id: 12345, name: 'Test User' },
+      platform: 'telegram',
     };
 
-    const { raceService } = await import("@core/infra/dependencies");
+    const { raceService } = await import('@core/infra/dependencies');
     vi.mocked(raceService.getAvailableRaces).mockRejectedValue(
-      new Error("Database connection failed")
+      new Error('Database connection failed')
     );
 
     // Act & Assert
     await expect(listRacesCommand(input)).rejects.toThrow(
-      "Database connection failed"
+      'Database connection failed'
     );
   });
 });
@@ -301,11 +301,11 @@ describe("listRacesCommand", () => {
 
 ```typescript
 // PrismaUserRepository.integration.test.ts
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { PrismaClient } from "@prisma/client";
-import { PrismaUserRepository } from "../PrismaUserRepository.ts";
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { PrismaClient } from '@prisma/client';
+import { PrismaUserRepository } from '../PrismaUserRepository.ts';
 
-describe("PrismaUserRepository Integration", () => {
+describe('PrismaUserRepository Integration', () => {
   let prisma: PrismaClient;
   let repository: PrismaUserRepository;
 
@@ -330,12 +330,12 @@ describe("PrismaUserRepository Integration", () => {
     await prisma.$disconnect();
   });
 
-  it("should create and find user", async () => {
+  it('should create and find user', async () => {
     // Arrange
     const userData = {
-      telegramId: "123456789",
-      name: "João Silva",
-      username: "joao_silva",
+      telegramId: '123456789',
+      name: 'João Silva',
+      username: 'joao_silva',
       isActive: true,
       isPremium: false,
     };
@@ -356,43 +356,43 @@ describe("PrismaUserRepository Integration", () => {
 
 ```typescript
 // CommandRouter.integration.test.ts
-import { describe, it, expect, beforeEach } from "vitest";
-import { routeCommand } from "../CommandRouter.ts";
-import { CommandInput } from "@app-types/Command.ts";
+import { describe, it, expect, beforeEach } from 'vitest';
+import { routeCommand } from '../CommandRouter.ts';
+import { CommandInput } from '@app-types/Command.ts';
 
-describe("CommandRouter Integration", () => {
+describe('CommandRouter Integration', () => {
   beforeEach(() => {
     // Setup test environment
   });
 
-  it("should route known command successfully", async () => {
+  it('should route known command successfully', async () => {
     // Arrange
     const input: CommandInput = {
-      user: { id: 12345, name: "Test User" },
+      user: { id: 12345, name: 'Test User' },
       args: [],
-      platform: "telegram",
+      platform: 'telegram',
     };
 
     // Act
-    const result = await routeCommand("corridas", input);
+    const result = await routeCommand('corridas', input);
 
     // Assert
     expect(result.text).toBeDefined();
-    expect(result.format).toBe("HTML");
+    expect(result.format).toBe('HTML');
   });
 
-  it("should handle unknown command gracefully", async () => {
+  it('should handle unknown command gracefully', async () => {
     // Arrange
     const input: CommandInput = {
-      user: { id: 12345, name: "Test User" },
-      platform: "telegram",
+      user: { id: 12345, name: 'Test User' },
+      platform: 'telegram',
     };
 
     // Act
-    const result = await routeCommand("unknown_command", input);
+    const result = await routeCommand('unknown_command', input);
 
     // Assert
-    expect(result.text).toContain("Comando não reconhecido");
+    expect(result.text).toContain('Comando não reconhecido');
   });
 });
 ```
@@ -406,10 +406,10 @@ describe("CommandRouter Integration", () => {
 export class MockFactories {
   static createMockUser(overrides: Partial<User> = {}): User {
     return {
-      id: "user-123",
-      telegramId: "123456789",
-      name: "Test User",
-      username: "test_user",
+      id: 'user-123',
+      telegramId: '123456789',
+      name: 'Test User',
+      username: 'test_user',
       isActive: true,
       isPremium: false,
       createdAt: new Date(),
@@ -420,16 +420,16 @@ export class MockFactories {
 
   static createMockRace(overrides: Partial<Race> = {}): Race {
     return {
-      id: "race-123",
-      title: "Test Race",
-      organization: "Test Org",
-      distances: ["5km", "10km"],
+      id: 'race-123',
+      title: 'Test Race',
+      organization: 'Test Org',
+      distances: ['5km', '10km'],
       distancesNumbers: [5, 10],
-      date: new Date("2024-12-31"),
-      location: "Test Location",
-      link: "https://test.com",
-      time: "08:00",
-      status: "OPEN",
+      date: new Date('2024-12-31'),
+      location: 'Test Location',
+      link: 'https://test.com',
+      time: '08:00',
+      status: 'OPEN',
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,
@@ -440,9 +440,9 @@ export class MockFactories {
     overrides: Partial<CommandInput> = {}
   ): CommandInput {
     return {
-      user: { id: 12345, name: "Test User" },
+      user: { id: 12345, name: 'Test User' },
       args: [],
-      platform: "telegram",
+      platform: 'telegram',
       ...overrides,
     };
   }
@@ -468,8 +468,8 @@ export class DatabaseTestHelpers {
 
     await prisma.race.createMany({
       data: [
-        MockFactories.createMockRace({ title: "Test Race 1" }),
-        MockFactories.createMockRace({ title: "Test Race 2" }),
+        MockFactories.createMockRace({ title: 'Test Race 1' }),
+        MockFactories.createMockRace({ title: 'Test Race 2' }),
       ],
     });
   }
@@ -505,22 +505,22 @@ test: {
 ## 🐛 Testing Error Scenarios
 
 ```typescript
-describe("Error Handling", () => {
-  it("should handle database connection errors", async () => {
+describe('Error Handling', () => {
+  it('should handle database connection errors', async () => {
     // Arrange
-    mockRepository.findById.mockRejectedValue(new Error("Connection refused"));
+    mockRepository.findById.mockRejectedValue(new Error('Connection refused'));
 
     // Act & Assert
-    await expect(service.getUser("123")).rejects.toThrow("Connection refused");
+    await expect(service.getUser('123')).rejects.toThrow('Connection refused');
   });
 
-  it("should handle invalid input gracefully", async () => {
+  it('should handle invalid input gracefully', async () => {
     // Act
-    const result = await service.registerUser("", "");
+    const result = await service.registerUser('', '');
 
     // Assert
     expect(result.success).toBe(false);
-    expect(result.error).toContain("Invalid input");
+    expect(result.error).toContain('Invalid input');
   });
 });
 ```
@@ -528,8 +528,8 @@ describe("Error Handling", () => {
 ## 🚀 Test Performance
 
 ```typescript
-describe("Performance Tests", () => {
-  it("should process large dataset efficiently", async () => {
+describe('Performance Tests', () => {
+  it('should process large dataset efficiently', async () => {
     // Arrange
     const largeDataset = Array.from({ length: 1000 }, (_, i) =>
       MockFactories.createMockRace({ id: `race-${i}` })

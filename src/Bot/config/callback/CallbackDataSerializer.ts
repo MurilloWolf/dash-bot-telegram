@@ -6,38 +6,38 @@ import {
   RaceFilterCallbackData,
   RaceSearchCallbackData,
   CallbackData,
-} from "../../../types/callbacks/index.ts";
-import { UserCallbackData } from "@app-types/callbacks/userCallbacks.ts";
-import { SharedCallbackData } from "@app-types/callbacks/sharedCallbacks.ts";
+} from '../../../types/callbacks/index.ts';
+import { UserCallbackData } from '@app-types/callbacks/userCallbacks.ts';
+import { SharedCallbackData } from '@app-types/callbacks/sharedCallbacks.ts';
 
 export class CallbackDataSerializer {
   static serialize(data: CallbackData): string {
     switch (data.type) {
-      case "race_details":
+      case 'race_details':
         return `rd:${data.raceId}`;
 
-      case "race_reminder":
+      case 'race_reminder':
         return `rr:${data.raceId}:${data.action}`;
 
-      case "race_location":
+      case 'race_location':
         return `rl:${data.raceId}`;
 
-      case "races_list":
-        return data.distance ? `ls:${data.distance}` : "ls";
+      case 'races_list':
+        return data.distance ? `ls:${data.distance}` : 'ls';
 
-      case "races_filter":
+      case 'races_filter':
         return `rf:${data.distance}`;
 
-      case "races_search":
+      case 'races_search':
         return `rs:${data.startDistance}:${data.endDistance}`;
 
-      case "user_config":
-        return `uc:${data.action}:${data.value || ""}`;
+      case 'user_config':
+        return `uc:${data.action}:${data.value || ''}`;
 
-      case "navigation":
+      case 'navigation':
         return `nav:${data.action}:${data.target}`;
 
-      case "pagination":
+      case 'pagination':
         return `pag:${data.action}:${data.page}:${data.target}`;
 
       default:
@@ -48,66 +48,66 @@ export class CallbackDataSerializer {
   }
 
   static deserialize(serialized: string): CallbackData {
-    const parts = serialized.split(":");
+    const parts = serialized.split(':');
     const prefix = parts[0];
 
     switch (prefix) {
-      case "rd":
+      case 'rd':
         return {
-          type: "race_details",
+          type: 'race_details',
           raceId: parts[1],
         } as RaceDetailsCallbackData;
 
-      case "rr":
+      case 'rr':
         return {
-          type: "race_reminder",
+          type: 'race_reminder',
           raceId: parts[1],
-          action: parts[2] as "set" | "cancel",
+          action: parts[2] as 'set' | 'cancel',
         } as RaceReminderCallbackData;
 
-      case "rl":
+      case 'rl':
         return {
-          type: "race_location",
+          type: 'race_location',
           raceId: parts[1],
         } as RaceLocationCallbackData;
 
-      case "ls":
+      case 'ls':
         return {
-          type: "races_list",
+          type: 'races_list',
           distance: parts[1] ? parseInt(parts[1]) : undefined,
         } as RaceListCallbackData;
 
-      case "rf":
+      case 'rf':
         return {
-          type: "races_filter",
+          type: 'races_filter',
           distance: parseInt(parts[1]),
         } as RaceFilterCallbackData;
 
-      case "rs":
+      case 'rs':
         return {
-          type: "races_search",
+          type: 'races_search',
           startDistance: parseInt(parts[1]),
           endDistance: parseInt(parts[2]),
         } as RaceSearchCallbackData;
 
-      case "uc":
+      case 'uc':
         return {
-          type: "user_config",
-          action: parts[1] as "distances" | "notifications" | "reminder",
+          type: 'user_config',
+          action: parts[1] as 'distances' | 'notifications' | 'reminder',
           value: parts[2] || undefined,
         } as UserCallbackData;
 
-      case "nav":
+      case 'nav':
         return {
-          type: "navigation",
-          action: parts[1] as "back" | "forward" | "home",
+          type: 'navigation',
+          action: parts[1] as 'back' | 'forward' | 'home',
           target: parts[2],
         } as SharedCallbackData;
 
-      case "pag":
+      case 'pag':
         return {
-          type: "pagination",
-          action: parts[1] as "next" | "prev",
+          type: 'pagination',
+          action: parts[1] as 'next' | 'prev',
           page: parseInt(parts[2]),
           target: parts[3],
         } as SharedCallbackData;
@@ -122,7 +122,7 @@ export class CallbackDataSerializer {
    */
   static validateSize(data: CallbackData): boolean {
     const serialized = this.serialize(data);
-    return Buffer.byteLength(serialized, "utf8") <= 64;
+    return Buffer.byteLength(serialized, 'utf8') <= 64;
   }
 
   /**
@@ -130,59 +130,59 @@ export class CallbackDataSerializer {
    */
   static getSize(data: CallbackData): number {
     const serialized = this.serialize(data);
-    return Buffer.byteLength(serialized, "utf8");
+    return Buffer.byteLength(serialized, 'utf8');
   }
 
   // Action creators to facilitate callback creation
   static raceDetails(raceId: string): RaceDetailsCallbackData {
-    return { type: "race_details", raceId };
+    return { type: 'race_details', raceId };
   }
 
   static racesList(distance?: number): RaceListCallbackData {
-    return { type: "races_list", distance };
+    return { type: 'races_list', distance };
   }
 
   static raceReminder(
     raceId: string,
-    action: "set" | "cancel"
+    action: 'set' | 'cancel'
   ): RaceReminderCallbackData {
-    return { type: "race_reminder", raceId, action };
+    return { type: 'race_reminder', raceId, action };
   }
 
   static raceLocation(raceId: string): RaceLocationCallbackData {
-    return { type: "race_location", raceId };
+    return { type: 'race_location', raceId };
   }
 
   static racesFilter(distance: number): RaceFilterCallbackData {
-    return { type: "races_filter", distance };
+    return { type: 'races_filter', distance };
   }
 
   static racesSearch(
     startDistance: number,
     endDistance: number
   ): RaceSearchCallbackData {
-    return { type: "races_search", startDistance, endDistance };
+    return { type: 'races_search', startDistance, endDistance };
   }
 
   static userConfig(
-    action: "distances" | "notifications" | "reminder",
+    action: 'distances' | 'notifications' | 'reminder',
     value?: string
   ): UserCallbackData {
-    return { type: "user_config", action, value };
+    return { type: 'user_config', action, value };
   }
 
   static navigation(
-    action: "back" | "next" | "close",
+    action: 'back' | 'next' | 'close',
     target: string
   ): SharedCallbackData {
-    return { type: "navigation", action, target };
+    return { type: 'navigation', action, target };
   }
 
   static pagination(
-    action: "prev" | "next" | "goto",
+    action: 'prev' | 'next' | 'goto',
     page: number,
     target: string
   ): SharedCallbackData {
-    return { type: "pagination", action, page, target };
+    return { type: 'pagination', action, page, target };
   }
 }

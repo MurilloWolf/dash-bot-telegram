@@ -1,14 +1,14 @@
-import { CommandInput, CommandOutput } from "@app-types/Command.ts";
-import { messageService, userService } from "@core/infra/dependencies.ts";
+import { CommandInput, CommandOutput } from '@app-types/Command.ts';
+import { messageService, userService } from '@core/infra/dependencies.ts';
 import {
   MessageDirection,
   MessageType,
   ChatType,
   MessageTypeValue,
   ChatTypeValue,
-} from "@core/domain/entities/Message.ts";
-import { logger } from "../../utils/Logger.ts";
-import { MessageSanitizer } from "../../utils/MessageSanitizer.ts";
+} from '@core/domain/entities/Message.ts';
+import { logger } from '../../utils/Logger.ts';
+import { MessageSanitizer } from '../../utils/MessageSanitizer.ts';
 
 // Types for Telegram messages
 interface TelegramMessage {
@@ -70,9 +70,9 @@ export class MessageInterceptor {
       const messageData = this.extractMessageData(input);
 
       if (!messageData) {
-        logger.warn("Could not extract data from received message", {
-          module: "MessageInterceptor",
-          action: "extract_message_data",
+        logger.warn('Could not extract data from received message', {
+          module: 'MessageInterceptor',
+          action: 'extract_message_data',
           platform: input.platform,
         });
         return;
@@ -93,8 +93,8 @@ export class MessageInterceptor {
           logger.warn(
             `Error finding/creating user ${messageData.telegramUserId}`,
             {
-              module: "MessageInterceptor",
-              action: "register_user",
+              module: 'MessageInterceptor',
+              action: 'register_user',
               telegramUserId: messageData.telegramUserId,
             },
             error as Error
@@ -129,17 +129,17 @@ export class MessageInterceptor {
       });
 
       logger.messageIntercept(
-        input.platform || "unknown",
-        "received",
+        input.platform || 'unknown',
+        'received',
         messageData.chatId?.toString(),
         messageData.telegramUserId?.toString()
       );
     } catch (error) {
       logger.error(
-        "Erro ao interceptar mensagem recebida",
+        'Erro ao interceptar mensagem recebida',
         {
-          module: "MessageInterceptor",
-          action: "intercept_incoming",
+          module: 'MessageInterceptor',
+          action: 'intercept_incoming',
           platform: input.platform,
         },
         error as Error
@@ -184,8 +184,8 @@ export class MessageInterceptor {
           logger.warn(
             `Error finding/creating user for outgoing message ${messageData.telegramUserId}`,
             {
-              module: "MessageInterceptor",
-              action: "register_user_outgoing",
+              module: 'MessageInterceptor',
+              action: 'register_user_outgoing',
               telegramUserId: messageData.telegramUserId,
             },
             error as Error
@@ -206,7 +206,7 @@ export class MessageInterceptor {
         });
       }
 
-      const originalCommand = messageData.text || "";
+      const originalCommand = messageData.text || '';
       const commandSummary =
         MessageSanitizer.createCommandSummary(originalCommand);
 
@@ -224,17 +224,17 @@ export class MessageInterceptor {
       });
 
       logger.messageIntercept(
-        input.platform || "unknown",
-        "sent",
+        input.platform || 'unknown',
+        'sent',
         messageData.chatId?.toString(),
         userId
       );
     } catch (error) {
       logger.error(
-        "Error intercepting sent message",
+        'Error intercepting sent message',
         {
-          module: "MessageInterceptor",
-          action: "intercept_outgoing",
+          module: 'MessageInterceptor',
+          action: 'intercept_outgoing',
           platform: input.platform,
         },
         error as Error
@@ -264,24 +264,24 @@ export class MessageInterceptor {
   } | null {
     try {
       switch (input.platform) {
-        case "telegram":
+        case 'telegram':
           return this.extractTelegramMessageData(input.raw as TelegramMessage);
-        case "whatsapp":
+        case 'whatsapp':
           return this.extractWhatsAppMessageData(input.raw as WhatsAppMessage);
         default:
           logger.warn(`Plataforma não suportada: ${input.platform}`, {
-            module: "MessageInterceptor",
-            action: "extract_message_data",
+            module: 'MessageInterceptor',
+            action: 'extract_message_data',
             platform: input.platform,
           });
           return null;
       }
     } catch (error) {
       logger.error(
-        "Erro ao extrair dados da mensagem",
+        'Erro ao extrair dados da mensagem',
         {
-          module: "MessageInterceptor",
-          action: "extract_message_data",
+          module: 'MessageInterceptor',
+          action: 'extract_message_data',
           platform: input.platform,
         },
         error as Error
@@ -314,14 +314,14 @@ export class MessageInterceptor {
 
     // Build the chat title based on the type
     let chatTitle: string | undefined;
-    if (msg.chat.type === "private") {
+    if (msg.chat.type === 'private') {
       // For private chats, use first_name + last_name from chat
-      const firstName = msg.chat.first_name || "";
-      const lastName = msg.chat.last_name || "";
+      const firstName = msg.chat.first_name || '';
+      const lastName = msg.chat.last_name || '';
       chatTitle = lastName ? `${firstName} ${lastName}` : firstName;
       logger.debug(`Título do chat privado construído`, {
-        module: "MessageInterceptor",
-        action: "build_chat_title",
+        module: 'MessageInterceptor',
+        action: 'build_chat_title',
         chatTitle,
         firstName,
         lastName,
@@ -330,15 +330,15 @@ export class MessageInterceptor {
       // For groups/channels, use the provided title
       chatTitle = msg.chat.title;
       logger.debug(`Título do grupo/canal`, {
-        module: "MessageInterceptor",
-        action: "get_group_title",
+        module: 'MessageInterceptor',
+        action: 'get_group_title',
         chatTitle,
       });
     }
 
     // Build the user's full name
-    const userFirstName = msg.from?.first_name || "";
-    const userLastName = msg.from?.last_name || "";
+    const userFirstName = msg.from?.first_name || '';
+    const userLastName = msg.from?.last_name || '';
     const fullUserName = userLastName
       ? `${userFirstName} ${userLastName}`
       : userFirstName;
@@ -385,14 +385,14 @@ export class MessageInterceptor {
   } | null {
     // TODO: Implement WhatsApp data extraction
     // _msg will be used when we implement this function
-    logger.debug("WhatsApp message received", {
-      module: "MessageInterceptor",
-      action: "extract_whatsapp_data",
+    logger.debug('WhatsApp message received', {
+      module: 'MessageInterceptor',
+      action: 'extract_whatsapp_data',
       message: JSON.stringify(_msg),
     });
-    logger.warn("WhatsApp data extraction not yet implemented", {
-      module: "MessageInterceptor",
-      action: "extract_whatsapp_data",
+    logger.warn('WhatsApp data extraction not yet implemented', {
+      module: 'MessageInterceptor',
+      action: 'extract_whatsapp_data',
     });
     return null;
   }
@@ -402,13 +402,13 @@ export class MessageInterceptor {
    */
   private convertTelegramChatType(type: string): ChatTypeValue {
     switch (type) {
-      case "private":
+      case 'private':
         return ChatType.PRIVATE;
-      case "group":
+      case 'group':
         return ChatType.GROUP;
-      case "supergroup":
+      case 'supergroup':
         return ChatType.SUPERGROUP;
-      case "channel":
+      case 'channel':
         return ChatType.CHANNEL;
       default:
         return ChatType.PRIVATE;
@@ -419,15 +419,33 @@ export class MessageInterceptor {
    * Converte tipo de mensagem do Telegram para o tipo interno
    */
   private convertTelegramMessageType(msg: TelegramMessage): MessageTypeValue {
-    if (msg.text) return MessageType.TEXT;
-    if (msg.photo) return MessageType.PHOTO;
-    if (msg.video) return MessageType.VIDEO;
-    if (msg.document) return MessageType.DOCUMENT;
-    if (msg.audio) return MessageType.AUDIO;
-    if (msg.voice) return MessageType.VOICE;
-    if (msg.location) return MessageType.LOCATION;
-    if (msg.contact) return MessageType.CONTACT;
-    if (msg.poll) return MessageType.POLL;
+    if (msg.text) {
+      return MessageType.TEXT;
+    }
+    if (msg.photo) {
+      return MessageType.PHOTO;
+    }
+    if (msg.video) {
+      return MessageType.VIDEO;
+    }
+    if (msg.document) {
+      return MessageType.DOCUMENT;
+    }
+    if (msg.audio) {
+      return MessageType.AUDIO;
+    }
+    if (msg.voice) {
+      return MessageType.VOICE;
+    }
+    if (msg.location) {
+      return MessageType.LOCATION;
+    }
+    if (msg.contact) {
+      return MessageType.CONTACT;
+    }
+    if (msg.poll) {
+      return MessageType.POLL;
+    }
     return MessageType.OTHER;
   }
 }

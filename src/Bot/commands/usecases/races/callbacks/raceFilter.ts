@@ -1,15 +1,15 @@
-import { CommandInput, CommandOutput } from "@app-types/Command.ts";
+import { CommandInput, CommandOutput } from '@app-types/Command.ts';
 import {
   CallbackData,
   RaceFilterCallbackData,
-} from "@app-types/callbacks/index.ts";
-import { raceService } from "@core/infra/dependencies.ts";
-import { BaseCallbackHandler } from "@bot/commands/shared/handlers/BaseCallbackHandler.ts";
-import { CallbackDataSerializer } from "@bot/config/callback/CallbackDataSerializer.ts";
+} from '@app-types/callbacks/index.ts';
+import { raceService } from '@core/infra/dependencies.ts';
+import { BaseCallbackHandler } from '@bot/commands/shared/handlers/BaseCallbackHandler.ts';
+import { CallbackDataSerializer } from '@bot/config/callback/CallbackDataSerializer.ts';
 
 export class RaceFilterCallbackHandler extends BaseCallbackHandler {
   canHandle(callbackData: CallbackData): boolean {
-    return callbackData.type === "races_filter";
+    return callbackData.type === 'races_filter';
   }
 
   async handle(input: CommandInput): Promise<CommandOutput> {
@@ -20,7 +20,7 @@ export class RaceFilterCallbackHandler extends BaseCallbackHandler {
       if (races.length === 0) {
         return {
           text: `❌ Nenhuma corrida encontrada para a distância: ${data.distance}km`,
-          format: "HTML",
+          format: 'HTML',
           editMessage: true,
           keyboard: {
             buttons: [
@@ -32,9 +32,9 @@ export class RaceFilterCallbackHandler extends BaseCallbackHandler {
       }
 
       // Create buttons for each filtered race
-      const raceButtons = races.slice(0, 10).map((race) => [
+      const raceButtons = races.slice(0, 10).map(race => [
         {
-          text: `🏃‍♂️ ${race.title} - ${race.distances.join("/")}`,
+          text: `🏃‍♂️ ${race.title} - ${race.distances.join('/')}`,
           callbackData: CallbackDataSerializer.raceDetails(race.id),
         },
       ]);
@@ -42,23 +42,23 @@ export class RaceFilterCallbackHandler extends BaseCallbackHandler {
       // Navigation buttons
       const navigationButtons = [
         [
-          { text: "5km", callbackData: CallbackDataSerializer.racesFilter(5) },
+          { text: '5km', callbackData: CallbackDataSerializer.racesFilter(5) },
           {
-            text: "10km",
+            text: '10km',
             callbackData: CallbackDataSerializer.racesFilter(10),
           },
           {
-            text: "21km",
+            text: '21km',
             callbackData: CallbackDataSerializer.racesFilter(21),
           },
         ],
         [
           {
-            text: "42km",
+            text: '42km',
             callbackData: CallbackDataSerializer.racesFilter(42),
           },
           {
-            text: "📋 Todas",
+            text: '📋 Todas',
             callbackData: CallbackDataSerializer.racesList(),
           },
         ],
@@ -66,7 +66,7 @@ export class RaceFilterCallbackHandler extends BaseCallbackHandler {
 
       return {
         text: `🏃‍♂️ <strong>Corridas de ${data.distance}km</strong>\n\nEncontradas ${races.length} corrida(s):`,
-        format: "HTML",
+        format: 'HTML',
         editMessage: true,
         keyboard: {
           buttons: [...raceButtons, ...navigationButtons],
@@ -74,8 +74,8 @@ export class RaceFilterCallbackHandler extends BaseCallbackHandler {
         },
       };
     } catch (error) {
-      this.logError(error, "RaceFilterCallbackHandler");
-      return this.createErrorResponse("Erro ao filtrar corridas.");
+      this.logError(error, 'RaceFilterCallbackHandler');
+      return this.createErrorResponse('Erro ao filtrar corridas.');
     }
   }
 }

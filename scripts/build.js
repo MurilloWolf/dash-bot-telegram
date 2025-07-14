@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import { spawn } from "child_process";
-import { readdir, readFile, writeFile } from "fs/promises";
-import { join, extname, dirname } from "path";
-import { fileURLToPath } from "url";
+import { spawn } from 'child_process';
+import { readdir, readFile, writeFile } from 'fs/promises';
+import { join, extname, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -14,12 +14,12 @@ const __dirname = dirname(__filename);
 function runCommand(command, args = [], options = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
-      stdio: "inherit",
+      stdio: 'inherit',
       shell: true,
       ...options,
     });
 
-    child.on("close", (code) => {
+    child.on('close', code => {
       if (code === 0) {
         resolve();
       } else {
@@ -27,7 +27,7 @@ function runCommand(command, args = [], options = {}) {
       }
     });
 
-    child.on("error", (error) => {
+    child.on('error', error => {
       reject(error);
     });
   });
@@ -47,7 +47,7 @@ async function getAllJsFiles(dir) {
 
       if (entry.isDirectory()) {
         await walk(fullPath);
-      } else if (entry.isFile() && extname(entry.name) === ".js") {
+      } else if (entry.isFile() && extname(entry.name) === '.js') {
         files.push(fullPath);
       }
     }
@@ -61,7 +61,7 @@ async function getAllJsFiles(dir) {
  * Fixes TypeScript imports in compiled JavaScript files
  */
 async function fixImportsInFile(filePath) {
-  const content = await readFile(filePath, "utf8");
+  const content = await readFile(filePath, 'utf8');
 
   // Replace imports with .ts extension to .js
   const fixedContent = content
@@ -73,8 +73,8 @@ async function fixImportsInFile(filePath) {
     );
 
   if (content !== fixedContent) {
-    await writeFile(filePath, fixedContent, "utf8");
-    console.log(`✅ Fixed imports in: ${filePath.replace(process.cwd(), ".")}`);
+    await writeFile(filePath, fixedContent, 'utf8');
+    console.log(`✅ Fixed imports in: ${filePath.replace(process.cwd(), '.')}`);
     return true;
   }
 
@@ -85,30 +85,30 @@ async function fixImportsInFile(filePath) {
  * Main build function
  */
 async function build() {
-  const projectRoot = join(__dirname, "..");
-  const distDir = join(projectRoot, "dist");
+  const projectRoot = join(__dirname, '..');
+  const distDir = join(projectRoot, 'dist');
 
   try {
-    console.log("🏗️  Building TypeScript project...");
+    console.log('🏗️  Building TypeScript project...');
 
     // Step 1: Clean dist directory
-    console.log("🧹 Cleaning dist directory...");
-    await runCommand("rm", ["-rf", "dist"], { cwd: projectRoot });
+    console.log('🧹 Cleaning dist directory...');
+    await runCommand('rm', ['-rf', 'dist'], { cwd: projectRoot });
 
     // Step 2: Compile TypeScript
-    console.log("🔨 Compiling TypeScript...");
-    await runCommand("tsc", ["-p", "tsconfig.build.json"], {
+    console.log('🔨 Compiling TypeScript...');
+    await runCommand('tsc', ['-p', 'tsconfig.build.json'], {
       cwd: projectRoot,
     });
 
     // Step 3: Resolve path aliases
-    console.log("🔗 Resolving path aliases...");
-    await runCommand("tsc-alias", ["-p", "tsconfig.build.json"], {
+    console.log('🔗 Resolving path aliases...');
+    await runCommand('tsc-alias', ['-p', 'tsconfig.build.json'], {
       cwd: projectRoot,
     });
 
     // Step 4: Fix .ts imports to .js
-    console.log("🔧 Fixing TypeScript imports...");
+    console.log('🔧 Fixing TypeScript imports...');
     const jsFiles = await getAllJsFiles(distDir);
     let fixedCount = 0;
 
@@ -123,7 +123,7 @@ async function build() {
     console.log(`📁 Output directory: ${distDir}`);
     console.log(`🔧 Fixed ${fixedCount} import statements`);
   } catch (error) {
-    console.error("❌ Build failed:", error.message);
+    console.error('❌ Build failed:', error.message);
     process.exit(1);
   }
 }

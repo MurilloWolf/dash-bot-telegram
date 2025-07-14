@@ -9,11 +9,11 @@ import {
   PrismaChatRepository,
   PrismaMediaRepository,
   PrismaLocationRepository,
-} from "./prisma/index.ts";
-import { UserService } from "../domain/services/UserService.ts";
-import { RaceService } from "../domain/services/RaceService.ts";
-import { PaymentService } from "../domain/services/PaymentService.ts";
-import { MessageService } from "../domain/services/MessageService.ts";
+} from './prisma/index.ts';
+import { UserService } from '../domain/services/UserService.ts';
+import { RaceService } from '../domain/services/RaceService.ts';
+import { PaymentService } from '../domain/services/PaymentService.ts';
+import { MessageService } from '../domain/services/MessageService.ts';
 
 // Repositories
 export const userRepository = new PrismaUserRepository();

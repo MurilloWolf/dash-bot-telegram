@@ -106,7 +106,7 @@ export async function handleTelegramMessage(bot: TelegramBot, msg: Message) {
   const input: CommandInput = {
     user: { id: msg.from?.id, name: msg.from?.first_name },
     args,
-    platform: "telegram",
+    platform: 'telegram',
     raw: msg, // Dados brutos para o interceptor
   };
 
@@ -170,7 +170,7 @@ export async function handleTelegramMessage(bot: TelegramBot, msg: Message) {
 const input: CommandInput = {
   user: { id: userId, name: userName },
   args: commandArgs,
-  platform: "telegram", // ou "whatsapp", "discord", etc.
+  platform: 'telegram', // ou "whatsapp", "discord", etc.
   raw: originalMessage, // Dados específicos da plataforma
 };
 
@@ -196,7 +196,7 @@ O middleware é configurado automaticamente e não requer configuração manual.
 try {
   await messageInterceptor.interceptIncomingMessage(input);
 } catch (error) {
-  console.error("❌ Erro ao interceptar mensagem recebida:", error);
+  console.error('❌ Erro ao interceptar mensagem recebida:', error);
   // Não interrompe o fluxo do comando
 }
 ```

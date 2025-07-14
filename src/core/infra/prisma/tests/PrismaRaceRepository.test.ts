@@ -1,14 +1,14 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { PrismaRaceRepository } from "../PrismaRaceRepository.ts";
-import { RaceStatus } from "../../../domain/entities/Race.ts";
-import prisma from "../client.ts";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { PrismaRaceRepository } from '../PrismaRaceRepository.ts';
+import { RaceStatus } from '../../../domain/entities/Race.ts';
+import prisma from '../client.ts';
 import type {
   Race as PrismaRace,
   RaceStatus as PrismaRaceStatus,
-} from "@prisma/client";
+} from '@prisma/client';
 
 // Mock Prisma client
-vi.mock("../client.ts", () => ({
+vi.mock('../client.ts', () => ({
   default: {
     race: {
       findMany: vi.fn(),
@@ -21,7 +21,7 @@ vi.mock("../client.ts", () => ({
   },
 }));
 
-describe("PrismaRaceRepository", () => {
+describe('PrismaRaceRepository', () => {
   let repository: PrismaRaceRepository;
   let mockRace: PrismaRace;
 
@@ -30,66 +30,66 @@ describe("PrismaRaceRepository", () => {
     vi.clearAllMocks();
 
     mockRace = {
-      id: "race-id",
-      title: "Test Race",
-      organization: "Test Organization",
-      distances: JSON.stringify(["5K", "10K"]), // Keep as string for compatibility
+      id: 'race-id',
+      title: 'Test Race',
+      organization: 'Test Organization',
+      distances: JSON.stringify(['5K', '10K']), // Keep as string for compatibility
       distancesNumbers: JSON.stringify([5, 10]), // Keep as string for compatibility
-      date: new Date("2024-01-15"),
-      location: "Test Location",
-      link: "https://test.com",
-      time: "08:00",
-      status: "OPEN" as PrismaRaceStatus, // Type assertion for enum compatibility
-      createdAt: new Date("2024-01-01"),
-      updatedAt: new Date("2024-01-01"),
+      date: new Date('2024-01-15'),
+      location: 'Test Location',
+      link: 'https://test.com',
+      time: '08:00',
+      status: 'OPEN' as PrismaRaceStatus, // Type assertion for enum compatibility
+      createdAt: new Date('2024-01-01'),
+      updatedAt: new Date('2024-01-01'),
     } as PrismaRace;
   });
 
-  describe("findByTitle", () => {
-    it("should find races by title", async () => {
+  describe('findByTitle', () => {
+    it('should find races by title', async () => {
       const mockRaces = [mockRace];
       vi.mocked(prisma.race.findMany).mockResolvedValue(mockRaces);
 
-      const result = await repository.findByTitle("Test Race");
+      const result = await repository.findByTitle('Test Race');
 
       expect(prisma.race.findMany).toHaveBeenCalledWith({
         where: {
           title: {
-            contains: "Test Race",
+            contains: 'Test Race',
           },
         },
-        orderBy: { date: "asc" },
+        orderBy: { date: 'asc' },
       });
 
       expect(result).toHaveLength(1);
-      expect(result![0].title).toBe("Test Race");
+      expect(result![0].title).toBe('Test Race');
     });
 
-    it("should return null if no races found", async () => {
+    it('should return null if no races found', async () => {
       vi.mocked(prisma.race.findMany).mockResolvedValue([]);
 
-      const result = await repository.findByTitle("Non-existent Race");
+      const result = await repository.findByTitle('Non-existent Race');
 
       expect(result).toBeNull();
     });
 
-    it("should return null if races is null", async () => {
+    it('should return null if races is null', async () => {
       // @ts-expect-error - mocking null return
       vi.mocked(prisma.race.findMany).mockResolvedValue(null);
 
-      const result = await repository.findByTitle("Test Race");
+      const result = await repository.findByTitle('Test Race');
 
       expect(result).toBeNull();
     });
   });
 
-  describe("findByRange", () => {
-    it("should find races within distance range", async () => {
+  describe('findByRange', () => {
+    it('should find races within distance range', async () => {
       // Mock findAll to return races
-      vi.spyOn(repository, "findAll").mockResolvedValue([
+      vi.spyOn(repository, 'findAll').mockResolvedValue([
         {
           ...mockRace,
-          distances: ["5K", "10K", "21K"],
+          distances: ['5K', '10K', '21K'],
           distancesNumbers: [5, 10, 21],
           status: RaceStatus.OPEN,
         },
@@ -98,29 +98,29 @@ describe("PrismaRaceRepository", () => {
       const result = await repository.findByRange(5, 15);
 
       expect(result).toHaveLength(1);
-      expect(result[0].title).toBe("Test Race");
+      expect(result[0].title).toBe('Test Race');
     });
 
-    it("should return empty array if no races found", async () => {
-      vi.spyOn(repository, "findAll").mockResolvedValue([]);
+    it('should return empty array if no races found', async () => {
+      vi.spyOn(repository, 'findAll').mockResolvedValue([]);
 
       const result = await repository.findByRange(5, 15);
 
       expect(result).toEqual([]);
     });
 
-    it("should filter races by distance range", async () => {
-      vi.spyOn(repository, "findAll").mockResolvedValue([
+    it('should filter races by distance range', async () => {
+      vi.spyOn(repository, 'findAll').mockResolvedValue([
         {
           ...mockRace,
-          distances: ["5K", "10K"],
+          distances: ['5K', '10K'],
           distancesNumbers: [5, 10],
           status: RaceStatus.OPEN,
         },
         {
           ...mockRace,
-          id: "race-id-2",
-          distances: ["21K", "42K"],
+          id: 'race-id-2',
+          distances: ['21K', '42K'],
           distancesNumbers: [21, 42],
           status: RaceStatus.OPEN,
         },
@@ -129,35 +129,35 @@ describe("PrismaRaceRepository", () => {
       const result = await repository.findByRange(5, 15);
 
       expect(result).toHaveLength(1);
-      expect(result[0].id).toBe("race-id");
+      expect(result[0].id).toBe('race-id');
     });
   });
 
-  describe("findById", () => {
-    it("should find race by id", async () => {
+  describe('findById', () => {
+    it('should find race by id', async () => {
       vi.mocked(prisma.race.findUnique).mockResolvedValue(mockRace);
 
-      const result = await repository.findById("race-id");
+      const result = await repository.findById('race-id');
 
       expect(prisma.race.findUnique).toHaveBeenCalledWith({
-        where: { id: "race-id" },
+        where: { id: 'race-id' },
       });
 
       expect(result).not.toBeNull();
-      expect(result!.id).toBe("race-id");
+      expect(result!.id).toBe('race-id');
     });
 
-    it("should return null if race not found", async () => {
+    it('should return null if race not found', async () => {
       vi.mocked(prisma.race.findUnique).mockResolvedValue(null);
 
-      const result = await repository.findById("non-existent-id");
+      const result = await repository.findById('non-existent-id');
 
       expect(result).toBeNull();
     });
   });
 
-  describe("findAll", () => {
-    it("should find all races without filter", async () => {
+  describe('findAll', () => {
+    it('should find all races without filter', async () => {
       const mockRaces = [mockRace];
       vi.mocked(prisma.race.findMany).mockResolvedValue(mockRaces);
 
@@ -165,13 +165,13 @@ describe("PrismaRaceRepository", () => {
 
       expect(prisma.race.findMany).toHaveBeenCalledWith({
         where: {},
-        orderBy: { date: "asc" },
+        orderBy: { date: 'asc' },
       });
 
       expect(result).toHaveLength(1);
     });
 
-    it("should filter by status", async () => {
+    it('should filter by status', async () => {
       const mockRaces = [mockRace];
       vi.mocked(prisma.race.findMany).mockResolvedValue(mockRaces);
 
@@ -179,18 +179,18 @@ describe("PrismaRaceRepository", () => {
 
       expect(prisma.race.findMany).toHaveBeenCalledWith({
         where: { status: RaceStatus.OPEN },
-        orderBy: { date: "asc" },
+        orderBy: { date: 'asc' },
       });
 
       expect(result).toHaveLength(1);
     });
 
-    it("should filter by date range", async () => {
+    it('should filter by date range', async () => {
       const mockRaces = [mockRace];
       vi.mocked(prisma.race.findMany).mockResolvedValue(mockRaces);
 
-      const startDate = new Date("2024-01-01");
-      const endDate = new Date("2024-12-31");
+      const startDate = new Date('2024-01-01');
+      const endDate = new Date('2024-12-31');
 
       const result = await repository.findAll({ startDate, endDate });
 
@@ -201,13 +201,13 @@ describe("PrismaRaceRepository", () => {
             lte: endDate,
           },
         },
-        orderBy: { date: "asc" },
+        orderBy: { date: 'asc' },
       });
 
       expect(result).toHaveLength(1);
     });
 
-    it("should filter by distances", async () => {
+    it('should filter by distances', async () => {
       const mockRaces = [mockRace];
       vi.mocked(prisma.race.findMany).mockResolvedValue(mockRaces);
 
@@ -216,7 +216,7 @@ describe("PrismaRaceRepository", () => {
       expect(result).toHaveLength(1);
     });
 
-    it("should filter by distances and exclude non-matching", async () => {
+    it('should filter by distances and exclude non-matching', async () => {
       const mockRaces = [mockRace];
       vi.mocked(prisma.race.findMany).mockResolvedValue(mockRaces);
 
@@ -226,8 +226,8 @@ describe("PrismaRaceRepository", () => {
     });
   });
 
-  describe("findOpenRaces", () => {
-    it("should find open races", async () => {
+  describe('findOpenRaces', () => {
+    it('should find open races', async () => {
       const mockRaces = [mockRace];
       vi.mocked(prisma.race.findMany).mockResolvedValue(mockRaces);
 
@@ -238,16 +238,16 @@ describe("PrismaRaceRepository", () => {
           date: { gte: expect.any(Date) },
           status: RaceStatus.OPEN,
         },
-        orderBy: { date: "asc" },
+        orderBy: { date: 'asc' },
       });
 
       expect(result).toHaveLength(1);
     });
   });
 
-  describe("findNextRace", () => {
-    it("should find next race", async () => {
-      const nextRaceDate = new Date("2024-01-15");
+  describe('findNextRace', () => {
+    it('should find next race', async () => {
+      const nextRaceDate = new Date('2024-01-15');
       const mockNextRace = { ...mockRace, date: nextRaceDate };
       const mockRacesOnSameDate = [mockNextRace];
 
@@ -260,20 +260,20 @@ describe("PrismaRaceRepository", () => {
         where: {
           date: { gte: expect.any(Date) },
         },
-        orderBy: { date: "asc" },
+        orderBy: { date: 'asc' },
       });
 
       expect(prisma.race.findMany).toHaveBeenCalledWith({
         where: {
           date: nextRaceDate,
         },
-        orderBy: { date: "asc" },
+        orderBy: { date: 'asc' },
       });
 
       expect(result).toHaveLength(1);
     });
 
-    it("should return null if no next race found", async () => {
+    it('should return null if no next race found', async () => {
       vi.mocked(prisma.race.findFirst).mockResolvedValue(null);
 
       const result = await repository.findNextRace();
@@ -282,21 +282,21 @@ describe("PrismaRaceRepository", () => {
     });
   });
 
-  describe("findByDistances", () => {
-    it("should find races by distances", async () => {
+  describe('findByDistances', () => {
+    it('should find races by distances', async () => {
       const mockRaces = [mockRace];
       vi.mocked(prisma.race.findMany).mockResolvedValue(mockRaces);
 
       const result = await repository.findByDistances([5, 10]);
 
       expect(prisma.race.findMany).toHaveBeenCalledWith({
-        orderBy: { date: "asc" },
+        orderBy: { date: 'asc' },
       });
 
       expect(result).toHaveLength(1);
     });
 
-    it("should filter races by distances", async () => {
+    it('should filter races by distances', async () => {
       const mockRaces = [mockRace];
       vi.mocked(prisma.race.findMany).mockResolvedValue(mockRaces);
 
@@ -306,17 +306,17 @@ describe("PrismaRaceRepository", () => {
     });
   });
 
-  describe("create", () => {
-    it("should create a race", async () => {
+  describe('create', () => {
+    it('should create a race', async () => {
       const raceData = {
-        title: "New Race",
-        organization: "New Organization",
-        distances: ["5K", "10K"],
+        title: 'New Race',
+        organization: 'New Organization',
+        distances: ['5K', '10K'],
         distancesNumbers: [5, 10],
-        date: new Date("2024-01-15"),
-        location: "New Location",
-        link: "https://new.com",
-        time: "09:00",
+        date: new Date('2024-01-15'),
+        location: 'New Location',
+        link: 'https://new.com',
+        time: '09:00',
         status: RaceStatus.OPEN,
       };
 
@@ -353,11 +353,11 @@ describe("PrismaRaceRepository", () => {
     });
   });
 
-  describe("update", () => {
-    it("should update a race", async () => {
+  describe('update', () => {
+    it('should update a race', async () => {
       const updateData = {
-        title: "Updated Race",
-        distances: ["5K", "10K", "21K"],
+        title: 'Updated Race',
+        distances: ['5K', '10K', '21K'],
         distancesNumbers: [5, 10, 21],
       };
 
@@ -368,10 +368,10 @@ describe("PrismaRaceRepository", () => {
         distancesNumbers: JSON.stringify(updateData.distancesNumbers),
       });
 
-      const result = await repository.update("race-id", updateData);
+      const result = await repository.update('race-id', updateData);
 
       expect(prisma.race.update).toHaveBeenCalledWith({
-        where: { id: "race-id" },
+        where: { id: 'race-id' },
         data: {
           title: updateData.title,
           distances: JSON.stringify(updateData.distances),
@@ -382,9 +382,9 @@ describe("PrismaRaceRepository", () => {
       expect(result.title).toBe(updateData.title);
     });
 
-    it("should update without distances", async () => {
+    it('should update without distances', async () => {
       const updateData = {
-        title: "Updated Race",
+        title: 'Updated Race',
       };
 
       vi.mocked(prisma.race.update).mockResolvedValue({
@@ -392,10 +392,10 @@ describe("PrismaRaceRepository", () => {
         title: updateData.title,
       });
 
-      const result = await repository.update("race-id", updateData);
+      const result = await repository.update('race-id', updateData);
 
       expect(prisma.race.update).toHaveBeenCalledWith({
-        where: { id: "race-id" },
+        where: { id: 'race-id' },
         data: {
           title: updateData.title,
         },
@@ -405,20 +405,20 @@ describe("PrismaRaceRepository", () => {
     });
   });
 
-  describe("delete", () => {
-    it("should delete a race", async () => {
+  describe('delete', () => {
+    it('should delete a race', async () => {
       vi.mocked(prisma.race.delete).mockResolvedValue(mockRace);
 
-      await repository.delete("race-id");
+      await repository.delete('race-id');
 
       expect(prisma.race.delete).toHaveBeenCalledWith({
-        where: { id: "race-id" },
+        where: { id: 'race-id' },
       });
     });
   });
 
-  describe("updateStatus", () => {
-    it("should update race status", async () => {
+  describe('updateStatus', () => {
+    it('should update race status', async () => {
       const updatedRace = {
         ...mockRace,
         status: RaceStatus.CLOSED,
@@ -427,12 +427,12 @@ describe("PrismaRaceRepository", () => {
       vi.mocked(prisma.race.update).mockResolvedValue(updatedRace);
 
       const result = await repository.updateStatus(
-        "race-id",
+        'race-id',
         RaceStatus.CLOSED
       );
 
       expect(prisma.race.update).toHaveBeenCalledWith({
-        where: { id: "race-id" },
+        where: { id: 'race-id' },
         data: { status: RaceStatus.CLOSED },
       });
 
@@ -440,11 +440,11 @@ describe("PrismaRaceRepository", () => {
     });
   });
 
-  describe("mapToEntity", () => {
-    it("should map prisma race to entity", () => {
+  describe('mapToEntity', () => {
+    it('should map prisma race to entity', () => {
       const prismaRace = {
         ...mockRace,
-        distances: JSON.stringify(["5K", "10K"]),
+        distances: JSON.stringify(['5K', '10K']),
         distancesNumbers: JSON.stringify([5, 10]),
       };
 
@@ -455,7 +455,7 @@ describe("PrismaRaceRepository", () => {
         id: mockRace.id,
         title: mockRace.title,
         organization: mockRace.organization,
-        distances: ["5K", "10K"],
+        distances: ['5K', '10K'],
         distancesNumbers: [5, 10],
         date: mockRace.date,
         location: mockRace.location,
@@ -467,7 +467,7 @@ describe("PrismaRaceRepository", () => {
       });
     });
 
-    it("should handle null distances", () => {
+    it('should handle null distances', () => {
       const prismaRace = {
         ...mockRace,
         distances: null,
@@ -481,7 +481,7 @@ describe("PrismaRaceRepository", () => {
       expect(result.distancesNumbers).toEqual([]);
     });
 
-    it("should handle null status", () => {
+    it('should handle null status', () => {
       const prismaRace = {
         ...mockRace,
         status: null,

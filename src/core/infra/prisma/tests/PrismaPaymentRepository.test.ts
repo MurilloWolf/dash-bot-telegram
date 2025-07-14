@@ -1,24 +1,24 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   PrismaProductRepository,
   PrismaPaymentRepository,
   PrismaSubscriptionRepository,
-} from "../PrismaPaymentRepository.ts";
+} from '../PrismaPaymentRepository.ts';
 import {
   BillingType,
   PaymentStatus,
-} from "../../../domain/entities/Payment.ts";
-import prisma from "../client.ts";
+} from '../../../domain/entities/Payment.ts';
+import prisma from '../client.ts';
 import type {
   Product as PrismaProduct,
   Payment as PrismaPayment,
   Subscription as PrismaSubscription,
   BillingType as PrismaBillingType,
   PaymentStatus as PrismaPaymentStatus,
-} from "@prisma/client";
+} from '@prisma/client';
 
 // Mock Prisma client
-vi.mock("../client.ts", () => ({
+vi.mock('../client.ts', () => ({
   default: {
     product: {
       findUnique: vi.fn(),
@@ -45,7 +45,7 @@ vi.mock("../client.ts", () => ({
   },
 }));
 
-describe("PrismaProductRepository", () => {
+describe('PrismaProductRepository', () => {
   let repository: PrismaProductRepository;
   let mockProduct: PrismaProduct;
 
@@ -54,61 +54,61 @@ describe("PrismaProductRepository", () => {
     vi.clearAllMocks();
 
     mockProduct = {
-      id: "product-id",
-      name: "Test Product",
-      description: "Test Description",
+      id: 'product-id',
+      name: 'Test Product',
+      description: 'Test Description',
       price: 9.99,
-      currency: "USD",
-      billingType: "RECURRING" as PrismaBillingType,
-      interval: "month",
+      currency: 'USD',
+      billingType: 'RECURRING' as PrismaBillingType,
+      interval: 'month',
       isActive: true,
       features: JSON.stringify({ feature1: true, feature2: false }),
-      createdAt: new Date("2024-01-01"),
+      createdAt: new Date('2024-01-01'),
     } as PrismaProduct;
   });
 
-  describe("findById", () => {
-    it("should find product by id", async () => {
+  describe('findById', () => {
+    it('should find product by id', async () => {
       vi.mocked(prisma.product.findUnique).mockResolvedValue(mockProduct);
 
-      const result = await repository.findById("product-id");
+      const result = await repository.findById('product-id');
 
       expect(prisma.product.findUnique).toHaveBeenCalledWith({
-        where: { id: "product-id" },
+        where: { id: 'product-id' },
       });
 
       expect(result).not.toBeNull();
-      expect(result!.id).toBe("product-id");
+      expect(result!.id).toBe('product-id');
       expect(result!.features).toEqual({ feature1: true, feature2: false });
     });
 
-    it("should return null if product not found", async () => {
+    it('should return null if product not found', async () => {
       vi.mocked(prisma.product.findUnique).mockResolvedValue(null);
 
-      const result = await repository.findById("non-existent-id");
+      const result = await repository.findById('non-existent-id');
 
       expect(result).toBeNull();
     });
   });
 
-  describe("findAll", () => {
-    it("should find all products", async () => {
+  describe('findAll', () => {
+    it('should find all products', async () => {
       const mockProducts = [mockProduct];
       vi.mocked(prisma.product.findMany).mockResolvedValue(mockProducts);
 
       const result = await repository.findAll();
 
       expect(prisma.product.findMany).toHaveBeenCalledWith({
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: 'desc' },
       });
 
       expect(result).toHaveLength(1);
-      expect(result[0].id).toBe("product-id");
+      expect(result[0].id).toBe('product-id');
     });
   });
 
-  describe("findActiveProducts", () => {
-    it("should find active products", async () => {
+  describe('findActiveProducts', () => {
+    it('should find active products', async () => {
       const mockProducts = [mockProduct];
       vi.mocked(prisma.product.findMany).mockResolvedValue(mockProducts);
 
@@ -116,7 +116,7 @@ describe("PrismaProductRepository", () => {
 
       expect(prisma.product.findMany).toHaveBeenCalledWith({
         where: { isActive: true },
-        orderBy: { price: "asc" },
+        orderBy: { price: 'asc' },
       });
 
       expect(result).toHaveLength(1);
@@ -124,15 +124,15 @@ describe("PrismaProductRepository", () => {
     });
   });
 
-  describe("create", () => {
-    it("should create a product", async () => {
+  describe('create', () => {
+    it('should create a product', async () => {
       const productData = {
-        name: "New Product",
-        description: "New Description",
+        name: 'New Product',
+        description: 'New Description',
         price: 19.99,
-        currency: "USD",
+        currency: 'USD',
         billingType: BillingType.RECURRING,
-        interval: "month",
+        interval: 'month',
         isActive: true,
         features: { feature1: true, feature2: false },
       };
@@ -157,10 +157,10 @@ describe("PrismaProductRepository", () => {
     });
   });
 
-  describe("update", () => {
-    it("should update a product", async () => {
+  describe('update', () => {
+    it('should update a product', async () => {
       const updateData = {
-        name: "Updated Product",
+        name: 'Updated Product',
         price: 29.99,
         features: { feature1: false, feature2: true },
       };
@@ -171,10 +171,10 @@ describe("PrismaProductRepository", () => {
         features: JSON.stringify(updateData.features),
       });
 
-      const result = await repository.update("product-id", updateData);
+      const result = await repository.update('product-id', updateData);
 
       expect(prisma.product.update).toHaveBeenCalledWith({
-        where: { id: "product-id" },
+        where: { id: 'product-id' },
         data: {
           ...updateData,
           features: JSON.stringify(updateData.features),
@@ -185,9 +185,9 @@ describe("PrismaProductRepository", () => {
       expect(result.features).toEqual(updateData.features);
     });
 
-    it("should update without features", async () => {
+    it('should update without features', async () => {
       const updateData = {
-        name: "Updated Product",
+        name: 'Updated Product',
         price: 29.99,
       };
 
@@ -196,10 +196,10 @@ describe("PrismaProductRepository", () => {
         ...updateData,
       });
 
-      const result = await repository.update("product-id", updateData);
+      const result = await repository.update('product-id', updateData);
 
       expect(prisma.product.update).toHaveBeenCalledWith({
-        where: { id: "product-id" },
+        where: { id: 'product-id' },
         data: updateData,
       });
 
@@ -207,20 +207,20 @@ describe("PrismaProductRepository", () => {
     });
   });
 
-  describe("delete", () => {
-    it("should delete a product", async () => {
+  describe('delete', () => {
+    it('should delete a product', async () => {
       vi.mocked(prisma.product.delete).mockResolvedValue(mockProduct);
 
-      await repository.delete("product-id");
+      await repository.delete('product-id');
 
       expect(prisma.product.delete).toHaveBeenCalledWith({
-        where: { id: "product-id" },
+        where: { id: 'product-id' },
       });
     });
   });
 
-  describe("mapToEntity", () => {
-    it("should map prisma product to entity", () => {
+  describe('mapToEntity', () => {
+    it('should map prisma product to entity', () => {
       const prismaProduct = {
         ...mockProduct,
         features: JSON.stringify({ feature1: true, feature2: false }),
@@ -243,7 +243,7 @@ describe("PrismaProductRepository", () => {
       });
     });
 
-    it("should handle null description", () => {
+    it('should handle null description', () => {
       const prismaProduct = {
         ...mockProduct,
         description: null,
@@ -255,7 +255,7 @@ describe("PrismaProductRepository", () => {
       expect(result.description).toBeUndefined();
     });
 
-    it("should handle null features", () => {
+    it('should handle null features', () => {
       const prismaProduct = {
         ...mockProduct,
         features: null,
@@ -269,7 +269,7 @@ describe("PrismaProductRepository", () => {
   });
 });
 
-describe("PrismaPaymentRepository", () => {
+describe('PrismaPaymentRepository', () => {
   let repository: PrismaPaymentRepository;
   let mockPayment: PrismaPayment;
 
@@ -278,109 +278,108 @@ describe("PrismaPaymentRepository", () => {
     vi.clearAllMocks();
 
     mockPayment = {
-      id: "payment-id",
-      telegramChargeId: "telegram-charge-id",
-      provider: "telegram",
+      id: 'payment-id',
+      telegramChargeId: 'telegram-charge-id',
+      provider: 'telegram',
       amount: 9.99,
-      currency: "USD",
-      status: "PENDING" as PrismaPaymentStatus,
-      userEmail: "user@example.com",
-      userPhone: "+1234567890",
-      createdAt: new Date("2024-01-01"),
-      paidAt: new Date("2024-01-01"),
-      expiresAt: new Date("2024-01-02"),
-      invoiceUrl: "https://invoice.example.com",
-      userId: "user-id",
-      productId: "product-id",
+      currency: 'USD',
+      status: 'PENDING' as PrismaPaymentStatus,
+      userEmail: 'user@example.com',
+      userPhone: '+1234567890',
+      createdAt: new Date('2024-01-01'),
+      paidAt: new Date('2024-01-01'),
+      expiresAt: new Date('2024-01-02'),
+      invoiceUrl: 'https://invoice.example.com',
+      userId: 'user-id',
+      productId: 'product-id',
     } as PrismaPayment;
   });
 
-  describe("findById", () => {
-    it("should find payment by id", async () => {
+  describe('findById', () => {
+    it('should find payment by id', async () => {
       vi.mocked(prisma.payment.findUnique).mockResolvedValue(mockPayment);
 
-      const result = await repository.findById("payment-id");
+      const result = await repository.findById('payment-id');
 
       expect(prisma.payment.findUnique).toHaveBeenCalledWith({
-        where: { id: "payment-id" },
+        where: { id: 'payment-id' },
       });
 
       expect(result).not.toBeNull();
-      expect(result!.id).toBe("payment-id");
+      expect(result!.id).toBe('payment-id');
     });
 
-    it("should return null if payment not found", async () => {
+    it('should return null if payment not found', async () => {
       vi.mocked(prisma.payment.findUnique).mockResolvedValue(null);
 
-      const result = await repository.findById("non-existent-id");
+      const result = await repository.findById('non-existent-id');
 
       expect(result).toBeNull();
     });
   });
 
-  describe("findByUserId", () => {
-    it("should find payments by user id", async () => {
+  describe('findByUserId', () => {
+    it('should find payments by user id', async () => {
       const mockPayments = [mockPayment];
       vi.mocked(prisma.payment.findMany).mockResolvedValue(mockPayments);
 
-      const result = await repository.findByUserId("user-id");
+      const result = await repository.findByUserId('user-id');
 
       expect(prisma.payment.findMany).toHaveBeenCalledWith({
-        where: { userId: "user-id" },
-        orderBy: { createdAt: "desc" },
+        where: { userId: 'user-id' },
+        orderBy: { createdAt: 'desc' },
       });
 
       expect(result).toHaveLength(1);
-      expect(result[0].userId).toBe("user-id");
+      expect(result[0].userId).toBe('user-id');
     });
   });
 
-  describe("findByTelegramChargeId", () => {
-    it("should find payment by telegram charge id", async () => {
+  describe('findByTelegramChargeId', () => {
+    it('should find payment by telegram charge id', async () => {
       vi.mocked(prisma.payment.findFirst).mockResolvedValue(mockPayment);
 
-      const result = await repository.findByTelegramChargeId(
-        "telegram-charge-id"
-      );
+      const result =
+        await repository.findByTelegramChargeId('telegram-charge-id');
 
       expect(prisma.payment.findFirst).toHaveBeenCalledWith({
-        where: { telegramChargeId: "telegram-charge-id" },
+        where: { telegramChargeId: 'telegram-charge-id' },
       });
 
       expect(result).not.toBeNull();
-      expect(result!.telegramChargeId).toBe("telegram-charge-id");
+      expect(result!.telegramChargeId).toBe('telegram-charge-id');
     });
 
-    it("should return null if payment not found", async () => {
+    it('should return null if payment not found', async () => {
       vi.mocked(prisma.payment.findFirst).mockResolvedValue(null);
 
-      const result = await repository.findByTelegramChargeId("non-existent-id");
+      const result = await repository.findByTelegramChargeId('non-existent-id');
 
       expect(result).toBeNull();
     });
   });
 
-  describe("create", () => {
-    it("should create a payment", async () => {
+  describe('create', () => {
+    it('should create a payment', async () => {
       const paymentData = {
-        telegramChargeId: "new-telegram-charge-id",
-        provider: "telegram",
+        telegramChargeId: 'new-telegram-charge-id',
+        provider: 'telegram',
         amount: 19.99,
-        currency: "USD",
+        currency: 'USD',
         status: PaymentStatus.PENDING,
-        userEmail: "newuser@example.com",
-        userPhone: "+9876543210",
-        paidAt: new Date("2024-01-01"),
-        expiresAt: new Date("2024-01-02"),
-        invoiceUrl: "https://newinvoice.example.com",
-        userId: "new-user-id",
-        productId: "new-product-id",
+        userEmail: 'newuser@example.com',
+        userPhone: '+9876543210',
+        paidAt: new Date('2024-01-01'),
+        expiresAt: new Date('2024-01-02'),
+        invoiceUrl: 'https://newinvoice.example.com',
+        userId: 'new-user-id',
+        productId: 'new-product-id',
       };
 
       vi.mocked(prisma.payment.create).mockResolvedValue({
         ...mockPayment,
         ...paymentData,
-        createdAt: new Date("2024-01-01"),
+        createdAt: new Date('2024-01-01'),
       });
 
       const result = await repository.create(paymentData);
@@ -393,11 +392,11 @@ describe("PrismaPaymentRepository", () => {
     });
   });
 
-  describe("update", () => {
-    it("should update a payment", async () => {
+  describe('update', () => {
+    it('should update a payment', async () => {
       const updateData = {
         status: PaymentStatus.PAID,
-        paidAt: new Date("2024-01-01"),
+        paidAt: new Date('2024-01-01'),
       };
 
       vi.mocked(prisma.payment.update).mockResolvedValue({
@@ -405,10 +404,10 @@ describe("PrismaPaymentRepository", () => {
         ...updateData,
       });
 
-      const result = await repository.update("payment-id", updateData);
+      const result = await repository.update('payment-id', updateData);
 
       expect(prisma.payment.update).toHaveBeenCalledWith({
-        where: { id: "payment-id" },
+        where: { id: 'payment-id' },
         data: updateData,
       });
 
@@ -416,20 +415,20 @@ describe("PrismaPaymentRepository", () => {
     });
   });
 
-  describe("delete", () => {
-    it("should delete a payment", async () => {
+  describe('delete', () => {
+    it('should delete a payment', async () => {
       vi.mocked(prisma.payment.delete).mockResolvedValue(mockPayment);
 
-      await repository.delete("payment-id");
+      await repository.delete('payment-id');
 
       expect(prisma.payment.delete).toHaveBeenCalledWith({
-        where: { id: "payment-id" },
+        where: { id: 'payment-id' },
       });
     });
   });
 
-  describe("mapToEntity", () => {
-    it("should map prisma payment to entity", () => {
+  describe('mapToEntity', () => {
+    it('should map prisma payment to entity', () => {
       // @ts-expect-error - testing private method
       const result = repository.mapToEntity(mockPayment);
 
@@ -451,7 +450,7 @@ describe("PrismaPaymentRepository", () => {
       });
     });
 
-    it("should handle null optional fields", () => {
+    it('should handle null optional fields', () => {
       const prismaPayment = {
         ...mockPayment,
         telegramChargeId: null,
@@ -477,7 +476,7 @@ describe("PrismaPaymentRepository", () => {
   });
 });
 
-describe("PrismaSubscriptionRepository", () => {
+describe('PrismaSubscriptionRepository', () => {
   let repository: PrismaSubscriptionRepository;
   let mockSubscription: PrismaSubscription;
 
@@ -486,78 +485,78 @@ describe("PrismaSubscriptionRepository", () => {
     vi.clearAllMocks();
 
     mockSubscription = {
-      id: "subscription-id",
-      startDate: new Date("2024-01-01"),
-      endDate: new Date("2024-01-31"),
+      id: 'subscription-id',
+      startDate: new Date('2024-01-01'),
+      endDate: new Date('2024-01-31'),
       isActive: true,
       autoRenew: true,
       cancelledAt: null,
-      userId: "user-id",
-      productId: "product-id",
-      paymentId: "payment-id",
+      userId: 'user-id',
+      productId: 'product-id',
+      paymentId: 'payment-id',
     } as PrismaSubscription;
   });
 
-  describe("findById", () => {
-    it("should find subscription by id", async () => {
+  describe('findById', () => {
+    it('should find subscription by id', async () => {
       vi.mocked(prisma.subscription.findUnique).mockResolvedValue(
         mockSubscription
       );
 
-      const result = await repository.findById("subscription-id");
+      const result = await repository.findById('subscription-id');
 
       expect(prisma.subscription.findUnique).toHaveBeenCalledWith({
-        where: { id: "subscription-id" },
+        where: { id: 'subscription-id' },
       });
 
       expect(result).not.toBeNull();
-      expect(result!.id).toBe("subscription-id");
+      expect(result!.id).toBe('subscription-id');
     });
 
-    it("should return null if subscription not found", async () => {
+    it('should return null if subscription not found', async () => {
       vi.mocked(prisma.subscription.findUnique).mockResolvedValue(null);
 
-      const result = await repository.findById("non-existent-id");
+      const result = await repository.findById('non-existent-id');
 
       expect(result).toBeNull();
     });
   });
 
-  describe("findByUserId", () => {
-    it("should find subscriptions by user id", async () => {
+  describe('findByUserId', () => {
+    it('should find subscriptions by user id', async () => {
       const mockSubscriptions = [mockSubscription];
       vi.mocked(prisma.subscription.findMany).mockResolvedValue(
         mockSubscriptions
       );
 
-      const result = await repository.findByUserId("user-id");
+      const result = await repository.findByUserId('user-id');
 
       expect(prisma.subscription.findMany).toHaveBeenCalledWith({
-        where: { userId: "user-id" },
-        orderBy: { startDate: "desc" },
+        where: { userId: 'user-id' },
+        orderBy: { startDate: 'desc' },
       });
 
       expect(result).toHaveLength(1);
-      expect(result[0].userId).toBe("user-id");
+      expect(result[0].userId).toBe('user-id');
     });
   });
 
-  describe("findActiveByUserId", () => {
-    it("should find active subscriptions by user id", async () => {
+  describe('findActiveByUserId', () => {
+    it('should find active subscriptions by user id', async () => {
       const mockSubscriptions = [mockSubscription];
       vi.mocked(prisma.subscription.findMany).mockResolvedValue(
         mockSubscriptions
       );
 
-      const result = await repository.findActiveByUserId("user-id");
+      const result = await repository.findActiveByUserId('user-id');
 
       expect(prisma.subscription.findMany).toHaveBeenCalledWith({
         where: {
-          userId: "user-id",
+          userId: 'user-id',
           isActive: true,
           OR: [{ endDate: null }, { endDate: { gt: expect.any(Date) } }],
         },
-        orderBy: { startDate: "desc" },
+        orderBy: { startDate: 'desc' },
       });
 
       expect(result).toHaveLength(1);
@@ -565,16 +564,16 @@ describe("PrismaSubscriptionRepository", () => {
     });
   });
 
-  describe("create", () => {
-    it("should create a subscription", async () => {
+  describe('create', () => {
+    it('should create a subscription', async () => {
       const subscriptionData = {
-        endDate: new Date("2024-01-31"),
+        endDate: new Date('2024-01-31'),
         isActive: true,
         autoRenew: true,
         cancelledAt: undefined,
-        userId: "new-user-id",
-        productId: "new-product-id",
-        paymentId: "new-payment-id",
+        userId: 'new-user-id',
+        productId: 'new-product-id',
+        paymentId: 'new-payment-id',
       };
 
       vi.mocked(prisma.subscription.create).mockResolvedValue({
@@ -586,7 +585,7 @@ describe("PrismaSubscriptionRepository", () => {
         userId: subscriptionData.userId,
         productId: subscriptionData.productId,
         paymentId: subscriptionData.paymentId,
-        startDate: new Date("2024-01-01"),
+        startDate: new Date('2024-01-01'),
       });
 
       const result = await repository.create(subscriptionData);
@@ -599,11 +598,11 @@ describe("PrismaSubscriptionRepository", () => {
     });
   });
 
-  describe("update", () => {
-    it("should update a subscription", async () => {
+  describe('update', () => {
+    it('should update a subscription', async () => {
       const updateData = {
         isActive: false,
-        cancelledAt: new Date("2024-01-15"),
+        cancelledAt: new Date('2024-01-15'),
       };
 
       vi.mocked(prisma.subscription.update).mockResolvedValue({
@@ -611,10 +610,10 @@ describe("PrismaSubscriptionRepository", () => {
         ...updateData,
       });
 
-      const result = await repository.update("subscription-id", updateData);
+      const result = await repository.update('subscription-id', updateData);
 
       expect(prisma.subscription.update).toHaveBeenCalledWith({
-        where: { id: "subscription-id" },
+        where: { id: 'subscription-id' },
         data: updateData,
       });
 
@@ -623,20 +622,20 @@ describe("PrismaSubscriptionRepository", () => {
     });
   });
 
-  describe("delete", () => {
-    it("should delete a subscription", async () => {
+  describe('delete', () => {
+    it('should delete a subscription', async () => {
       vi.mocked(prisma.subscription.delete).mockResolvedValue(mockSubscription);
 
-      await repository.delete("subscription-id");
+      await repository.delete('subscription-id');
 
       expect(prisma.subscription.delete).toHaveBeenCalledWith({
-        where: { id: "subscription-id" },
+        where: { id: 'subscription-id' },
       });
     });
   });
 
-  describe("mapToEntity", () => {
-    it("should map prisma subscription to entity", () => {
+  describe('mapToEntity', () => {
+    it('should map prisma subscription to entity', () => {
       // @ts-expect-error - testing private method
       const result = repository.mapToEntity(mockSubscription);
 
@@ -653,7 +652,7 @@ describe("PrismaSubscriptionRepository", () => {
       });
     });
 
-    it("should handle null optional fields", () => {
+    it('should handle null optional fields', () => {
       const prismaSubscription = {
         ...mockSubscription,
         endDate: null,

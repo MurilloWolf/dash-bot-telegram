@@ -1,11 +1,11 @@
-import { CommandInput, CommandOutput } from "@app-types/Command.ts";
-import { logger } from "../../../../../utils/Logger.ts";
+import { CommandInput, CommandOutput } from '@app-types/Command.ts';
+import { logger } from '../../../../../utils/Logger.ts';
 
 export async function startCommand(
   input: CommandInput
 ): Promise<CommandOutput> {
   try {
-    const userName = input.user?.name ?? "Corredor";
+    const userName = input.user?.name ?? 'Corredor';
     return {
       text:
         `🏃‍♂️ <b>Bem-vindo ao DashBot, ${userName}!</b> 🏃‍♀️\n\n` +
@@ -18,11 +18,11 @@ export async function startCommand(
         `⚙️ /config - Configure suas preferências\n` +
         `❓ /ajuda - Guia completo de comandos\n\n` +
         `<i>💡 Dica: Configure suas distâncias favoritas com /config para receber recomendações personalizadas!</i>`,
-      format: "HTML",
+      format: 'HTML',
     };
   } catch (error) {
-    logger.commandError("start", error as Error, input.user?.id?.toString());
-    const userName = input.user?.name ?? "Corredor";
+    logger.commandError('start', error as Error, input.user?.id?.toString());
+    const userName = input.user?.name ?? 'Corredor';
     return {
       text:
         `🏃‍♂️ <b>Bem-vindo ao DashBot, ${userName}!</b> 🏃‍♀️\n\n` +
@@ -35,7 +35,7 @@ export async function startCommand(
         `⚙️ /config - Configure suas preferências\n` +
         `❓ /ajuda - Guia completo de comandos\n\n` +
         `<i>💡 Dica: Configure suas distâncias favoritas com /config para receber recomendações personalizadas!</i>`,
-      format: "HTML",
+      format: 'HTML',
     };
   }
 }

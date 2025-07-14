@@ -1,10 +1,10 @@
-import { Message, Chat, Media, Location } from "../entities/Message.ts";
+import { Message, Chat, Media, Location } from '../entities/Message.ts';
 import {
   MessageRepository,
   ChatRepository,
   MediaRepository,
   LocationRepository,
-} from "../repositories/MessageRepository.ts";
+} from '../repositories/MessageRepository.ts';
 
 export class MessageService {
   constructor(
@@ -27,7 +27,7 @@ export class MessageService {
   }
 
   async createMessage(
-    messageData: Omit<Message, "id" | "createdAt" | "updatedAt">
+    messageData: Omit<Message, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<Message> {
     return this.messageRepository.create(messageData);
   }
@@ -52,7 +52,7 @@ export class MessageService {
   }
 
   async createChat(
-    chatData: Omit<Chat, "id" | "createdAt" | "updatedAt">
+    chatData: Omit<Chat, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<Chat> {
     return this.chatRepository.create(chatData);
   }
@@ -65,7 +65,7 @@ export class MessageService {
     return this.mediaRepository.findByMessageId(messageId);
   }
 
-  async createMedia(mediaData: Omit<Media, "id">): Promise<Media> {
+  async createMedia(mediaData: Omit<Media, 'id'>): Promise<Media> {
     return this.mediaRepository.create(mediaData);
   }
 
@@ -73,7 +73,7 @@ export class MessageService {
     return this.locationRepository.findByMessageId(messageId);
   }
 
-  async createLocation(locationData: Omit<Location, "id">): Promise<Location> {
+  async createLocation(locationData: Omit<Location, 'id'>): Promise<Location> {
     return this.locationRepository.create(locationData);
   }
 }

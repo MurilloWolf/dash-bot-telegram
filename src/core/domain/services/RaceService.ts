@@ -3,8 +3,8 @@ import {
   RaceFilter,
   RaceStatus,
   RaceStatusValue,
-} from "../entities/Race.ts";
-import { RaceRepository } from "../repositories/RaceRepository.ts";
+} from '../entities/Race.ts';
+import { RaceRepository } from '../repositories/RaceRepository.ts';
 
 export class RaceService {
   constructor(private raceRepository: RaceRepository) {}
@@ -40,7 +40,7 @@ export class RaceService {
   }
 
   async createRace(
-    raceData: Omit<Race, "id" | "createdAt" | "updatedAt">
+    raceData: Omit<Race, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<Race> {
     return this.raceRepository.create(raceData);
   }
@@ -74,7 +74,7 @@ export class RaceService {
   }
 
   formatRaceMessages(races: Race[]): string[] {
-    const messages = races.map((race) => this.formatRaceMessage(race));
+    const messages = races.map(race => this.formatRaceMessage(race));
     return messages;
   }
 
@@ -83,14 +83,18 @@ export class RaceService {
     const organization = `<i>${race.organization}</i>`;
     const distances = this.formatDistances(race.distances);
     const date = `📅 ${this.formatDateBR(race.date)}`;
-    const time = race.time ? `⏰ ${race.time}` : "";
-    const location = race.location ? `📍 <b>Local:</b> ${race.location}` : "";
+    const time = race.time ? `⏰ ${race.time}` : '';
+    const location = race.location ? `📍 <b>Local:</b> ${race.location}` : '';
     const linkText = `🔗 <a href="${race.link}">Inscrições</a>`;
     const status = this.getStatusEmoji(race.status);
 
     let message = `${title}\n${organization}\n${date}`;
-    if (time) message += `\n${time}`;
-    if (location) message += `\n${location}`;
+    if (time) {
+      message += `\n${time}`;
+    }
+    if (location) {
+      message += `\n${location}`;
+    }
     message += `\n\n${distances}\n\n${status}\n${linkText}`;
 
     return message;
@@ -98,18 +102,18 @@ export class RaceService {
 
   private formatDistances(distances: string[]): string {
     if (distances.length === 0) {
-      return "❌ Distâncias não informadas";
+      return '❌ Distâncias não informadas';
     }
 
     const formattedDistances = distances
-      .map((distance) => `🏃‍♂️ ${distance}`)
-      .join("\n");
+      .map(distance => `🏃‍♂️ ${distance}`)
+      .join('\n');
     return `📏 Distâncias:\n${formattedDistances}`;
   }
 
   private formatDateBR(date: Date): string {
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   }
@@ -117,15 +121,15 @@ export class RaceService {
   private getStatusEmoji(status: string): string {
     switch (status) {
       case RaceStatus.OPEN:
-        return "🔓 Aberto";
+        return '🔓 Aberto';
       case RaceStatus.CLOSED:
-        return "🔒 Fechado";
+        return '🔒 Fechado';
       case RaceStatus.COMING_SOON:
-        return "⏳ Em breve";
+        return '⏳ Em breve';
       case RaceStatus.CANCELLED:
-        return "❌ Cancelado";
+        return '❌ Cancelado';
       default:
-        return "";
+        return '';
     }
   }
 }

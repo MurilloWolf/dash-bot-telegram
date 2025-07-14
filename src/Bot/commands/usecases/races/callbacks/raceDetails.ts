@@ -1,15 +1,15 @@
-import { CommandInput, CommandOutput } from "@app-types/Command.ts";
+import { CommandInput, CommandOutput } from '@app-types/Command.ts';
 import {
   CallbackData,
   RaceDetailsCallbackData,
-} from "@app-types/callbacks/index.ts";
-import { CallbackDataSerializer } from "@bot/config/callback/CallbackDataSerializer.ts";
-import { raceService } from "@core/infra/dependencies.ts";
-import { BaseCallbackHandler } from "@bot/commands/shared/handlers/BaseCallbackHandler.ts";
+} from '@app-types/callbacks/index.ts';
+import { CallbackDataSerializer } from '@bot/config/callback/CallbackDataSerializer.ts';
+import { raceService } from '@core/infra/dependencies.ts';
+import { BaseCallbackHandler } from '@bot/commands/shared/handlers/BaseCallbackHandler.ts';
 
 export class RaceDetailsCallbackHandler extends BaseCallbackHandler {
   canHandle(callbackData: CallbackData): boolean {
-    return callbackData.type === "race_details";
+    return callbackData.type === 'race_details';
   }
 
   async handle(input: CommandInput): Promise<CommandOutput> {
@@ -19,27 +19,27 @@ export class RaceDetailsCallbackHandler extends BaseCallbackHandler {
       const race = await raceService.getRaceById(data.raceId);
 
       if (!race) {
-        return this.createErrorResponse("Corrida não encontrada.");
+        return this.createErrorResponse('Corrida não encontrada.');
       }
 
       const detailedMessage = raceService.formatDetailedRaceMessage(race);
 
       return {
         text: detailedMessage,
-        format: "HTML",
+        format: 'HTML',
         editMessage: true,
         keyboard: {
           buttons: [
             [
               {
-                text: "📍 Ver Localização",
+                text: '📍 Ver Localização',
                 callbackData: CallbackDataSerializer.raceLocation(data.raceId),
               },
               {
-                text: "⏰ Definir Lembrete",
+                text: '⏰ Definir Lembrete',
                 callbackData: CallbackDataSerializer.raceReminder(
                   data.raceId,
-                  "set"
+                  'set'
                 ),
               },
             ],
@@ -49,8 +49,8 @@ export class RaceDetailsCallbackHandler extends BaseCallbackHandler {
         },
       };
     } catch (error) {
-      this.logError(error, "RaceDetailsCallbackHandler");
-      return this.createErrorResponse("Erro ao buscar detalhes da corrida.");
+      this.logError(error, 'RaceDetailsCallbackHandler');
+      return this.createErrorResponse('Erro ao buscar detalhes da corrida.');
     }
   }
 }

@@ -1,18 +1,18 @@
-import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
-import { PaymentService } from "../PaymentService.ts";
+import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
+import { PaymentService } from '../PaymentService.ts';
 import {
   Product,
   Payment,
   Subscription,
   PaymentStatus,
-} from "../../entities/Payment.ts";
+} from '../../entities/Payment.ts';
 import {
   ProductRepository,
   PaymentRepository,
   SubscriptionRepository,
-} from "../../repositories/PaymentRepository.ts";
+} from '../../repositories/PaymentRepository.ts';
 
-describe("PaymentService", () => {
+describe('PaymentService', () => {
   let paymentService: PaymentService;
   let mockPaymentRepository: PaymentRepository;
   let mockProductRepository: ProductRepository;
@@ -53,15 +53,15 @@ describe("PaymentService", () => {
     );
   });
 
-  describe("getPaymentsByUserId", () => {
-    it("should return payments for a user", async () => {
-      const userId = "user-123";
+  describe('getPaymentsByUserId', () => {
+    it('should return payments for a user', async () => {
+      const userId = 'user-123';
       const payments: Payment[] = [
         {
-          id: "pay-1",
-          provider: "telegram",
+          id: 'pay-1',
+          provider: 'telegram',
           amount: 19.99,
-          currency: "BRL",
+          currency: 'BRL',
           status: PaymentStatus.PAID,
           createdAt: new Date(),
           userId,
@@ -76,8 +76,8 @@ describe("PaymentService", () => {
       expect(result).toEqual(payments);
     });
 
-    it("should return empty array when user has no payments", async () => {
-      const userId = "user-123";
+    it('should return empty array when user has no payments', async () => {
+      const userId = 'user-123';
 
       (mockPaymentRepository.findByUserId as Mock).mockResolvedValue([]);
 
@@ -88,17 +88,17 @@ describe("PaymentService", () => {
     });
   });
 
-  describe("getPaymentById", () => {
-    it("should return payment by id", async () => {
-      const paymentId = "pay-123";
+  describe('getPaymentById', () => {
+    it('should return payment by id', async () => {
+      const paymentId = 'pay-123';
       const payment: Payment = {
         id: paymentId,
-        provider: "telegram",
+        provider: 'telegram',
         amount: 19.99,
-        currency: "BRL",
+        currency: 'BRL',
         status: PaymentStatus.PAID,
         createdAt: new Date(),
-        userId: "user-123",
+        userId: 'user-123',
       };
 
       (mockPaymentRepository.findById as Mock).mockResolvedValue(payment);
@@ -109,8 +109,8 @@ describe("PaymentService", () => {
       expect(result).toEqual(payment);
     });
 
-    it("should return null when payment does not exist", async () => {
-      const paymentId = "pay-inexistente";
+    it('should return null when payment does not exist', async () => {
+      const paymentId = 'pay-inexistente';
 
       (mockPaymentRepository.findById as Mock).mockResolvedValue(null);
 
@@ -121,19 +121,19 @@ describe("PaymentService", () => {
     });
   });
 
-  describe("createPayment", () => {
-    it("should create a new payment", async () => {
-      const paymentData: Omit<Payment, "id" | "createdAt"> = {
-        provider: "telegram",
+  describe('createPayment', () => {
+    it('should create a new payment', async () => {
+      const paymentData: Omit<Payment, 'id' | 'createdAt'> = {
+        provider: 'telegram',
         amount: 19.99,
-        currency: "BRL",
+        currency: 'BRL',
         status: PaymentStatus.PENDING,
-        userId: "user-123",
-        productId: "prod-123",
+        userId: 'user-123',
+        productId: 'prod-123',
       };
 
       const createdPayment: Payment = {
-        id: "pay-123",
+        id: 'pay-123',
         ...paymentData,
         createdAt: new Date(),
       };
@@ -147,20 +147,20 @@ describe("PaymentService", () => {
     });
   });
 
-  describe("updatePaymentStatus", () => {
-    it("should update payment status", async () => {
-      const paymentId = "pay-123";
+  describe('updatePaymentStatus', () => {
+    it('should update payment status', async () => {
+      const paymentId = 'pay-123';
       const status = PaymentStatus.PAID;
 
       const updatedPayment: Payment = {
         id: paymentId,
-        provider: "telegram",
+        provider: 'telegram',
         amount: 19.99,
-        currency: "BRL",
+        currency: 'BRL',
         status: PaymentStatus.PAID,
         createdAt: new Date(),
         paidAt: new Date(),
-        userId: "user-123",
+        userId: 'user-123',
       };
 
       (mockPaymentRepository.update as Mock).mockResolvedValue(updatedPayment);
@@ -177,15 +177,15 @@ describe("PaymentService", () => {
     });
   });
 
-  describe("getActiveProducts", () => {
-    it("should return active products", async () => {
+  describe('getActiveProducts', () => {
+    it('should return active products', async () => {
       const products: Product[] = [
         {
-          id: "prod-1",
-          name: "Premium Plan",
+          id: 'prod-1',
+          name: 'Premium Plan',
           price: 19.99,
-          currency: "BRL",
-          billingType: "RECURRING",
+          currency: 'BRL',
+          billingType: 'RECURRING',
           isActive: true,
           features: {},
           createdAt: new Date(),
@@ -202,7 +202,7 @@ describe("PaymentService", () => {
       expect(result).toEqual(products);
     });
 
-    it("should return empty array when no active products", async () => {
+    it('should return empty array when no active products', async () => {
       (mockProductRepository.findActiveProducts as Mock).mockResolvedValue([]);
 
       const result = await paymentService.getActiveProducts();
@@ -212,15 +212,15 @@ describe("PaymentService", () => {
     });
   });
 
-  describe("getProductById", () => {
-    it("should return product by id", async () => {
-      const productId = "prod-123";
+  describe('getProductById', () => {
+    it('should return product by id', async () => {
+      const productId = 'prod-123';
       const product: Product = {
         id: productId,
-        name: "Premium Plan",
+        name: 'Premium Plan',
         price: 19.99,
-        currency: "BRL",
-        billingType: "RECURRING",
+        currency: 'BRL',
+        billingType: 'RECURRING',
         isActive: true,
         features: {},
         createdAt: new Date(),
@@ -234,8 +234,8 @@ describe("PaymentService", () => {
       expect(result).toEqual(product);
     });
 
-    it("should return null when product does not exist", async () => {
-      const productId = "prod-inexistente";
+    it('should return null when product does not exist', async () => {
+      const productId = 'prod-inexistente';
 
       (mockProductRepository.findById as Mock).mockResolvedValue(null);
 
@@ -246,17 +246,17 @@ describe("PaymentService", () => {
     });
   });
 
-  describe("getUserSubscriptions", () => {
-    it("should return user subscriptions", async () => {
-      const userId = "user-123";
+  describe('getUserSubscriptions', () => {
+    it('should return user subscriptions', async () => {
+      const userId = 'user-123';
       const subscriptions: Subscription[] = [
         {
-          id: "sub-1",
+          id: 'sub-1',
           startDate: new Date(),
           isActive: true,
           autoRenew: true,
           userId,
-          productId: "prod-123",
+          productId: 'prod-123',
         },
       ];
 
@@ -272,8 +272,8 @@ describe("PaymentService", () => {
       expect(result).toEqual(subscriptions);
     });
 
-    it("should return empty array when user has no subscriptions", async () => {
-      const userId = "user-123";
+    it('should return empty array when user has no subscriptions', async () => {
+      const userId = 'user-123';
 
       (mockSubscriptionRepository.findByUserId as Mock).mockResolvedValue([]);
 
@@ -286,18 +286,18 @@ describe("PaymentService", () => {
     });
   });
 
-  describe("getActiveSubscriptions", () => {
-    it("should return active subscriptions for user", async () => {
-      const userId = "user-123";
+  describe('getActiveSubscriptions', () => {
+    it('should return active subscriptions for user', async () => {
+      const userId = 'user-123';
       const subscriptions: Subscription[] = [
         {
-          id: "sub-1",
+          id: 'sub-1',
           startDate: new Date(),
           endDate: new Date(Date.now() + 86400000), // 1 day from now
           isActive: true,
           autoRenew: true,
           userId,
-          productId: "prod-123",
+          productId: 'prod-123',
         },
       ];
 
@@ -313,8 +313,8 @@ describe("PaymentService", () => {
       expect(result).toEqual(subscriptions);
     });
 
-    it("should return empty array when user has no active subscriptions", async () => {
-      const userId = "user-123";
+    it('should return empty array when user has no active subscriptions', async () => {
+      const userId = 'user-123';
 
       (mockSubscriptionRepository.findActiveByUserId as Mock).mockResolvedValue(
         []
@@ -329,18 +329,18 @@ describe("PaymentService", () => {
     });
   });
 
-  describe("createSubscription", () => {
-    it("should create a new subscription", async () => {
-      const subscriptionData: Omit<Subscription, "id" | "startDate"> = {
+  describe('createSubscription', () => {
+    it('should create a new subscription', async () => {
+      const subscriptionData: Omit<Subscription, 'id' | 'startDate'> = {
         isActive: true,
         autoRenew: true,
-        userId: "user-123",
-        productId: "prod-123",
-        paymentId: "pay-123",
+        userId: 'user-123',
+        productId: 'prod-123',
+        paymentId: 'pay-123',
       };
 
       const createdSubscription: Subscription = {
-        id: "sub-123",
+        id: 'sub-123',
         startDate: new Date(),
         ...subscriptionData,
       };
@@ -358,9 +358,9 @@ describe("PaymentService", () => {
     });
   });
 
-  describe("cancelSubscription", () => {
-    it("should cancel a subscription", async () => {
-      const subscriptionId = "sub-123";
+  describe('cancelSubscription', () => {
+    it('should cancel a subscription', async () => {
+      const subscriptionId = 'sub-123';
       const cancelledAt = new Date();
 
       const cancelledSubscription: Subscription = {
@@ -369,8 +369,8 @@ describe("PaymentService", () => {
         isActive: false,
         autoRenew: false,
         cancelledAt,
-        userId: "user-123",
-        productId: "prod-123",
+        userId: 'user-123',
+        productId: 'prod-123',
       };
 
       (mockSubscriptionRepository.update as Mock).mockResolvedValue(
