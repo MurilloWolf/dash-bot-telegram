@@ -1,14 +1,15 @@
 import { CommandInput, CommandOutput } from '@app-types/Command.ts';
-import { raceService } from '@core/infra/dependencies.ts';
+import { raceApiService } from '@services/index.ts';
+import { RaceFormatter } from '../../../../../utils/formatters/index.ts';
 import { logger } from '../../../../../utils/Logger.ts';
 
 export async function nextRacesCommand(
   _input: CommandInput
 ): Promise<CommandOutput> {
   try {
-    const nextRace = await raceService.getNextRace();
-
-    if (!nextRace) {
+    const nextRaces = await raceApiService.getNextRace();
+    console.info('NEXT RACES', JSON.stringify(nextRaces, null, 2));
+    if (!nextRaces || nextRaces.length === 0) {
       return {
         text: '❌ Nenhuma corrida disponível no momento!',
         format: 'HTML',
@@ -16,9 +17,8 @@ export async function nextRacesCommand(
     }
 
     return {
-      text: 'Proximas corridas',
+      text: RaceFormatter.formatRaceList(nextRaces),
       format: 'HTML',
-      messages: raceService.formatRaceMessages(nextRace),
     };
   } catch (error) {
     logger.commandError(

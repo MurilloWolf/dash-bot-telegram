@@ -9,7 +9,7 @@
 │                    ADAPTERS (Framework)                     │
 │  • TelegramBotAdapter                                       │
 │  • WhatsAppBotAdapter (futuro)                             │
-│  • Database Adapters (Prisma)                              │
+│  • HTTP Service Adapters                                   │
 └─────────────────────────┬───────────────────────────────────┘
                           │ Interface Adapters
 ┌─────────────────────────┼───────────────────────────────────┐
@@ -30,8 +30,7 @@
                           │ Enterprise Business Rules
 ┌─────────────────────────┼───────────────────────────────────┐
 │               INFRASTRUCTURE                               │
-│  • Prisma Repositories                                    │
-│  • Database (PostgreSQL)                                  │
+│  • HTTP Services (UserApiService, RaceApiService)         │
 │  • External APIs                                          │
 │  • File System, Logging                                   │
 └─────────────────────────────────────────────────────────────┘
@@ -81,18 +80,15 @@ Message {
 
 ```typescript
 // dependencies.ts - Container manual
-export const userRepository = new PrismaUserRepository();
-export const userService = new UserService(
-  userRepository,
-  userPreferencesRepository
-);
+export const userApiService = new UserApiService();
+export const raceApiService = new RaceApiService();
 
 // Uso nos handlers
-export async function listUsersCommand(
+export async function listRacesCommand(
   input: CommandInput
 ): Promise<CommandOutput> {
   // Injeta dependência via import
-  const users = await userService.getAllUsers();
+  const races = await raceApiService.getAvailableRaces();
   // ...
 }
 ```
@@ -175,32 +171,39 @@ export async function routeCommand(
 }
 ```
 
-### 7. Repository Pattern
+### 7. Service Layer Pattern
 
 ```typescript
-// Interface do domínio
-export interface UserRepository {
-  findById(id: string): Promise<User | null>;
-  findByTelegramId(telegramId: string): Promise<User | null>;
-  create(data: CreateUserData): Promise<User>;
-  update(id: string, data: UpdateUserData): Promise<User>;
-  delete(id: string): Promise<void>;
+// Interface para services
+export interface ApiService {
+  get<T>(url: string): Promise<T>;
+  post<T>(url: string, data: unknown): Promise<T>;
 }
 
-// Implementação de infraestrutura
-export class PrismaUserRepository implements UserRepository {
-  constructor(private prisma: PrismaClient) {}
+// Implementação específica por domínio
+export class UserApiService {
+  constructor(private httpClient: HttpClient) {}
 
-  async findById(id: string): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-      include: { preferences: true },
+  async registerUser(telegramId: string, name: string): Promise<User> {
+    const response = await this.httpClient.post<User>('/users/register', {
+      telegramId,
+      name,
     });
-    return user ? this.toDomain(user) : null;
+    return response.data;
   }
 
-  private toDomain(prismaUser: PrismaUser): User {
-    // Converte modelo Prisma para entidade de domínio
+  async getUserByTelegramId(telegramId: string): Promise<User | null> {
+    try {
+      const response = await this.httpClient.get<User>(
+        `/users/telegram/${telegramId}`
+      );
+      return response.data;
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) {
+        return null;
+      }
+      throw error;
+    }
   }
 }
 ```
@@ -313,6 +316,85 @@ export class MessageInterceptor {
 }
 ```
 
+### 11. HTTP Client Pattern (Interceptor + Response Wrapper)
+
+```typescript
+// Custom HTTP Client com interceptors
+export class HttpClient {
+  private api: AxiosInstance;
+
+  constructor(baseURL?: string) {
+    this.api = axios.create({ baseURL });
+    this.setupInterceptors();
+  }
+
+  private setupInterceptors(): void {
+    this.api.interceptors.response.use(response => {
+      // Auto-extração da estrutura ApiResponse
+      const responseData = response.data as ApiResponse;
+
+      if (responseData?.success === false) {
+        throw new ApiError(responseData.error || 'API operation failed');
+      }
+
+      return {
+        data: responseData.data,
+        status: response.status,
+        statusText: response.statusText,
+      } as HttpResponse<typeof responseData.data>;
+    });
+  }
+
+  async get<T>(url: string): Promise<HttpResponse<T>> {
+    return this.api.get<T>(url) as Promise<HttpResponse<T>>;
+  }
+}
+
+// Usage nos services
+export class RaceApiService {
+  async getAvailableRaces(): Promise<Race[]> {
+    const response = await httpClient.get<Race[]>('/races/available');
+    return response.data; // Acesso direto aos dados
+  }
+}
+```
+
+### 12. Service Layer Pattern (Modular)
+
+```typescript
+// Services especializados por domínio
+export class UserApiService {
+  private readonly baseUrl = '/users';
+
+  async registerUser(
+    telegramId: string,
+    name: string,
+    username?: string
+  ): Promise<User> {
+    const response = await httpClient.post<User>(`${this.baseUrl}/register`, {
+      telegramId,
+      name,
+      username,
+    });
+    return response.data;
+  }
+}
+
+export class RaceApiService {
+  private readonly baseUrl = '/races';
+
+  async getAvailableRaces(): Promise<Race[]> {
+    const response = await httpClient.get<Race[]>(`${this.baseUrl}/available`);
+    return response.data;
+  }
+}
+
+// Exportação centralizada
+export { userApiService } from './UserApiService.ts';
+export { raceApiService } from './RaceApiService.ts';
+export { chatApiService } from './ChatApiService.ts';
+```
+
 ## 📋 Vantagens dos Padrões Implementados
 
 ### Manutenibilidade
@@ -320,24 +402,35 @@ export class MessageInterceptor {
 - Separação clara de responsabilidades
 - Código organizado em camadas
 - Facilidade para mudanças
+- Services modulares por domínio
 
 ### Testabilidade
 
 - Dependency injection facilita mocking
 - Interfaces permitem test doubles
 - Isolamento de componentes
+- HTTP Client testável com interceptors
 
 ### Extensibilidade
 
 - Novos adapters facilmente adicionados
 - Novos comandos seguem mesmo padrão
 - Sistema de callbacks expansível
+- HTTP Client extensível para novas APIs
 
 ### Reusabilidade
 
 - Componentes podem ser reutilizados
 - Lógica de negócio independente de framework
 - Patterns consistentes
+- Services modulares reutilizáveis
+
+### Performance
+
+- HTTP Client com interceptors otimizados
+- Response caching capabilities
+- Error handling centralizado
+- Logging estruturado para debugging
 
 ## 🎯 Guidelines para Novos Desenvolvimentos
 
@@ -347,3 +440,5 @@ export class MessageInterceptor {
 4. **Implementar error handling**: Try-catch em todas as operações externas
 5. **Adicionar logs estruturados**: Para debugging e monitoramento
 6. **Seguir patterns existentes**: Consistência é fundamental
+7. **Criar services modulares**: Um service por domínio/contexto
+8. **Usar HttpClient customizado**: Para comunicação externa padronizada

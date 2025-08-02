@@ -7,7 +7,7 @@ Como GitHub Copilot trabalhando neste projeto, você deve se comportar como um *
 - **Clean Architecture & Domain Driven Design**
 - **TypeScript avançado com type safety**
 - **Bot development e sistemas distribuídos**
-- **Database design e otimização**
+- **HTTP Client architecture e APIs**
 - **Testing strategies e qualidade de código**
 - **Performance e scalability**
 
@@ -18,7 +18,7 @@ Como GitHub Copilot trabalhando neste projeto, você deve se comportar como um *
 ```typescript
 // ❌ Não faça isso - código direto sem pensar
 export async function listRaces() {
-  const races = await prisma.race.findMany();
+  const races = await raceApiService.getAvailableRaces();
   return races;
 }
 
@@ -88,9 +88,7 @@ export async function createUser(
     return Result.success(user);
   } catch (error) {
     logger.error('Failed to create user', { data }, error);
-    return Result.failure(
-      new UserCreationError('Database error', { cause: error })
-    );
+    return Result.failure(new UserCreationError('API error', { cause: error }));
   }
 }
 ```
@@ -100,54 +98,16 @@ export async function createUser(
 ### 1. Layer Responsibilities
 
 ```typescript
-// ✅ DOMAIN LAYER - Business rules only
-export class UserService {
-  async upgradeUserToPremium(
-    userId: string,
-    subscriptionId: string
-  ): Promise<void> {
-    // Pure business logic
-    const user = await this.userRepository.findById(userId);
-    if (!user) throw new UserNotFoundError();
-
-    const subscription =
-      await this.subscriptionRepository.findById(subscriptionId);
-    if (!subscription.isValid()) throw new InvalidSubscriptionError();
-
-    await this.userRepository.update(userId, {
-      isPremium: true,
-      premiumSince: new Date(),
-    });
-  }
+// Interface clara para repository
+export interface UserRepository {
+  findById(id: string): Promise<User | null>;
 }
 
-// ✅ APPLICATION LAYER - Use case orchestration
-export async function upgradeToPremiumCommand(
-  input: CommandInput
-): Promise<CommandOutput> {
-  try {
-    await userService.upgradeUserToPremium(input.user.id, input.args[0]);
-    return {
-      text: '✅ Upgrade para Premium realizado com sucesso!',
-      format: 'HTML',
-    };
-  } catch (error) {
-    return handleCommandError('upgradeToPremium', error, input);
-  }
-}
-
-// ✅ INFRASTRUCTURE LAYER - Technical implementation
+// ❌ Implementação vazando detalhes de infraestrutura
 export class PrismaUserRepository implements UserRepository {
-  async update(id: string, data: UpdateUserData): Promise<User> {
-    const updated = await this.prisma.user.update({
-      where: { id },
-      data,
-      include: { preferences: true },
-    });
-    return this.toDomain(updated);
-  }
-}
 ```
+
+````
 
 ### 2. Dependency Direction Rules
 
@@ -172,7 +132,7 @@ export class PrismaUserRepository implements UserRepository {
     /* implementation */
   }
 }
-```
+````
 
 ## 🧪 Testing Strategy como Senior
 
@@ -201,7 +161,7 @@ describe('UserService', () => {
 // ✅ Integration Tests - Alguns testes críticos
 describe('User Registration Flow', () => {
   it('should register new user with preferences', async () => {
-    // Test with real database
+    // Test with real API environment
     const telegramId = '123456789';
     const result = await userService.registerUser(telegramId, 'Test User');
 
@@ -215,7 +175,7 @@ describe('User Registration Flow', () => {
 // ✅ E2E Tests - Poucos testes críticos
 describe('Complete Race Listing Flow', () => {
   it('should list races for telegram user', async () => {
-    // Test complete flow from adapter to database
+    // Test complete flow from adapter to API services
     const telegramMessage = createMockTelegramMessage('/corridas');
     const response = await telegramAdapter.processMessage(telegramMessage);
 
@@ -253,33 +213,22 @@ describe('Race filtering by distance', () => {
 
 ## 🚀 Performance como Senior
 
-### 1. Database Optimization
+### 1. HTTP Client Optimization
 
 ```typescript
-// ❌ N+1 Query Problem
-const users = await prisma.user.findMany();
+// ❌ N+1 API Request Problem
+const users = await userApiService.getAllUsers();
 for (const user of users) {
-  const preferences = await prisma.userPreferences.findUnique({
-    where: { userId: user.id },
-  });
+  const preferences = await userApiService.getUserPreferences(user.id);
 }
 
-// ✅ Optimized with includes
-const users = await prisma.user.findMany({
-  include: {
-    preferences: true,
-  },
-});
+// ✅ Optimized with batch requests or single endpoint
+const usersWithPreferences = await userApiService.getUsersWithPreferences();
 
 // ✅ Pagination for large datasets
-const races = await prisma.race.findMany({
-  where: {
-    status: 'OPEN',
-    date: { gte: new Date() },
-  },
-  orderBy: { date: 'asc' },
-  take: 20,
-  skip: page * 20,
+const races = await raceApiService.getAvailableRaces({
+  limit: 20,
+  offset: page * 20,
 });
 ```
 
@@ -315,7 +264,7 @@ export class TelegramAdapter {
 
 ### 1. Input Validation
 
-```typescript
+````typescript
 // ✅ Comprehensive input validation
 export function validateTelegramId(id: unknown): asserts id is string {
   if (typeof id !== 'string') {
@@ -331,16 +280,18 @@ export function validateTelegramId(id: unknown): asserts id is string {
   }
 }
 
-// ✅ SQL Injection prevention (Prisma helps)
-const users = await prisma.user.findMany({
-  where: {
-    name: {
-      contains: userInput, // Prisma handles escaping
-      mode: 'insensitive',
-    },
-  },
+```typescript
+// ✅ API security and input validation
+function validateTelegramId(id: string): boolean {
+  return /^\d+$/.test(id) && id.length > 0;
+}
+
+const users = await userApiService.searchUsers({
+  filter: userInput, // HttpClient handles escaping
 });
-```
+````
+
+````
 
 ### 2. Data Sanitization
 
@@ -358,7 +309,7 @@ export class MessageSanitizer {
     return text.replace(/[_*[\]()~`>#+=|{}.!-]/g, '\\$&');
   }
 }
-```
+````
 
 ## 📊 Monitoring como Senior
 

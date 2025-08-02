@@ -13,7 +13,8 @@
     "paths": {
       "@bot/*": ["./src/Bot/*"],
       "@app-types/*": ["./src/types/*"],
-      "@core/*": ["./src/core/*"]
+      "@core/*": ["./src/core/*"],
+      "@services/*": ["./src/services/*"]
     }
   },
   "include": ["src"],

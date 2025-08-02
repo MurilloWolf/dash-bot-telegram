@@ -1,3 +1,39 @@
+## [0.4.0] - 2025-08-02
+
+### 🗑️ Removed - Database Dependencies
+
+- **Database Integration**: Removida integração completa com PostgreSQL e Prisma
+- **Scripts NPM**: Removidos scripts relacionados ao banco:
+  - `prisma`: Migrations do Prisma
+  - `studio:prod`: Prisma Studio para produção
+  - `studio:dev`: Prisma Studio para desenvolvimento
+  - `db`: Script para popular banco com dados
+  - `db:setup:test`: Setup do banco para testes
+- **Dependencies**: Removida dependência `sqlstring`
+- **Docker**: Removidas configurações do PostgreSQL do docker-compose.yml
+
+### 🔧 Modified - Build and Deploy
+
+- **Build Script**: Atualizado `scripts/build-production.js` para remover etapas do Prisma
+- **Dockerfile**: Removidas etapas de geração do Prisma Client e cópias relacionadas
+- **Deploy Guide**: Atualizado `DEPLOY_GUIDE.md` removendo seções de configuração de banco
+- **Setup Script**: Simplificado `scripts/setup-dev.sh` removendo inicialização do PostgreSQL
+
+### 📝 Updated - Documentation
+
+- **Deploy Guide**: Simplificado processo de deploy sem necessidade de banco
+- **Custos**: Atualizado custos estimados (agora: Grátis vs ~$2/mês)
+- **Troubleshooting**: Removidas seções de debug de banco de dados
+
+### ✅ Benefits
+
+- **Simplicidade**: Deploy mais simples sem configuração de banco
+- **Custos**: Redução de custos (sem necessidade de PostgreSQL)
+- **Manutenção**: Menos dependências para gerenciar
+- **Performance**: Build mais rápido sem etapas do Prisma
+
+---
+
 ## [0.3.1](https://github.com/MurilloWolf/dash-bot-telegram/compare/v0.3.0...v0.3.1) (2025-07-14)
 
 ### Bug Fixes

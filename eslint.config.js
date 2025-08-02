@@ -74,7 +74,6 @@ export default [
       "coverage/**",
       "*.config.js",
       "scripts/**",
-      "prisma/migrations/**",
       "**/*.d.ts",
       "src/index.js" // Legacy file
     ]

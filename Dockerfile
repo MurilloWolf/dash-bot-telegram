@@ -26,9 +26,6 @@ RUN npm ci --include=dev
 # Copy application code
 COPY . .
 
-# Generate Prisma client for production
-RUN npx prisma generate
-
 # Build the application using our custom build system
 RUN npm run build
 
@@ -41,8 +38,6 @@ RUN npm ci --only=production && npm cache clean --force
 
 # Copy built application
 COPY --from=build /app/dist ./dist
-COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=build /app/prisma ./prisma
 
 # Create non-root user (bot doesn't need root)
 RUN addgroup --system --gid 1001 botuser

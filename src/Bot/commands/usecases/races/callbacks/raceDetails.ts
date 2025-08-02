@@ -4,7 +4,8 @@ import {
   RaceDetailsCallbackData,
 } from '@app-types/callbacks/index.ts';
 import { CallbackDataSerializer } from '@bot/config/callback/CallbackDataSerializer.ts';
-import { raceService } from '@core/infra/dependencies.ts';
+import { raceApiService } from '@services/index.ts';
+import { RaceFormatter } from '../../../../../utils/formatters/index.ts';
 import { BaseCallbackHandler } from '@bot/commands/shared/handlers/BaseCallbackHandler.ts';
 
 export class RaceDetailsCallbackHandler extends BaseCallbackHandler {
@@ -16,13 +17,13 @@ export class RaceDetailsCallbackHandler extends BaseCallbackHandler {
     try {
       const data = input.callbackData as RaceDetailsCallbackData;
 
-      const race = await raceService.getRaceById(data.raceId);
+      const race = await raceApiService.getRaceById(data.raceId);
 
       if (!race) {
         return this.createErrorResponse('Corrida não encontrada.');
       }
 
-      const detailedMessage = raceService.formatDetailedRaceMessage(race);
+      const detailedMessage = RaceFormatter.formatDetailedRaceMessage(race);
 
       return {
         text: detailedMessage,

@@ -1,57 +1,18 @@
 import { CommandInput, CommandOutput } from '@app-types/Command.ts';
-import { messageService, userService } from '@core/infra/dependencies.ts';
+import { messageApiService } from '@services/index.ts';
+import { logger } from '../../utils/Logger.ts';
+import { MessageSanitizer } from '../../utils/MessageSanitizer.ts';
 import {
   MessageDirection,
   MessageType,
   ChatType,
+  TelegramMessage,
+  WhatsAppMessage,
+  ExtractedMessageData,
   MessageTypeValue,
   ChatTypeValue,
-} from '@core/domain/entities/Message.ts';
-import { logger } from '../../utils/Logger.ts';
-import { MessageSanitizer } from '../../utils/MessageSanitizer.ts';
-
-// Types for Telegram messages
-interface TelegramMessage {
-  message_id: number;
-  chat: {
-    id: number;
-    type: string;
-    title?: string;
-    username?: string;
-    first_name?: string; // For private chats
-    last_name?: string; // For private chats
-    all_members_are_administrators?: boolean;
-  };
-  from?: {
-    id: number;
-    first_name: string;
-    last_name?: string;
-    username?: string;
-  };
-  text?: string;
-  photo?: unknown;
-  video?: unknown;
-  document?: unknown;
-  audio?: unknown;
-  voice?: unknown;
-  location?: unknown;
-  contact?: unknown;
-  poll?: unknown;
-  reply_to_message?: {
-    message_id: number;
-  };
-  edit_date?: number;
-}
-
-// Types for WhatsApp messages (example structure)
-interface WhatsAppMessage {
-  id: string;
-  from: string;
-  to: string;
-  text?: string;
-  type: string;
-  timestamp: number;
-}
+  SupportedPlatform,
+} from '../../types/MessageInterceptor.ts';
 
 export class MessageInterceptor {
   /**
@@ -61,12 +22,10 @@ export class MessageInterceptor {
    */
   async interceptIncomingMessage(input: CommandInput): Promise<void> {
     try {
-      // Only process if we have sufficient message information
       if (!input.raw || !input.platform) {
         return;
       }
 
-      // Determine the platform type and extract relevant data
       const messageData = this.extractMessageData(input);
 
       if (!messageData) {
@@ -78,54 +37,27 @@ export class MessageInterceptor {
         return;
       }
 
-      // Find or create user if necessary
-      let userId: string | undefined;
-      if (messageData.telegramUserId) {
-        try {
-          // Use the registerUser method that already handles search and creation
-          const user = await userService.registerUser(
-            messageData.telegramUserId,
-            messageData.userName || `User ${messageData.telegramUserId}`,
-            messageData.userUsername
-          );
-          userId = user.id;
-        } catch (error) {
-          logger.warn(
-            `Error finding/creating user ${messageData.telegramUserId}`,
-            {
-              module: 'MessageInterceptor',
-              action: 'register_user',
-              telegramUserId: messageData.telegramUserId,
-            },
-            error as Error
-          );
-          // Continue without userId if unable to create/find
-        }
-      }
-
       // Save or update the chat
-      let chat = await messageService.getChatByTelegramId(messageData.chatId);
-      if (!chat) {
-        chat = await messageService.createChat({
+
+      // Save the received message - backend will handle user creation/lookup
+      await messageApiService.createMessage({
+        telegramId: BigInt(messageData.messageId),
+        text: messageData.text,
+        direction: MessageDirection.INCOMING,
+        type: messageData.messageType,
+        editedAt: messageData.editedAt,
+        userTelegramId: messageData.telegramUserId,
+        chatTelegramId: messageData.chatId,
+        replyToTelegramId: messageData.replyToId,
+        chat: {
           telegramId: messageData.chatId,
           type: messageData.chatType,
           title: messageData.chatTitle,
           username: messageData.chatUsername,
           memberCount: messageData.memberCount,
-        });
-      }
-
-      // Save the received message
-      await messageService.createMessage({
-        telegramId: BigInt(messageData.messageId),
-        text: messageData.text,
-        direction: MessageDirection.INCOMING,
-        type: messageData.messageType,
-        userId: userId, // Now uses the internal user ID, not the telegramId
-        chatId: chat.id,
-        replyToId: messageData.replyToId,
-        editedAt: messageData.editedAt,
-        isDeleted: false,
+        },
+        media: undefined, // TODO: Extract media information from message
+        location: undefined, // TODO: Extract location information from message
       });
 
       logger.messageIntercept(
@@ -158,7 +90,6 @@ export class MessageInterceptor {
     output: CommandOutput
   ): Promise<void> {
     try {
-      // Only process if we have sufficient information
       if (!input.raw || !input.platform || !output.text) {
         return;
       }
@@ -169,65 +100,37 @@ export class MessageInterceptor {
         return;
       }
 
-      // Find or create user if necessary (same code as incoming message)
-      let userId: string | undefined;
-      if (messageData.telegramUserId) {
-        try {
-          // Use the registerUser method that already handles search and creation
-          const user = await userService.registerUser(
-            messageData.telegramUserId,
-            messageData.userName || `User ${messageData.telegramUserId}`,
-            messageData.userUsername
-          );
-          userId = user.id;
-        } catch (error) {
-          logger.warn(
-            `Error finding/creating user for outgoing message ${messageData.telegramUserId}`,
-            {
-              module: 'MessageInterceptor',
-              action: 'register_user_outgoing',
-              telegramUserId: messageData.telegramUserId,
-            },
-            error as Error
-          );
-          // Continue without userId if unable to create/find
-        }
-      }
-
-      // Save or update the chat if necessary
-      let chat = await messageService.getChatByTelegramId(messageData.chatId);
-      if (!chat) {
-        chat = await messageService.createChat({
-          telegramId: messageData.chatId,
-          type: messageData.chatType, // Uses the type extracted from the message
-          title: messageData.chatTitle,
-          username: messageData.chatUsername,
-          memberCount: messageData.memberCount,
-        });
-      }
-
       const originalCommand = messageData.text || '';
       const commandSummary =
         MessageSanitizer.createCommandSummary(originalCommand);
 
       const outgoingMessageId = BigInt(`${Date.now()}${messageData.messageId}`);
 
-      await messageService.createMessage({
+      await messageApiService.createMessage({
         telegramId: outgoingMessageId,
-        text: commandSummary, // Resumo ao invés do texto completo
+        text: commandSummary,
         direction: MessageDirection.OUTGOING,
         type: MessageType.TEXT,
-        userId: userId,
-        chatId: chat.id,
-        replyToId: messageData.messageId.toString(), // Referencia a mensagem original
-        isDeleted: false,
+        editedAt: undefined,
+        userTelegramId: messageData.telegramUserId,
+        chatTelegramId: messageData.chatId,
+        replyToTelegramId: messageData.messageId.toString(),
+        chat: {
+          telegramId: messageData.chatId,
+          type: messageData.chatType,
+          title: messageData.chatTitle,
+          username: messageData.chatUsername,
+          memberCount: messageData.memberCount,
+        },
+        media: undefined, // TODO: Extract media information from response
+        location: undefined, // TODO: Extract location information from response
       });
 
       logger.messageIntercept(
         input.platform || 'unknown',
         'sent',
         messageData.chatId?.toString(),
-        userId
+        messageData.telegramUserId
       );
     } catch (error) {
       logger.error(
@@ -247,23 +150,11 @@ export class MessageInterceptor {
    * @param input CommandInput
    * @returns Dados estruturados da mensagem ou null
    */
-  private extractMessageData(input: CommandInput): {
-    messageId: number;
-    chatId: string;
-    chatType: ChatTypeValue;
-    chatTitle?: string;
-    chatUsername?: string;
-    memberCount?: number;
-    text?: string;
-    messageType: MessageTypeValue;
-    telegramUserId?: string;
-    userName?: string;
-    userUsername?: string;
-    replyToId?: string;
-    editedAt?: Date;
-  } | null {
+  private extractMessageData(input: CommandInput): ExtractedMessageData | null {
     try {
-      switch (input.platform) {
+      const platform = input.platform as SupportedPlatform;
+
+      switch (platform) {
         case 'telegram':
           return this.extractTelegramMessageData(input.raw as TelegramMessage);
         case 'whatsapp':
@@ -293,21 +184,9 @@ export class MessageInterceptor {
   /**
    * Extrai dados de mensagem do Telegram
    */
-  private extractTelegramMessageData(msg: TelegramMessage): {
-    messageId: number;
-    chatId: string;
-    chatType: ChatTypeValue;
-    chatTitle?: string;
-    chatUsername?: string;
-    memberCount?: number;
-    text?: string;
-    messageType: MessageTypeValue;
-    telegramUserId?: string;
-    userName?: string;
-    userUsername?: string;
-    replyToId?: string;
-    editedAt?: Date;
-  } | null {
+  private extractTelegramMessageData(
+    msg: TelegramMessage
+  ): ExtractedMessageData | null {
     if (!msg || !msg.chat || !msg.message_id) {
       return null;
     }
@@ -319,7 +198,8 @@ export class MessageInterceptor {
       const firstName = msg.chat.first_name || '';
       const lastName = msg.chat.last_name || '';
       chatTitle = lastName ? `${firstName} ${lastName}` : firstName;
-      logger.debug(`Título do chat privado construído`, {
+
+      logger.debug('Título do chat privado construído', {
         module: 'MessageInterceptor',
         action: 'build_chat_title',
         chatTitle,
@@ -329,7 +209,8 @@ export class MessageInterceptor {
     } else {
       // For groups/channels, use the provided title
       chatTitle = msg.chat.title;
-      logger.debug(`Título do grupo/canal`, {
+
+      logger.debug('Título do grupo/canal', {
         module: 'MessageInterceptor',
         action: 'get_group_title',
         chatTitle,
@@ -364,42 +245,24 @@ export class MessageInterceptor {
     };
   }
 
-  /**
-   * Extrai dados de mensagem do WhatsApp (implementação futura)
-   */
-
-  private extractWhatsAppMessageData(_msg: WhatsAppMessage): {
-    messageId: number;
-    chatId: string;
-    chatType: ChatTypeValue;
-    chatTitle?: string;
-    chatUsername?: string;
-    memberCount?: number;
-    text?: string;
-    messageType: MessageTypeValue;
-    telegramUserId?: string;
-    userName?: string;
-    userUsername?: string;
-    replyToId?: string;
-    editedAt?: Date;
-  } | null {
+  private extractWhatsAppMessageData(
+    _msg: WhatsAppMessage
+  ): ExtractedMessageData | null {
     // TODO: Implement WhatsApp data extraction
-    // _msg will be used when we implement this function
     logger.debug('WhatsApp message received', {
       module: 'MessageInterceptor',
       action: 'extract_whatsapp_data',
       message: JSON.stringify(_msg),
     });
+
     logger.warn('WhatsApp data extraction not yet implemented', {
       module: 'MessageInterceptor',
       action: 'extract_whatsapp_data',
     });
+
     return null;
   }
 
-  /**
-   * Converte tipo de chat do Telegram para o tipo interno
-   */
   private convertTelegramChatType(type: string): ChatTypeValue {
     switch (type) {
       case 'private':
@@ -411,13 +274,15 @@ export class MessageInterceptor {
       case 'channel':
         return ChatType.CHANNEL;
       default:
+        logger.warn('Tipo de chat Telegram desconhecido', {
+          module: 'MessageInterceptor',
+          action: 'convert_telegram_chat_type',
+          unknownType: type,
+        });
         return ChatType.PRIVATE;
     }
   }
 
-  /**
-   * Converte tipo de mensagem do Telegram para o tipo interno
-   */
   private convertTelegramMessageType(msg: TelegramMessage): MessageTypeValue {
     if (msg.text) {
       return MessageType.TEXT;
@@ -446,9 +311,15 @@ export class MessageInterceptor {
     if (msg.poll) {
       return MessageType.POLL;
     }
+
+    logger.debug('Tipo de mensagem não identificado, usando OTHER', {
+      module: 'MessageInterceptor',
+      action: 'convert_telegram_message_type',
+      messageId: msg.message_id,
+    });
+
     return MessageType.OTHER;
   }
 }
 
-// Singleton instance for use throughout the system
 export const messageInterceptor = new MessageInterceptor();

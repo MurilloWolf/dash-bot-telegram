@@ -1,13 +1,13 @@
 import { CommandInput, CommandOutput } from '@app-types/Command.ts';
 import { CallbackDataSerializer } from '@bot/config/callback/CallbackDataSerializer.ts';
-import { raceService } from '@core/infra/dependencies.ts';
+import { raceApiService } from '@services/index.ts';
 import { logger } from '../../../../../utils/Logger.ts';
 
 export async function searchRacesCommand(
   _input: CommandInput
 ): Promise<CommandOutput> {
   try {
-    const races = await raceService.getAvailableRaces();
+    const races = await raceApiService.getAvailableRaces();
 
     if (races.length === 0) {
       return {

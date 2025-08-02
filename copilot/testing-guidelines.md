@@ -61,13 +61,11 @@ describe('ComponentName', () => {
     it('should handle error case when something fails', async () => {
       // Arrange
       const mockRepository = {
-        findById: vi.fn().mockRejectedValue(new Error('Database error')),
+        findById: vi.fn().mockRejectedValue(new Error('API error')),
       };
 
       // Act & Assert
-      await expect(service.methodName('invalid')).rejects.toThrow(
-        'Database error'
-      );
+      await expect(service.methodName('invalid')).rejects.toThrow('API error');
       expect(mockRepository.findById).toHaveBeenCalledWith('invalid');
     });
   });
@@ -186,12 +184,12 @@ describe('UserService', () => {
 
       mockUserRepository.findByTelegramId.mockResolvedValue(null);
       mockUserRepository.create.mockRejectedValue(
-        new Error('Database connection failed')
+        new Error('API connection failed')
       );
 
       // Act & Assert
       await expect(userService.registerUser(telegramId, name)).rejects.toThrow(
-        'Database connection failed'
+        'API connection failed'
       );
     });
   });
@@ -207,8 +205,8 @@ import { listRacesCommand } from '../listRacesCommand.ts';
 import { CommandInput } from '@app-types/Command.ts';
 
 // Mock dependencies
-vi.mock('@core/infra/dependencies', () => ({
-  raceService: {
+vi.mock('@services/index.ts', () => ({
+  raceApiService: {
     getAvailableRaces: vi.fn(),
   },
 }));
@@ -242,8 +240,8 @@ describe('listRacesCommand', () => {
       platform: 'telegram',
     };
 
-    const { raceService } = await import('@core/infra/dependencies');
-    vi.mocked(raceService.getAvailableRaces).mockResolvedValue(mockRaces);
+    const { raceApiService } = await import('@services/index.ts');
+    vi.mocked(raceApiService.getAvailableRaces).mockResolvedValue(mockRaces);
 
     // Act
     const result = await listRacesCommand(input);
@@ -253,7 +251,7 @@ describe('listRacesCommand', () => {
     expect(result.format).toBe('HTML');
     expect(result.keyboard).toBeDefined();
     expect(result.keyboard?.buttons).toHaveLength(3); // 2 races + filter buttons
-    expect(raceService.getAvailableRaces).toHaveBeenCalledTimes(1);
+    expect(raceApiService.getAvailableRaces).toHaveBeenCalledTimes(1);
   });
 
   it('should return empty message when no races available', async () => {
@@ -263,8 +261,8 @@ describe('listRacesCommand', () => {
       platform: 'telegram',
     };
 
-    const { raceService } = await import('@core/infra/dependencies');
-    vi.mocked(raceService.getAvailableRaces).mockResolvedValue([]);
+    const { raceApiService } = await import('@services/index.ts');
+    vi.mocked(raceApiService.getAvailableRaces).mockResolvedValue([]);
 
     // Act
     const result = await listRacesCommand(input);
@@ -282,14 +280,14 @@ describe('listRacesCommand', () => {
       platform: 'telegram',
     };
 
-    const { raceService } = await import('@core/infra/dependencies');
-    vi.mocked(raceService.getAvailableRaces).mockRejectedValue(
-      new Error('Database connection failed')
+    const { raceApiService } = await import('@services/index.ts');
+    vi.mocked(raceApiService.getAvailableRaces).mockRejectedValue(
+      new Error('API connection failed')
     );
 
     // Act & Assert
     await expect(listRacesCommand(input)).rejects.toThrow(
-      'Database connection failed'
+      'API connection failed'
     );
   });
 });
@@ -297,37 +295,23 @@ describe('listRacesCommand', () => {
 
 ## 🔗 Integration Testing
 
-### Repository Integration Test
+### API Service Integration Test
 
 ```typescript
-// PrismaUserRepository.integration.test.ts
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { PrismaClient } from '@prisma/client';
-import { PrismaUserRepository } from '../PrismaUserRepository.ts';
+// UserApiService.integration.test.ts
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { UserApiService } from '../UserApiService.ts';
 
-describe('PrismaUserRepository Integration', () => {
-  let prisma: PrismaClient;
-  let repository: PrismaUserRepository;
+describe('UserApiService Integration', () => {
+  let userService: UserApiService;
 
-  beforeEach(async () => {
-    // Use test database
-    prisma = new PrismaClient({
-      datasources: {
-        db: {
-          url: process.env.TEST_DATABASE_URL,
-        },
-      },
-    });
-
-    repository = new PrismaUserRepository(prisma);
-
-    // Clean test data
-    await prisma.user.deleteMany();
+  beforeAll(() => {
+    // Use real HttpClient with test environment
+    userService = new UserApiService();
   });
 
-  afterEach(async () => {
-    await prisma.user.deleteMany();
-    await prisma.$disconnect();
+  afterAll(() => {
+    // Cleanup test data if needed
   });
 
   it('should create and find user', async () => {
@@ -449,29 +433,29 @@ export class MockFactories {
 }
 ```
 
-### Database Test Helpers
+### API Test Helpers
 
 ```typescript
-// testUtils/databaseHelpers.ts
-export class DatabaseTestHelpers {
-  static async cleanDatabase(prisma: PrismaClient): Promise<void> {
-    await prisma.message.deleteMany();
-    await prisma.chat.deleteMany();
-    await prisma.user.deleteMany();
-    await prisma.race.deleteMany();
+// testUtils/apiHelpers.ts
+export class ApiTestHelpers {
+  static createMockApiResponse<T>(data: T, success = true): ApiResponse<T> {
+    return {
+      success,
+      data,
+      message: success ? 'Success' : 'Error',
+    };
   }
 
-  static async seedTestData(prisma: PrismaClient): Promise<void> {
-    await prisma.user.create({
-      data: MockFactories.createMockUser(),
-    });
+  static createMockHttpResponse<T>(data: T, status = 200): HttpResponse<T> {
+    return {
+      data,
+      status,
+      statusText: status === 200 ? 'OK' : 'Error',
+    };
+  }
 
-    await prisma.race.createMany({
-      data: [
-        MockFactories.createMockRace({ title: 'Test Race 1' }),
-        MockFactories.createMockRace({ title: 'Test Race 2' }),
-      ],
-    });
+  static async simulateApiDelay(ms: number = 100): Promise<void> {
+    await new Promise(resolve => setTimeout(resolve, ms));
   }
 }
 ```
@@ -565,3 +549,367 @@ describe('Performance Tests', () => {
 - [ ] Nomes de testes são descritivos
 - [ ] Mocks são apropriados
 - [ ] Cobertura é adequada
+
+## 🔧 Service Layer Testing Patterns
+
+### Testing HttpClient
+
+```typescript
+// HttpClient.test.ts
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { HttpClient, ApiError } from '../HttpClient.ts';
+import axios from 'axios';
+
+// Mock axios
+vi.mock('axios');
+const mockedAxios = vi.mocked(axios);
+
+describe('HttpClient', () => {
+  let httpClient: HttpClient;
+
+  beforeEach(() => {
+    httpClient = new HttpClient('http://api.test.com');
+    vi.clearAllMocks();
+  });
+
+  describe('Response Processing', () => {
+    it('should extract data from ApiResponse structure', async () => {
+      // Arrange
+      const mockApiResponse = {
+        success: true,
+        data: { id: '1', name: 'Test Race' },
+        message: 'Success',
+      };
+
+      mockedAxios.create.mockReturnValue({
+        get: vi.fn().mockResolvedValue({
+          data: mockApiResponse,
+          status: 200,
+          statusText: 'OK',
+        }),
+        interceptors: {
+          response: { use: vi.fn() },
+        },
+      } as any);
+
+      // Act
+      const response = await httpClient.get<{ id: string; name: string }>(
+        '/races'
+      );
+
+      // Assert
+      expect(response.data).toEqual({ id: '1', name: 'Test Race' });
+      expect(response.status).toBe(200);
+    });
+
+    it('should throw ApiError when success is false', async () => {
+      // Arrange
+      const mockApiResponse = {
+        success: false,
+        error: 'Race not found',
+        data: null,
+      };
+
+      mockedAxios.create.mockReturnValue({
+        get: vi.fn().mockResolvedValue({
+          data: mockApiResponse,
+          status: 404,
+        }),
+        interceptors: {
+          response: { use: vi.fn() },
+        },
+      } as any);
+
+      // Act & Assert
+      await expect(httpClient.get('/races/invalid')).rejects.toThrow(ApiError);
+      await expect(httpClient.get('/races/invalid')).rejects.toThrow(
+        'Race not found'
+      );
+    });
+  });
+});
+```
+
+### Testing Service Classes
+
+```typescript
+// UserApiService.test.ts
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { UserApiService } from '../UserApiService.ts';
+import { httpClient } from '../http/HttpClient.ts';
+import { ApiError } from '../http/HttpClient.ts';
+
+// Mock the HttpClient
+vi.mock('../http/HttpClient.ts', () => ({
+  httpClient: {
+    post: vi.fn(),
+    get: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
+  },
+}));
+
+describe('UserApiService', () => {
+  let userService: UserApiService;
+  const mockHttpClient = vi.mocked(httpClient);
+
+  beforeEach(() => {
+    userService = new UserApiService();
+    vi.clearAllMocks();
+  });
+
+  describe('registerUser', () => {
+    it('should register new user successfully', async () => {
+      // Arrange
+      const telegramId = '123456789';
+      const name = 'John Doe';
+      const username = 'john_doe';
+
+      const expectedUser = {
+        id: 'user-123',
+        telegramId,
+        name,
+        username,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+      };
+
+      mockHttpClient.post.mockResolvedValue({
+        data: expectedUser,
+        status: 201,
+        statusText: 'Created',
+      });
+
+      // Act
+      const result = await userService.registerUser(telegramId, name, username);
+
+      // Assert
+      expect(result).toEqual(expectedUser);
+      expect(mockHttpClient.post).toHaveBeenCalledWith('/users/register', {
+        telegramId,
+        name,
+        username,
+      });
+      expect(mockHttpClient.post).toHaveBeenCalledTimes(1);
+    });
+
+    it('should handle registration errors', async () => {
+      // Arrange
+      const telegramId = '123456789';
+      const name = 'John Doe';
+
+      mockHttpClient.post.mockRejectedValue(
+        new ApiError('User already exists', 409)
+      );
+
+      // Act & Assert
+      await expect(userService.registerUser(telegramId, name)).rejects.toThrow(
+        'User already exists'
+      );
+
+      expect(mockHttpClient.post).toHaveBeenCalledWith('/users/register', {
+        telegramId,
+        name,
+        username: undefined,
+      });
+    });
+  });
+
+  describe('getUserByTelegramId', () => {
+    it('should return user when found', async () => {
+      // Arrange
+      const telegramId = '123456789';
+      const expectedUser = {
+        id: 'user-123',
+        telegramId,
+        name: 'John Doe',
+        isActive: true,
+      };
+
+      mockHttpClient.get.mockResolvedValue({
+        data: expectedUser,
+        status: 200,
+        statusText: 'OK',
+      });
+
+      // Act
+      const result = await userService.getUserByTelegramId(telegramId);
+
+      // Assert
+      expect(result).toEqual(expectedUser);
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        `/users/telegram/${telegramId}`
+      );
+    });
+
+    it('should return null when user not found (404)', async () => {
+      // Arrange
+      const telegramId = '987654321';
+
+      mockHttpClient.get.mockRejectedValue(new ApiError('User not found', 404));
+
+      // Act
+      const result = await userService.getUserByTelegramId(telegramId);
+
+      // Assert
+      expect(result).toBeNull();
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        `/users/telegram/${telegramId}`
+      );
+    });
+
+    it('should throw error for non-404 errors', async () => {
+      // Arrange
+      const telegramId = '123456789';
+
+      mockHttpClient.get.mockRejectedValue(
+        new ApiError('Internal server error', 500)
+      );
+
+      // Act & Assert
+      await expect(userService.getUserByTelegramId(telegramId)).rejects.toThrow(
+        'Internal server error'
+      );
+    });
+  });
+});
+```
+
+### Integration Testing Services
+
+```typescript
+// UserApiService.integration.test.ts
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { UserApiService } from '../UserApiService.ts';
+
+describe('UserApiService Integration', () => {
+  let userService: UserApiService;
+
+  beforeAll(() => {
+    // Use real HttpClient with test environment
+    userService = new UserApiService();
+  });
+
+  afterAll(() => {
+    // Cleanup test data if needed
+  });
+
+  it('should complete full user registration flow', async () => {
+    const telegramId = `test-${Date.now()}`;
+    const name = 'Integration Test User';
+    const username = 'test_user';
+
+    // Register user
+    const registeredUser = await userService.registerUser(
+      telegramId,
+      name,
+      username
+    );
+
+    expect(registeredUser.telegramId).toBe(telegramId);
+    expect(registeredUser.name).toBe(name);
+    expect(registeredUser.username).toBe(username);
+
+    // Retrieve user
+    const retrievedUser = await userService.getUserByTelegramId(telegramId);
+
+    expect(retrievedUser).not.toBeNull();
+    expect(retrievedUser?.id).toBe(registeredUser.id);
+  });
+});
+```
+
+### Testing Service Singletons
+
+```typescript
+// services.test.ts
+import { describe, it, expect } from 'vitest';
+import { userApiService, raceApiService, chatApiService } from '../index.ts';
+
+describe('Service Singletons', () => {
+  it('should export singleton instances', () => {
+    expect(userApiService).toBeDefined();
+    expect(raceApiService).toBeDefined();
+    expect(chatApiService).toBeDefined();
+  });
+
+  it('should maintain singleton behavior', () => {
+    const { userApiService: service1 } = require('../index.ts');
+    const { userApiService: service2 } = require('../index.ts');
+
+    expect(service1).toBe(service2);
+  });
+});
+```
+
+### Mock Factories for Services
+
+```typescript
+// test-utils/serviceFactories.ts
+import { vi } from 'vitest';
+
+export const createMockUserApiService = () => ({
+  registerUser: vi.fn(),
+  getUserByTelegramId: vi.fn(),
+  getUserById: vi.fn(),
+});
+
+export const createMockRaceApiService = () => ({
+  getAvailableRaces: vi.fn(),
+  getRaceById: vi.fn(),
+  getRacesByDistances: vi.fn(),
+  getNextRace: vi.fn(),
+});
+
+export const createMockHttpClient = () => ({
+  get: vi.fn(),
+  post: vi.fn(),
+  put: vi.fn(),
+  delete: vi.fn(),
+});
+
+// Usage in tests
+import { createMockUserApiService } from './test-utils/serviceFactories.ts';
+
+describe('SomeComponent', () => {
+  it('should work with mocked service', () => {
+    const mockUserService = createMockUserApiService();
+    mockUserService.getUserByTelegramId.mockResolvedValue(null);
+
+    // Test logic here
+  });
+});
+```
+
+### Service Error Testing
+
+```typescript
+describe('Service Error Scenarios', () => {
+  it('should handle network timeouts', async () => {
+    mockHttpClient.get.mockRejectedValue(new Error('Network timeout'));
+
+    await expect(userService.getUserByTelegramId('123')).rejects.toThrow(
+      'Network timeout'
+    );
+  });
+
+  it('should handle malformed API responses', async () => {
+    mockHttpClient.get.mockResolvedValue({
+      data: 'invalid json response',
+      status: 200,
+    });
+
+    await expect(userService.getUserByTelegramId('123')).rejects.toThrow();
+  });
+
+  it('should handle API rate limiting', async () => {
+    mockHttpClient.get.mockRejectedValue(
+      new ApiError('Rate limit exceeded', 429)
+    );
+
+    await expect(userService.getUserByTelegramId('123')).rejects.toThrow(
+      'Rate limit exceeded'
+    );
+  });
+});
+```

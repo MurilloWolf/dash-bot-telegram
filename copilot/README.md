@@ -8,6 +8,7 @@ Este diretório contém documentação específica para melhorar a qualidade das
 
 - [`project-overview.md`](./project-overview.md) - Visão geral do projeto e arquitetura
 - [`architecture-patterns.md`](./architecture-patterns.md) - Padrões arquiteturais utilizados
+- [`service-layer-architecture.md`](./service-layer-architecture.md) - Arquitetura da camada de serviços
 - [`domain-models.md`](./domain-models.md) - Modelos de domínio e entidades
 - [`api-patterns.md`](./api-patterns.md) - Padrões de API e interfaces
 - [`testing-guidelines.md`](./testing-guidelines.md) - Diretrizes de teste
@@ -21,7 +22,6 @@ Este diretório contém documentação específica para melhorar a qualidade das
 ### 🎯 Diretrizes Específicas
 
 - [`bot-commands.md`](./bot-commands.md) - Padrões para comandos de bot
-- [`database-patterns.md`](./database-patterns.md) - Padrões de banco de dados
 - [`callback-system.md`](./callback-system.md) - Sistema de callbacks
 
 ## Como Usar

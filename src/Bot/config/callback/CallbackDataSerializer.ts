@@ -164,6 +164,10 @@ export class CallbackDataSerializer {
     return { type: 'races_search', startDistance, endDistance };
   }
 
+  static racesSearchMenu(): SharedCallbackData {
+    return { type: 'navigation', action: 'back', target: 'search_menu' };
+  }
+
   static userConfig(
     action: 'distances' | 'notifications' | 'reminder',
     value?: string

@@ -34,7 +34,8 @@ markdownUtils.ts
 
 // ✅ Bom - kebab-case para diretórios
 src/adapters/in/telegram/
-src/core/domain/entities/
+src/services/http/
+src/Bot/commands/
 ```
 
 ### Variáveis e Funções
@@ -73,20 +74,40 @@ enum EMessageType {} // Enum
 
 ### Imports Organization
 
+````typescript
+### Imports Organization
+
 ```typescript
+// ✅ Bom - Ordem de imports
 // 1. Node modules
-import dotenv from 'dotenv';
-import TelegramBot from 'node-telegram-bot-api';
+import axios from 'axios';
+import { TelegramBot } from 'node-telegram-bot-api';
 
-// 2. Internal modules (por camada)
+// 2. Internal modules (com alias)
+import { httpClient } from '@services/http/HttpClient.ts';
+import { userApiService, raceApiService } from '@services/index.ts';
 import { CommandInput, CommandOutput } from '@app-types/Command.ts';
-import { routeCommand } from '@bot/router/CommandRouter.ts';
-import { messageService } from '@core/infra/dependencies.ts';
-import { logger } from '../../utils/Logger.ts';
+import { logger } from '../utils/Logger.ts';
 
-// 3. Relative imports (se necessário)
-import { validateInput } from './validators.ts';
+// 3. Types (separados)
+import type { User, Race, Chat } from '@app-types/Service.ts';
+import type { HttpResponse } from '@services/http/HttpClient.ts';
+````
+
+### Path Aliases
+
+```typescript
+// ✅ Use alias configurados no tsconfig.json
+import { CommandRouter } from '@bot/router/CommandRouter.ts';
+import { httpClient } from '@services/http/HttpClient.ts';
+import { userApiService, raceApiService } from '@services/index.ts';
+import { RaceFormatter } from '@utils/formatters/RaceFormatter.ts';
+
+// ❌ Evite imports relativos longos
+import { CommandRouter } from '../../../Bot/router/CommandRouter.ts';
 ```
+
+````
 
 ### Function Structure
 
@@ -127,7 +148,7 @@ export async function listRacesCommand(
     };
   }
 }
-```
+````
 
 ### Class Structure
 
@@ -266,25 +287,17 @@ describe('UserService', () => {
 
 ## 📊 Performance Guidelines
 
-### Database Queries
+### Performance Guidelines
+
+### HTTP Requests
 
 ```typescript
-// ✅ Sempre usar indexes apropriados
-// ✅ Evitar N+1 queries
-// ✅ Usar paginação para listas grandes
+// ✅ Sempre usar HttpClient customizado
+// ✅ Implementar retry logic quando necessário
+// ✅ Usar timeout apropriado
 
-// Exemplo com Prisma
-const races = await prisma.race.findMany({
-  where: {
-    status: 'OPEN',
-    date: { gte: new Date() },
-  },
-  orderBy: { date: 'asc' },
-  take: 10, // Paginação
-  include: {
-    /* apenas relacionamentos necessários */
-  },
-});
+// Exemplo com HttpClient
+const races = await raceApiService.getAvailableRaces();
 ```
 
 ### Memory Management
@@ -339,5 +352,110 @@ if (typeof telegramId !== 'string' || !telegramId.trim()) {
 
 // ✅ Rate limiting (futuro)
 // ✅ Input validation
-// ✅ SQL injection prevention (Prisma ORM)
+// ✅ API error handling with HttpClient
+```
+
+## 🌐 Service Layer Standards
+
+### HTTP Client Usage
+
+```typescript
+// ✅ Bom - Use HttpClient customizado
+import { httpClient, ApiError } from '@services/http/HttpClient.ts';
+
+export class RaceApiService {
+  private readonly baseUrl = '/races';
+
+  async getAvailableRaces(): Promise<Race[]> {
+    try {
+      const response = await httpClient.get<Race[]>(
+        `${this.baseUrl}/available`
+      );
+
+      logger.info('Successfully retrieved available races', {
+        module: 'RaceApiService',
+        action: 'get_available_races',
+        racesCount: response.data.length,
+      });
+
+      return response.data; // Acesso direto aos dados
+    } catch (error) {
+      logger.error(
+        'Error getting available races',
+        {
+          module: 'RaceApiService',
+          action: 'get_available_races',
+        },
+        error as Error
+      );
+      throw error;
+    }
+  }
+
+  async getRaceById(id: string): Promise<Race | null> {
+    try {
+      const response = await httpClient.get<Race>(`${this.baseUrl}/${id}`);
+      return response.data;
+    } catch (error: unknown) {
+      // ✅ Handle specific errors
+      if (error instanceof ApiError && error.status === 404) {
+        return null;
+      }
+      throw error;
+    }
+  }
+}
+```
+
+### Service Export Pattern
+
+```typescript
+// ✅ Bom - Singleton pattern
+export class UserApiService {
+  private readonly baseUrl = '/users';
+  // implementation...
+}
+
+// Export singleton instance
+export const userApiService = new UserApiService();
+
+// ✅ Centralized exports in index.ts
+export { httpClient } from './http/HttpClient.ts';
+export { userApiService } from './UserApiService.ts';
+export { raceApiService } from './RaceApiService.ts';
+export { chatApiService } from './ChatApiService.ts';
+```
+
+### Error Handling Standards
+
+```typescript
+// ✅ Bom - Consistent error handling
+async getUserByTelegramId(telegramId: string): Promise<User | null> {
+  try {
+    const response = await httpClient.get<User>(`${this.baseUrl}/telegram/${telegramId}`);
+
+    logger.info('Successfully retrieved user', {
+      module: 'UserApiService',
+      action: 'get_user_by_telegram_id',
+      userId: response.data.id,
+      telegramId,
+    });
+
+    return response.data;
+  } catch (error: unknown) {
+    // Handle expected 404s
+    if (error instanceof ApiError && error.status === 404) {
+      return null;
+    }
+
+    // Log and re-throw unexpected errors
+    logger.error('Error getting user by telegram ID', {
+      module: 'UserApiService',
+      action: 'get_user_by_telegram_id',
+      telegramId,
+    }, error as Error);
+
+    throw error;
+  }
+}
 ```

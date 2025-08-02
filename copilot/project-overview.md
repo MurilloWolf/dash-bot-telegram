@@ -36,27 +36,27 @@
 └─────────────────────────┼───────────────────────────────────┘
                          │
 ┌─────────────────────────┼───────────────────────────────────┐
-│                    CORE DOMAIN                              │
+│                    SERVICES LAYER                           │
 │  ┌─────────────────┐   │   ┌─────────────────┐              │
-│  │ Entities        │   │   │ Services        │              │
-│  │ (Race, User,    │   │   │ (Business       │              │
-│  │  Message, etc)  │   │   │  Logic)         │              │
+│  │ HTTP Client     │   │   │ API Services    │              │
+│  │ (Custom with    │   │   │ (UserApi,       │              │
+│  │  Interceptors)  │   │   │  RaceApi, etc)  │              │
 │  └─────────────────┘   │   └─────────────────┘              │
 │  ┌─────────────────┐   │   ┌─────────────────┐              │
-│  │ Repositories    │   │   │ Value Objects   │              │
-│  │ (Interfaces)    │   │   │                 │              │
+│  │ Types &         │   │   │ Formatters      │              │
+│  │ Interfaces      │   │   │ (Race, etc)     │              │
 │  └─────────────────┘   │   └─────────────────┘              │
 └─────────────────────────┼───────────────────────────────────┘
                          │
 ┌─────────────────────────┼───────────────────────────────────┐
 │                 INFRASTRUCTURE                              │
 │  ┌─────────────────┐   │   ┌─────────────────┐              │
-│  │ Prisma          │   │   │ External APIs   │              │
-│  │ Repositories    │   │   │ (Future)        │              │
+│  │ HTTP Services   │   │   │ External APIs   │              │
+│  │ (API Clients)   │   │   │ Communication   │              │
 │  └─────────────────┘   │   └─────────────────┘              │
 │  ┌─────────────────┐   │   ┌─────────────────┐              │
-│  │ Database        │   │   │ Logging &       │              │
-│  │ (PostgreSQL)    │   │   │ Monitoring      │              │
+│  │ File System &   │   │   │ Logging &       │              │
+│  │ Utilities       │   │   │ Monitoring      │              │
 │  └─────────────────┘   │   └─────────────────┘              │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -66,8 +66,7 @@
 ### Backend
 
 - **Node.js** com **TypeScript** (ES Modules)
-- **Prisma ORM** para acesso ao banco de dados
-- **PostgreSQL** como banco de dados principal
+- **Custom HTTP Client** para comunicação com APIs externas
 - **Vitest** para testes unitários
 - **ESLint** para qualidade de código
 
@@ -97,12 +96,16 @@ src/
 │   ├── config/         # Configurações (callbacks, commands)
 │   ├── middleware/     # Middleware para interceptação
 │   └── router/         # Roteamento de comandos
-├── core/               # Domínio central da aplicação
-│   ├── domain/         # Entidades, serviços, repositórios
-│   ├── infra/          # Implementações de infraestrutura
-│   └── scripts/        # Scripts de setup e seed
+├── services/           # Serviços modulares de comunicação externa
+│   ├── http/           # HttpClient customizado e utilitários
+│   ├── UserApiService.ts    # Serviço específico para usuários
+│   ├── RaceApiService.ts    # Serviço específico para corridas
+│   ├── ChatApiService.ts    # Serviço específico para chats
+│   ├── MessageApiService.ts # Serviço específico para mensagens
+│   └── index.ts        # Exportações centralizadas
 ├── types/              # Definições de tipos TypeScript
 └── utils/              # Utilitários compartilhados
+    └── formatters/     # Formatadores especializados (RaceFormatter)
 ```
 
 ## 🎮 Funcionalidades Principais
@@ -150,31 +153,49 @@ src/
 ### Dependency Injection
 
 - Injeção de dependências manual via `dependencies.ts`
+- Services modulares com singleton pattern
 - Facilita testes e mocking
 - Inversão de controle clara
+
+### HTTP Client Architecture
+
+- `HttpClient` customizado com interceptors
+- Padronização de responses com `HttpResponse<T>`
+- Tratamento automático de `ApiResponse` structure
+- Error handling unificado com `ApiError`
+
+### Service Layer Modularity
+
+- Services específicos por domínio (`UserApiService`, `RaceApiService`)
+- Responsabilidade única por service
+- Exportações centralizadas via `services/index.ts`
+- Type safety completa com TypeScript
 
 ### Type Safety
 
 - TypeScript strict mode
 - Tipos customizados para comandos e callbacks
 - Validação em tempo de compilação
+- Alias de paths para imports limpos (`@services/*`, `@bot/*`)
 
 ### Error Handling
 
 - Sistema de logging estruturado
 - Tratamento gracioso de falhas
 - Fallbacks para casos de erro
+- Interceptors para tratamento centralizado
 
 ### Extensibilidade
 
 - Registro automático de comandos
 - Sistema de callbacks tipado
 - Suporte fácil para novas plataformas
+- Formatters especializados (`RaceFormatter`)
 
 ## 🎯 Objetivos de Design
 
 1. **Separation of Concerns**: Cada camada tem responsabilidade bem definida
-2. **Platform Agnostic**: Core independente de plataforma específica
+2. **Platform Agnostic**: Lógica de negócio independente de plataforma específica
 3. **Testability**: Código facilmente testável com mocks
 4. **Maintainability**: Estrutura clara e organizacional
 5. **Scalability**: Preparado para crescimento e novas features

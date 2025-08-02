@@ -169,18 +169,14 @@ async function build() {
     log('\n🏗️  DashBot Production Build', colors.cyan);
     log('==============================', colors.cyan);
 
-    // Step 1: Generate Prisma Client
-    log('\n🔧 Generating Prisma Client...', colors.blue);
-    await runCommand('npx', ['prisma', 'generate'], { cwd: projectRoot });
-
-    // Step 2: Clean directories
+    // Step 1: Clean directories
     log('\n🧹 Cleaning build directories...', colors.yellow);
     await runCommand('rm', ['-rf', '.build-src', 'dist'], { cwd: projectRoot });
 
     // Step 2: Create build directory
     await mkdir(buildDir, { recursive: true });
 
-    // Step 3: Copy and process TypeScript files
+    // Step 2: Copy and process TypeScript files
     log('\n🔧 Processing TypeScript files...', colors.blue);
     const tsFiles = await getAllTsFiles(srcDir);
     let processedCount = 0;
@@ -197,7 +193,7 @@ async function build() {
       colors.green
     );
 
-    // Step 4: Create optimized tsconfig for build
+    // Step 3: Create optimized tsconfig for build
     const buildTsConfig = {
       compilerOptions: {
         module: 'ESNext',
@@ -219,6 +215,7 @@ async function build() {
           '@bot/*': ['./Bot/*'],
           '@app-types/*': ['./types/*'],
           '@core/*': ['./core/*'],
+          '@services/*': ['./services/*'],
         },
       },
       include: ['./**/*.ts'],
@@ -228,15 +225,15 @@ async function build() {
     const buildTsConfigPath = join(buildDir, 'tsconfig.json');
     await writeFile(buildTsConfigPath, JSON.stringify(buildTsConfig, null, 2));
 
-    // Step 5: Compile TypeScript
+    // Step 4: Compile TypeScript
     log('\n🔨 Compiling TypeScript...', colors.magenta);
     await runCommand('tsc', ['-p', 'tsconfig.json'], { cwd: buildDir });
 
-    // Step 6: Resolve path aliases
+    // Step 5: Resolve path aliases
     log('\n🔗 Resolving path aliases...', colors.blue);
     await runCommand('tsc-alias', ['-p', 'tsconfig.json'], { cwd: buildDir });
 
-    // Step 7: Clean up build directory
+    // Step 6: Clean up build directory
     log('\n🧹 Cleaning up...', colors.yellow);
     await runCommand('rm', ['-rf', '.build-src'], { cwd: projectRoot });
 

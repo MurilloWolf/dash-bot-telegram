@@ -3,7 +3,7 @@ import {
   CallbackData,
   RaceSearchCallbackData,
 } from '@app-types/callbacks/index.ts';
-import { raceService } from '@core/infra/dependencies.ts';
+import { raceApiService } from '@services/index.ts';
 import { CallbackDataSerializer } from '@bot/config/callback/CallbackDataSerializer.ts';
 import { BaseCallbackHandler } from '@bot/commands/shared/handlers/BaseCallbackHandler.ts';
 import { logger } from '../../../../../utils/Logger.ts';
@@ -21,7 +21,7 @@ export class RaceSearchCallbackHandler extends BaseCallbackHandler {
       const data = input.callbackData as RaceSearchCallbackData;
       const { startDistance, endDistance } = data;
 
-      const races = await raceService.getRacesByRange(
+      const races = await raceApiService.getRacesByRange(
         startDistance,
         endDistance
       );
@@ -36,7 +36,7 @@ export class RaceSearchCallbackHandler extends BaseCallbackHandler {
               [
                 {
                   text: '⬅️ Voltar',
-                  callbackData: CallbackDataSerializer.racesList(),
+                  callbackData: CallbackDataSerializer.racesSearchMenu(),
                 },
               ],
             ],
@@ -56,7 +56,7 @@ export class RaceSearchCallbackHandler extends BaseCallbackHandler {
         [
           {
             text: '⬅️ Voltar',
-            callbackData: CallbackDataSerializer.racesList(),
+            callbackData: CallbackDataSerializer.racesSearchMenu(),
           },
         ],
       ];

@@ -3,7 +3,7 @@ import {
   CallbackData,
   RaceListCallbackData,
 } from '@app-types/callbacks/index.ts';
-import { raceService } from '@core/infra/dependencies.ts';
+import { raceApiService } from '@services/index.ts';
 import { BaseCallbackHandler } from '@bot/commands/shared/handlers/BaseCallbackHandler.ts';
 import { CallbackDataSerializer } from '@bot/config/callback/CallbackDataSerializer.ts';
 
@@ -18,9 +18,9 @@ export class RaceListCallbackHandler extends BaseCallbackHandler {
       let races;
 
       if (data.distance) {
-        races = await raceService.getRacesByDistances([data.distance]);
+        races = await raceApiService.getRacesByDistance(data.distance);
       } else {
-        races = await raceService.getAvailableRaces();
+        races = await raceApiService.getAvailableRaces();
       }
 
       if (races.length === 0) {

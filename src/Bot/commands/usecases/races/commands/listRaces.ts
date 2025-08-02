@@ -1,13 +1,14 @@
 import { CommandInput, CommandOutput } from '@app-types/Command.ts';
 import { CallbackDataSerializer } from '@bot/config/callback/CallbackDataSerializer.ts';
-import { raceService } from '@core/infra/dependencies.ts';
+import { raceApiService } from '@services/index.ts';
+import { RaceFormatter } from '../../../../../utils/formatters/index.ts';
 import { logger } from '../../../../../utils/Logger.ts';
 
 export async function listRacesCommand(
   _input: CommandInput
 ): Promise<CommandOutput> {
   try {
-    const races = await raceService.getAvailableRaces();
+    const races = await raceApiService.getAvailableRaces();
 
     if (races.length === 0) {
       return {
@@ -67,21 +68,21 @@ export async function listRacesCommand(
 
 export async function listRacesByDistanceCommand(
   input: CommandInput,
-  distances: number[]
+  distance: number
 ): Promise<CommandOutput> {
   try {
-    const races = await raceService.getRacesByDistances(distances);
+    const races = await raceApiService.getRacesByDistance(distance);
 
     if (races.length === 0) {
       return {
-        text: `❌ Nenhuma corrida encontrada para as distâncias: ${distances.join(
-          ', '
-        )}km`,
+        text: `❌ Nenhuma corrida encontrada para a distância: ${distance}km`,
         format: 'HTML',
       };
     }
 
-    const raceMessages = races.map(race => raceService.formatRaceMessage(race));
+    const raceMessages = races.map(race =>
+      RaceFormatter.formatRaceMessage(race)
+    );
 
     return {
       messages: raceMessages,

@@ -16,7 +16,7 @@ export default defineConfig({
     alias: {
       "@bot": path.resolve(__dirname, "./src/Bot"),
       "@app-types": path.resolve(__dirname, "./src/types"),
-      "@core": path.resolve(__dirname, "./src/core"),
+      "@services": path.resolve(__dirname, "./src/services"),
     },
   },
 });

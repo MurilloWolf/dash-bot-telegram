@@ -651,3 +651,139 @@ export enum ErrorSeverity {
 - Provide options for selective data loading
 - Include performance hints in interface design
 - Consider batching operations for efficiency
+
+## 🌐 HTTP Client & Service Layer Patterns
+
+### 1. HttpClient Architecture
+
+```typescript
+// Custom HTTP Client com interceptors
+export interface HttpResponse<T> {
+  data: T;
+  status: number;
+  statusText: string;
+}
+
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  data: T;
+  message?: string;
+  error?: string;
+}
+
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public status?: number,
+    public response?: unknown
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+export class HttpClient {
+  private setupInterceptors(): void {
+    this.api.interceptors.response.use(response => {
+      const responseData = response.data as ApiResponse;
+
+      if (responseData?.success === false) {
+        throw new ApiError(
+          responseData.error || 'API operation failed',
+          response.status,
+          responseData
+        );
+      }
+
+      // Retorna estrutura limpa
+      return {
+        data: responseData.data,
+        status: response.status,
+        statusText: response.statusText,
+      } as HttpResponse<typeof responseData.data>;
+    });
+  }
+
+  async get<T>(url: string): Promise<HttpResponse<T>> {
+    return this.api.get<T>(url) as Promise<HttpResponse<T>>;
+  }
+}
+```
+
+### 2. Modular Service Pattern
+
+```typescript
+// Services especializados por domínio
+export class UserApiService {
+  private readonly baseUrl = '/users';
+
+  async registerUser(
+    telegramId: string,
+    name: string,
+    username?: string
+  ): Promise<User> {
+    try {
+      const response = await httpClient.post<User>(`${this.baseUrl}/register`, {
+        telegramId,
+        name,
+        username,
+      });
+
+      logger.info('Successfully registered user', {
+        module: 'UserApiService',
+        action: 'register_user',
+        userId: response.data.id,
+        telegramId,
+      });
+
+      return response.data;
+    } catch (error) {
+      logger.error(
+        'Error registering user',
+        {
+          module: 'UserApiService',
+          action: 'register_user',
+          telegramId,
+        },
+        error as Error
+      );
+      throw error;
+    }
+  }
+
+  async getUserByTelegramId(telegramId: string): Promise<User | null> {
+    try {
+      const response = await httpClient.get<User>(
+        `${this.baseUrl}/telegram/${telegramId}`
+      );
+      return response.data;
+    } catch (error: unknown) {
+      if (error instanceof ApiError && error.status === 404) {
+        return null;
+      }
+      throw error;
+    }
+  }
+}
+
+// Singleton exports
+export const userApiService = new UserApiService();
+export const raceApiService = new RaceApiService();
+export const chatApiService = new ChatApiService();
+```
+
+### 3. Centralized Service Exports
+
+```typescript
+// services/index.ts - Ponto central de exportação
+export { httpClient } from './http/HttpClient.ts';
+export { userApiService } from './UserApiService.ts';
+export { chatApiService } from './ChatApiService.ts';
+export { messageApiService } from './MessageApiService.ts';
+export { raceApiService } from './RaceApiService.ts';
+
+// Re-export types for convenience
+export type { CreateUserRequest } from '../types/Service.ts';
+export type { CreateChatRequest } from '../types/Service.ts';
+export type { Race, RaceStatus } from '../types/Service.ts';
+```

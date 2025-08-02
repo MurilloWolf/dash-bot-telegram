@@ -3,7 +3,7 @@ import {
   CallbackData,
   RaceFilterCallbackData,
 } from '@app-types/callbacks/index.ts';
-import { raceService } from '@core/infra/dependencies.ts';
+import { raceApiService } from '@services/index.ts';
 import { BaseCallbackHandler } from '@bot/commands/shared/handlers/BaseCallbackHandler.ts';
 import { CallbackDataSerializer } from '@bot/config/callback/CallbackDataSerializer.ts';
 
@@ -15,7 +15,7 @@ export class RaceFilterCallbackHandler extends BaseCallbackHandler {
   async handle(input: CommandInput): Promise<CommandOutput> {
     try {
       const data = input.callbackData as RaceFilterCallbackData;
-      const races = await raceService.getRacesByDistances([data.distance]);
+      const races = await raceApiService.getRacesByDistance(data.distance);
 
       if (races.length === 0) {
         return {
@@ -39,7 +39,6 @@ export class RaceFilterCallbackHandler extends BaseCallbackHandler {
         },
       ]);
 
-      // Navigation buttons
       const navigationButtons = [
         [
           { text: '5km', callbackData: CallbackDataSerializer.racesFilter(5) },
