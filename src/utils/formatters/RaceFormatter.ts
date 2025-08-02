@@ -19,19 +19,19 @@ export class RaceFormatter {
     const statusText = this.getStatusText(race.status);
     const distancesText = race.distances.join(' / ');
 
+    const invisibleLink = `<a href="${race.link}">&#8203;</a>`;
+
     return `${statusEmoji} <strong>${race.title}</strong>
 
 📅 <strong>Data:</strong> ${this.formatDate(race.date)}
 🕐 <strong>Horário:</strong> ${race.time}
 📍 <strong>Local:</strong> ${race.location}
 🏃‍♂️ <strong>Distâncias:</strong> ${distancesText}
+
 🏢 <strong>Organização:</strong> ${race.organization}
 📊 <strong>Status:</strong> ${statusText}
-
-🔗 <strong>Link para inscrições:</strong>
-<a href="${race.link}">Clique aqui para se inscrever</a>
-
-💡 <em>Use os botões abaixo para mais opções!</em>`;
+${invisibleLink}
+💡 <em>Use o botão abaixo para se inscrever!</em>`;
   }
 
   static formatRaceMessages(race: Race): string[] {

@@ -33,16 +33,22 @@ export class RaceDetailsCallbackHandler extends BaseCallbackHandler {
           buttons: [
             [
               {
-                text: '📍 Ver Localização',
-                callbackData: CallbackDataSerializer.raceLocation(data.raceId),
+                text: '🔗 Se Inscrever',
+                url: race.link,
               },
-              {
-                text: '⏰ Definir Lembrete',
-                callbackData: CallbackDataSerializer.raceReminder(
-                  data.raceId,
-                  'set'
-                ),
-              },
+            ],
+            [
+              // {
+              //   text: '📍 Ver Localização',
+              //   callbackData: CallbackDataSerializer.raceLocation(data.raceId),
+              // },
+              // {
+              //   text: '⏰ Definir Lembrete',
+              //   callbackData: CallbackDataSerializer.raceReminder(
+              //     data.raceId,
+              //     'set'
+              //   ),
+              // },
             ],
             [this.createBackButton(CallbackDataSerializer.racesList())],
           ],
