@@ -5,6 +5,7 @@ import {
 } from '../../../../../types/callbacks/index.ts';
 import { BaseCallbackHandler } from '@bot/commands/shared/handlers/BaseCallbackHandler.ts';
 import { CallbackDataSerializer } from '@bot/config/callback/CallbackDataSerializer.ts';
+import { raceApiService } from '@services/index.ts';
 
 export class RaceLocationCallbackHandler extends BaseCallbackHandler {
   canHandle(callbackData: CallbackData): boolean {
@@ -15,16 +16,44 @@ export class RaceLocationCallbackHandler extends BaseCallbackHandler {
     try {
       const data = input.callbackData as RaceLocationCallbackData;
 
-      // Here you would fetch race location information
-      // For example, GPS coordinates, address, map, etc.
+      // Buscar dados reais da corrida
+      const race = await raceApiService.getRaceById(data.raceId);
+
+      if (!race) {
+        return this.createErrorResponse('Corrida não encontrada.');
+      }
+
+      // Verificar se temos coordenadas
+      const latitude = race.latitude || -23.5873; // Fallback para Ibirapuera
+      const longitude = race.longitude || -46.6573;
+      const city = race.city || '';
+      const state = race.state || '';
+
+      // Criar mensagem descritiva elegante do local
+      let locationText = `<b>${race.title}</b>\n`;
+      locationText += `<i>${race.organization}</i>\n\n`;
+
+      locationText += `<b>Local do Evento</b>\n`;
+      locationText += `${race.location}`;
+
+      if (city && state) {
+        locationText += `\n<i>${city} - ${state}</i>`;
+      }
+
+      if (race.time) {
+        locationText += `\n\n<b>Horário</b>\n`;
+        locationText += `${race.time}`;
+      }
 
       return {
-        text: `📍 <strong>Localização da Corrida</strong>\n\n🗺️ Informações de localização serão exibidas aqui.\n\n💡 Em breve você poderá ver mapas e rotas!`,
+        text: locationText,
         format: 'HTML',
-        editMessage: true,
+        location: {
+          latitude,
+          longitude,
+        },
         keyboard: {
           buttons: [
-            [{ text: '🗺️ Abrir no Maps', url: 'https://maps.google.com' }],
             [
               this.createBackButton(
                 CallbackDataSerializer.raceDetails(data.raceId)
@@ -36,7 +65,7 @@ export class RaceLocationCallbackHandler extends BaseCallbackHandler {
       };
     } catch (error) {
       this.logError(error, 'RaceLocationCallbackHandler');
-      return this.createErrorResponse('Erro ao buscar localização.');
+      return this.createErrorResponse('Erro ao buscar localização da corrida.');
     }
   }
 }

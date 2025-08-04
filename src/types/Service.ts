@@ -130,6 +130,10 @@ export interface Race {
   distancesNumbers: number[];
   date: string;
   location: string;
+  city?: string;
+  state?: string;
+  latitude?: number;
+  longitude?: number;
   link: string;
   time: string;
   status: RaceStatus;

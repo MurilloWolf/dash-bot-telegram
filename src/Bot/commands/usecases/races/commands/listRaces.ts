@@ -42,6 +42,10 @@ export async function listRacesCommand(
           text: '📋 Ver Todas',
           callbackData: CallbackDataSerializer.racesList(),
         },
+        {
+          text: '⭐ Favoritas',
+          callbackData: CallbackDataSerializer.racesListFavorite(),
+        },
       ],
     ];
 

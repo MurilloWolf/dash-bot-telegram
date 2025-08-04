@@ -36,6 +36,15 @@ export interface RaceFilterCallbackData extends BaseCallbackData {
   distance: number;
 }
 
+export interface RaceFavoriteCallbackData extends BaseCallbackData {
+  type: 'race_favorite';
+  raceId: string;
+}
+
+export interface RaceListFavoriteCallbackData extends BaseCallbackData {
+  type: 'races_list_favorite';
+}
+
 // Union type for race callbacks
 export type RaceCallbackData =
   | RaceDetailsCallbackData
@@ -43,4 +52,6 @@ export type RaceCallbackData =
   | RaceReminderCallbackData
   | RaceLocationCallbackData
   | RaceFilterCallbackData
-  | RaceSearchCallbackData;
+  | RaceSearchCallbackData
+  | RaceFavoriteCallbackData
+  | RaceListFavoriteCallbackData;

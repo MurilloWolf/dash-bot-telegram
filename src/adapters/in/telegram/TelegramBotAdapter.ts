@@ -58,6 +58,14 @@ export class TelegramPlatformAdapter implements PlatformAdapter {
     output: CommandOutput
   ): Promise<void> {
     try {
+      if (output.location) {
+        await this.bot.sendLocation(
+          chatId,
+          output.location.latitude,
+          output.location.longitude
+        );
+      }
+
       const keyboard = this.convertKeyboardToTelegram(output.keyboard);
 
       if (output.messages && output.messages.length > 0) {
@@ -93,6 +101,11 @@ export class TelegramPlatformAdapter implements PlatformAdapter {
     output: CommandOutput
   ): Promise<void> {
     try {
+      if (output.location) {
+        await this.sendMessage(chatId, output);
+        return;
+      }
+
       const keyboard = this.convertKeyboardToTelegram(output.keyboard);
 
       await this.bot.editMessageText(output.text, {

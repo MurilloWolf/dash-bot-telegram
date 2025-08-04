@@ -57,6 +57,10 @@ export class RaceListCallbackHandler extends BaseCallbackHandler {
             text: '📋 Todas',
             callbackData: CallbackDataSerializer.racesList(),
           },
+          {
+            text: '⭐ Favoritas',
+            callbackData: CallbackDataSerializer.racesListFavorite(),
+          },
         ],
       ];
 

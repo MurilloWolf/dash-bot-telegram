@@ -38,17 +38,16 @@ export class RaceDetailsCallbackHandler extends BaseCallbackHandler {
               },
             ],
             [
-              // {
-              //   text: '📍 Ver Localização',
-              //   callbackData: CallbackDataSerializer.raceLocation(data.raceId),
-              // },
-              // {
-              //   text: '⏰ Definir Lembrete',
-              //   callbackData: CallbackDataSerializer.raceReminder(
-              //     data.raceId,
-              //     'set'
-              //   ),
-              // },
+              {
+                text: '📍 Ver Localização',
+                callbackData: CallbackDataSerializer.raceLocation(data.raceId),
+              },
+            ],
+             [
+              {
+                text: '❤️ Favoritar',
+                callbackData: CallbackDataSerializer.raceFavorite(data.raceId),
+              },
             ],
             [this.createBackButton(CallbackDataSerializer.racesList())],
           ],

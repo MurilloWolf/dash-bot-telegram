@@ -5,6 +5,8 @@ import {
   RaceLocationCallbackData,
   RaceFilterCallbackData,
   RaceSearchCallbackData,
+  RaceFavoriteCallbackData,
+  RaceListFavoriteCallbackData,
   CallbackData,
 } from '../../../types/callbacks/index.ts';
 import { UserCallbackData } from '@app-types/callbacks/userCallbacks.ts';
@@ -22,8 +24,14 @@ export class CallbackDataSerializer {
       case 'race_location':
         return `rl:${data.raceId}`;
 
+      case 'race_favorite':
+        return `rfav:${data.raceId}`;
+
       case 'races_list':
         return data.distance ? `ls:${data.distance}` : 'ls';
+
+      case 'races_list_favorite':
+        return 'lsfav';
 
       case 'races_filter':
         return `rf:${data.distance}`;
@@ -71,11 +79,22 @@ export class CallbackDataSerializer {
           raceId: parts[1],
         } as RaceLocationCallbackData;
 
+      case 'rfav':
+        return {
+          type: 'race_favorite',
+          raceId: parts[1],
+        } as RaceFavoriteCallbackData;
+
       case 'ls':
         return {
           type: 'races_list',
           distance: parts[1] ? parseInt(parts[1]) : undefined,
         } as RaceListCallbackData;
+
+      case 'lsfav':
+        return {
+          type: 'races_list_favorite',
+        } as RaceListFavoriteCallbackData;
 
       case 'rf':
         return {
@@ -142,6 +161,10 @@ export class CallbackDataSerializer {
     return { type: 'races_list', distance };
   }
 
+  static racesListFavorite(): RaceListFavoriteCallbackData {
+    return { type: 'races_list_favorite' };
+  }
+
   static raceReminder(
     raceId: string,
     action: 'set' | 'cancel'
@@ -151,6 +174,10 @@ export class CallbackDataSerializer {
 
   static raceLocation(raceId: string): RaceLocationCallbackData {
     return { type: 'race_location', raceId };
+  }
+
+  static raceFavorite(raceId: string): RaceFavoriteCallbackData {
+    return { type: 'race_favorite', raceId };
   }
 
   static racesFilter(distance: number): RaceFilterCallbackData {

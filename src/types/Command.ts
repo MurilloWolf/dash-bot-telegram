@@ -26,4 +26,8 @@ export interface CommandOutput {
   messages?: string[];
   keyboard?: InteractionKeyboard; // Keyboard/buttons for interaction
   editMessage?: boolean; // Whether to edit existing message instead of sending new one
+  location?: {
+    latitude: number;
+    longitude: number;
+  }; // For sending location
 }
