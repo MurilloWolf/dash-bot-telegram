@@ -10,6 +10,7 @@ primary_region = 'gig'
 
 [env]
   NODE_ENV = "production"
+  API_BASE_URL = "https://dash-bot-api.fly.dev/api"
 
 # Process configuration for the bot
 [processes]

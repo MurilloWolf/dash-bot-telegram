@@ -26,7 +26,6 @@ export class RaceDetailsCallbackHandler extends BaseCallbackHandler {
 
       const detailedMessage = RaceFormatter.formatDetailedRaceMessage(race);
 
-      // Verificar se a corrida já está favoritada
       let isFavorited = false;
       if (telegramId) {
         try {
@@ -35,12 +34,10 @@ export class RaceDetailsCallbackHandler extends BaseCallbackHandler {
             data.raceId
           );
         } catch {
-          // Se houver erro na verificação, assumir que não está favoritada
           isFavorited = false;
         }
       }
 
-      // Definir o botão de favoritar/desfavoritar baseado no status
       const favoriteButton = isFavorited
         ? {
             text: '💔 Desfavoritar',

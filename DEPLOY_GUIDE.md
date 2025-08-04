@@ -73,6 +73,9 @@ cd dash-bot-telegram
 # Token do Bot Telegram
 fly secrets set TELEGRAM_BOT_TOKEN="SEU_TOKEN_AQUI"
 
+# API Backend URL (já configurado em fly.toml, mas pode ser sobrescrito se necessário)
+# fly secrets set API_BASE_URL="https://dash-bot-api.fly.dev/api"
+
 # Opcional: API de corridas
 fly secrets set RACES_ENDPOINT="https://api.sua-fonte-de-corridas.com/races"
 ```

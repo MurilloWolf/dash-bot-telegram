@@ -98,6 +98,9 @@ gh secret list
 fly secrets set TELEGRAM_BOT_TOKEN="seu_token_do_bot_telegram"
 fly secrets set DATABASE_URL="sua_connection_string_do_banco"
 
+# API Backend URL (já configurado em fly.toml)
+# fly secrets set API_BASE_URL="https://dash-bot-api.fly.dev/api"
+
 # Verificar secrets configurados
 fly secrets list
 
