@@ -10,6 +10,7 @@ import {
   RaceReminderCallbackHandler,
   RaceSearchCallbackHandler,
   RaceFavoriteCallbackHandler,
+  RaceUnfavoriteCallbackHandler,
 } from './callbacks/index.ts';
 
 import {
@@ -30,6 +31,7 @@ export const raceCallbackHandlers = [
   new RaceReminderCallbackHandler(),
   new RaceSearchCallbackHandler(),
   new RaceFavoriteCallbackHandler(),
+  new RaceUnfavoriteCallbackHandler(),
 ];
 
 // Automatic registration of commands

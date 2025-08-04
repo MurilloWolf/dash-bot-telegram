@@ -4,7 +4,7 @@ import {
   RaceDetailsCallbackData,
 } from '@app-types/callbacks/index.ts';
 import { CallbackDataSerializer } from '@bot/config/callback/CallbackDataSerializer.ts';
-import { raceApiService } from '@services/index.ts';
+import { raceApiService, favoriteApiService } from '@services/index.ts';
 import { RaceFormatter } from '../../../../../utils/formatters/index.ts';
 import { BaseCallbackHandler } from '@bot/commands/shared/handlers/BaseCallbackHandler.ts';
 
@@ -16,6 +16,7 @@ export class RaceDetailsCallbackHandler extends BaseCallbackHandler {
   async handle(input: CommandInput): Promise<CommandOutput> {
     try {
       const data = input.callbackData as RaceDetailsCallbackData;
+      const telegramId = input.user?.id?.toString();
 
       const race = await raceApiService.getRaceById(data.raceId);
 
@@ -24,6 +25,31 @@ export class RaceDetailsCallbackHandler extends BaseCallbackHandler {
       }
 
       const detailedMessage = RaceFormatter.formatDetailedRaceMessage(race);
+
+      // Verificar se a corrida já está favoritada
+      let isFavorited = false;
+      if (telegramId) {
+        try {
+          isFavorited = await favoriteApiService.isRaceFavorited(
+            telegramId,
+            data.raceId
+          );
+        } catch {
+          // Se houver erro na verificação, assumir que não está favoritada
+          isFavorited = false;
+        }
+      }
+
+      // Definir o botão de favoritar/desfavoritar baseado no status
+      const favoriteButton = isFavorited
+        ? {
+            text: '💔 Desfavoritar',
+            callbackData: CallbackDataSerializer.raceUnfavorite(data.raceId),
+          }
+        : {
+            text: '❤️ Favoritar',
+            callbackData: CallbackDataSerializer.raceFavorite(data.raceId),
+          };
 
       return {
         text: detailedMessage,
@@ -43,12 +69,7 @@ export class RaceDetailsCallbackHandler extends BaseCallbackHandler {
                 callbackData: CallbackDataSerializer.raceLocation(data.raceId),
               },
             ],
-             [
-              {
-                text: '❤️ Favoritar',
-                callbackData: CallbackDataSerializer.raceFavorite(data.raceId),
-              },
-            ],
+            [favoriteButton],
             [this.createBackButton(CallbackDataSerializer.racesList())],
           ],
           inline: true,

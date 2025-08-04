@@ -6,6 +6,7 @@ import {
   RaceFilterCallbackData,
   RaceSearchCallbackData,
   RaceFavoriteCallbackData,
+  RaceUnfavoriteCallbackData,
   RaceListFavoriteCallbackData,
   CallbackData,
 } from '../../../types/callbacks/index.ts';
@@ -26,6 +27,9 @@ export class CallbackDataSerializer {
 
       case 'race_favorite':
         return `rfav:${data.raceId}`;
+
+      case 'race_unfavorite':
+        return `runfav:${data.raceId}`;
 
       case 'races_list':
         return data.distance ? `ls:${data.distance}` : 'ls';
@@ -84,6 +88,12 @@ export class CallbackDataSerializer {
           type: 'race_favorite',
           raceId: parts[1],
         } as RaceFavoriteCallbackData;
+
+      case 'runfav':
+        return {
+          type: 'race_unfavorite',
+          raceId: parts[1],
+        } as RaceUnfavoriteCallbackData;
 
       case 'ls':
         return {
@@ -178,6 +188,10 @@ export class CallbackDataSerializer {
 
   static raceFavorite(raceId: string): RaceFavoriteCallbackData {
     return { type: 'race_favorite', raceId };
+  }
+
+  static raceUnfavorite(raceId: string): RaceUnfavoriteCallbackData {
+    return { type: 'race_unfavorite', raceId };
   }
 
   static racesFilter(distance: number): RaceFilterCallbackData {

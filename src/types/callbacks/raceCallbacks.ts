@@ -41,6 +41,11 @@ export interface RaceFavoriteCallbackData extends BaseCallbackData {
   raceId: string;
 }
 
+export interface RaceUnfavoriteCallbackData extends BaseCallbackData {
+  type: 'race_unfavorite';
+  raceId: string;
+}
+
 export interface RaceListFavoriteCallbackData extends BaseCallbackData {
   type: 'races_list_favorite';
 }
@@ -54,4 +59,5 @@ export type RaceCallbackData =
   | RaceFilterCallbackData
   | RaceSearchCallbackData
   | RaceFavoriteCallbackData
+  | RaceUnfavoriteCallbackData
   | RaceListFavoriteCallbackData;

@@ -1,4 +1,5 @@
 export { RaceDetailsCallbackHandler } from './raceDetails.ts';
+export { RaceUnfavoriteCallbackHandler } from './raceUnfavorite.ts';
 export { RaceListCallbackHandler } from './raceList.ts';
 export { RaceListFavoriteCallbackHandler } from './raceListFavorite.ts';
 export { RaceFilterCallbackHandler } from './raceFilter.ts';
