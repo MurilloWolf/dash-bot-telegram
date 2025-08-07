@@ -1,4 +1,5 @@
 import { logger } from '../utils/Logger.js';
+import { alertService } from './AlertService.js';
 
 interface BotHealthStatus {
   status: 'healthy' | 'unhealthy' | 'warning';
@@ -20,8 +21,6 @@ interface BotHealthStatus {
 }
 
 interface AlertConfig {
-  telegramToken: string;
-  alertChatId: string;
   checkInterval: number;
   alertCooldown: number;
 }
@@ -34,19 +33,9 @@ export class BotHealthMonitor {
 
   constructor() {
     this.config = {
-      telegramToken: process.env.TELEGRAM_BOT_TOKEN!,
-      alertChatId: process.env.TELEGRAM_ALERT_AGENT!,
       checkInterval: 60000, // 1 minuto
       alertCooldown: 300000, // 5 minutos de cooldown entre alertas do mesmo tipo
     };
-
-    if (!this.config.telegramToken) {
-      throw new Error('TELEGRAM_BOT_TOKEN não configurado');
-    }
-
-    if (!this.config.alertChatId) {
-      throw new Error('TELEGRAM_ALERT_AGENT não configurado');
-    }
   }
 
   async checkBotStatus(): Promise<BotHealthStatus> {
@@ -83,42 +72,6 @@ export class BotHealthMonitor {
     }
   }
 
-  private async sendTelegramAlert(message: string): Promise<void> {
-    try {
-      const url = `https://api.telegram.org/bot${this.config.telegramToken}/sendMessage`;
-
-      const payload = {
-        chat_id: this.config.alertChatId,
-        text: message,
-        parse_mode: 'Markdown',
-        disable_web_page_preview: true,
-      };
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Telegram API error: ${JSON.stringify(errorData)}`);
-      }
-
-      logger.info('Alert sent to Telegram successfully', {
-        module: 'BotHealthMonitor',
-        chatId: this.config.alertChatId,
-      });
-    } catch (error) {
-      logger.error('Failed to send Telegram alert', {
-        module: 'BotHealthMonitor',
-        error: (error as Error).message,
-      });
-    }
-  }
-
   private formatAlertMessage(status: BotHealthStatus): string {
     const statusEmoji =
       status.status === 'healthy'
@@ -130,22 +83,22 @@ export class BotHealthMonitor {
       timeZone: 'America/Sao_Paulo',
     });
 
-    let message = `${statusEmoji} *DashBot Status Alert*\n\n`;
-    message += `📊 *Status:* ${status.status.toUpperCase()}\n`;
-    message += `🕒 *Timestamp:* ${timestamp}\n`;
+    let message = `${statusEmoji} <b>DashBot Status Alert</b>\n\n`;
+    message += `📊 <b>Status:</b> ${status.status.toUpperCase()}\n`;
+    message += `🕒 <b>Timestamp:</b> ${timestamp}\n`;
 
     if (status.uptime) {
       const uptimeMinutes = Math.floor(status.uptime / 60);
       const uptimeHours = Math.floor(uptimeMinutes / 60);
-      message += `⏱ *Uptime:* ${uptimeHours}h ${uptimeMinutes % 60}m\n`;
+      message += `⏱ <b>Uptime:</b> ${uptimeHours}h ${uptimeMinutes % 60}m\n`;
     }
 
     if (status.checks) {
-      message += `\n📋 *Detalhes:*\n`;
+      message += `\n📋 <b>Detalhes:</b>\n`;
 
       if (status.checks.bot) {
         const botEmoji = status.checks.bot.status === 'healthy' ? '✅' : '❌';
-        message += `${botEmoji} *Telegram Bot:* ${status.checks.bot.status}\n`;
+        message += `${botEmoji} <b>Telegram Bot:</b> ${status.checks.bot.status}\n`;
         if (status.checks.bot.error) {
           message += `   └ Error: ${status.checks.bot.error}\n`;
         }
@@ -157,7 +110,7 @@ export class BotHealthMonitor {
       if (status.checks.memory) {
         const memEmoji =
           status.checks.memory.status === 'healthy' ? '✅' : '⚠️';
-        message += `${memEmoji} *Memory:* ${status.checks.memory.status}\n`;
+        message += `${memEmoji} <b>Memory:</b> ${status.checks.memory.status}\n`;
         if (status.checks.memory.usage) {
           message += `   └ RSS: ${status.checks.memory.usage.rss}MB\n`;
           message += `   └ Heap: ${status.checks.memory.usage.heapUsed}/${status.checks.memory.usage.heapTotal}MB\n`;
@@ -166,10 +119,10 @@ export class BotHealthMonitor {
     }
 
     if (status.error) {
-      message += `\n❌ *Error:* ${status.error}\n`;
+      message += `\n❌ <b>Error:</b> ${status.error}\n`;
     }
 
-    message += `\n🔗 *App:* dash-bot-telegram`;
+    message += `\n🔗 <b>App:</b> dash-bot-telegram`;
 
     return message;
   }
@@ -187,7 +140,6 @@ export class BotHealthMonitor {
     logger.info('Starting bot health monitoring', {
       module: 'BotHealthMonitor',
       interval: this.config.checkInterval,
-      alertChatId: this.config.alertChatId,
     });
 
     // Verificação inicial
@@ -215,7 +167,16 @@ export class BotHealthMonitor {
 
       // Enviar alerta se necessário
       if (this.shouldSendAlert(status.status)) {
-        await this.sendTelegramAlert(this.formatAlertMessage(status));
+        const alertLevel =
+          status.status === 'healthy'
+            ? 'info'
+            : status.status === 'warning'
+              ? 'warning'
+              : 'error';
+
+        await alertService.sendAlert(this.formatAlertMessage(status), {
+          level: alertLevel,
+        });
         this.lastAlertTime = Date.now();
       }
 
@@ -228,8 +189,11 @@ export class BotHealthMonitor {
 
       // Em caso de erro crítico, enviar alerta
       if (this.shouldSendAlert('unhealthy')) {
-        const errorMessage = `🚨 *DashBot Critical Error*\n\n❌ *Health Monitor Failed*\n🕒 *Time:* ${new Date().toLocaleString('pt-BR')}\n⚠️ *Error:* ${(error as Error).message}`;
-        await this.sendTelegramAlert(errorMessage);
+        await alertService.sendCriticalAlert({
+          message: `Health Monitor Failed: ${(error as Error).message}`,
+          context: { module: 'BotHealthMonitor' },
+          timestamp: new Date(),
+        });
         this.lastAlertTime = Date.now();
       }
     }
@@ -248,13 +212,13 @@ export class BotHealthMonitor {
 
   // Método para teste manual
   async sendTestAlert(): Promise<void> {
-    const testMessage = `🧪 *DashBot Test Alert*\n\n✅ *Status:* Monitoring system is working\n🕒 *Time:* ${new Date().toLocaleString('pt-BR')}\n\nThis is a test alert to verify the monitoring system.`;
-    await this.sendTelegramAlert(testMessage);
+    const testMessage = `🧪 <b>DashBot Test Alert</b>\n\n✅ <b>Status:</b> Monitoring system is working\n🕒 <b>Time:</b> ${new Date().toLocaleString('pt-BR')}\n\nThis is a test alert to verify the monitoring system.`;
+    await alertService.sendAlert(testMessage, { level: 'info' });
   }
 
   // Método público para enviar alertas personalizados
   async sendAlert(message: string): Promise<void> {
-    await this.sendTelegramAlert(message);
+    await alertService.sendAlert(message, { level: 'info' });
   }
 
   // Método para simular diferentes cenários de teste
@@ -282,8 +246,9 @@ export class BotHealthMonitor {
 
     const alertMessage = this.formatAlertMessage(unhealthyStatus);
     const testAlert =
-      alertMessage + '\n\n⚠️ *This is a SIMULATED alert for testing purposes*';
-    await this.sendTelegramAlert(testAlert);
+      alertMessage +
+      '\n\n⚠️ <b>This is a SIMULATED alert for testing purposes</b>';
+    await alertService.sendAlert(testAlert, { level: 'error' });
   }
 
   async simulateHighMemoryUsage(): Promise<void> {
@@ -310,17 +275,18 @@ export class BotHealthMonitor {
 
     const alertMessage = this.formatAlertMessage(memoryWarningStatus);
     const testAlert =
-      alertMessage + '\n\n⚠️ *This is a SIMULATED alert for testing purposes*';
-    await this.sendTelegramAlert(testAlert);
+      alertMessage +
+      '\n\n⚠️ <b>This is a SIMULATED alert for testing purposes</b>';
+    await alertService.sendAlert(testAlert, { level: 'warning' });
   }
 
   async simulateCriticalError(): Promise<void> {
-    const criticalMessage = `🚨 *DashBot Critical Error (TEST)*\n\n❌ *System Failure Simulation*\n🕒 *Time:* ${new Date().toLocaleString('pt-BR')}\n⚠️ *Error:* Connection timeout - service unreachable\n\n🔧 *Recommended Actions:*\n• Check server connectivity\n• Restart the bot service\n• Review system logs\n\n⚠️ *This is a SIMULATED critical error for testing*`;
-    await this.sendTelegramAlert(criticalMessage);
+    const criticalMessage = `🚨 <b>DashBot Critical Error (TEST)</b>\n\n❌ <b>System Failure Simulation</b>\n🕒 <b>Time:</b> ${new Date().toLocaleString('pt-BR')}\n⚠️ <b>Error:</b> Connection timeout - service unreachable\n\n🔧 <b>Recommended Actions:</b>\n• Check server connectivity\n• Restart the bot service\n• Review system logs\n\n⚠️ <b>This is a SIMULATED critical error for testing</b>`;
+    await alertService.sendAlert(criticalMessage, { level: 'critical' });
   }
 
   async simulateStartupFailure(): Promise<void> {
-    const startupMessage = `🚨 *DashBot Startup Failed (TEST)*\n\n❌ *Service failed to start*\n🕒 *Time:* ${new Date().toLocaleString('pt-BR')}\n⚠️ *Error:* Unable to connect to Telegram API\n\n🔧 *Check:*\n• TELEGRAM_BOT_TOKEN configuration\n• Network connectivity\n• Service permissions\n\n⚠️ *This is a SIMULATED startup failure for testing*`;
-    await this.sendTelegramAlert(startupMessage);
+    const startupMessage = `🚨 <b>DashBot Startup Failed (TEST)</b>\n\n❌ <b>Service failed to start</b>\n🕒 <b>Time:</b> ${new Date().toLocaleString('pt-BR')}\n⚠️ <b>Error:</b> Unable to connect to Telegram API\n\n🔧 <b>Check:</b>\n• TELEGRAM_BOT_TOKEN configuration\n• Network connectivity\n• Service permissions\n\n⚠️ <b>This is a SIMULATED startup failure for testing</b>`;
+    await alertService.sendAlert(startupMessage, { level: 'critical' });
   }
 }

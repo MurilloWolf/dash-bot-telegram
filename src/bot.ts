@@ -6,54 +6,7 @@ import { initializeCallbacks } from './Bot/config/callback/CallbackInitializer.t
 import { logger } from './utils/Logger.ts';
 import { HealthCheckAdapter } from './adapters/in/http/HealthCheckAdapter.ts';
 import { BotHealthMonitor } from './services/BotHealthMonitor.ts';
-
-// Função auxiliar para enviar alertas diretos via Telegram API (apenas em produção)
-async function sendDirectTelegramAlert(message: string): Promise<void> {
-  // Só enviar alertas em produção
-  if (process.env.NODE_ENV !== 'production') {
-    logger.info('Alert skipped - development environment', {
-      module: 'Bot',
-      nodeEnv: process.env.NODE_ENV,
-    });
-    return;
-  }
-
-  if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_ALERT_AGENT) {
-    logger.warn('Alert skipped - missing Telegram configuration', {
-      module: 'Bot',
-    });
-    return;
-  }
-
-  try {
-    const alertUrl = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`;
-    const response = await fetch(alertUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: process.env.TELEGRAM_ALERT_AGENT,
-        text: message,
-        parse_mode: 'Markdown',
-        disable_web_page_preview: true,
-      }),
-    });
-
-    if (response.ok) {
-      logger.info('Direct alert sent successfully', { module: 'Bot' });
-    } else {
-      const errorData = await response.json();
-      logger.error('Failed to send direct alert', {
-        module: 'Bot',
-        error: JSON.stringify(errorData),
-      });
-    }
-  } catch (error) {
-    logger.error('Error sending direct alert', {
-      module: 'Bot',
-      error: (error as Error).message,
-    });
-  }
-}
+import { alertService } from './services/AlertService.ts';
 
 async function main() {
   logger.botStartup('Iniciando DashBot...');
@@ -138,9 +91,12 @@ async function main() {
           });
 
           // Enviar alerta de inicialização bem-sucedida
-          const startupMessage = `✅ *DashBot Started Successfully*\n\n🚀 *Status:* Bot is now running\n🕒 *Time:* ${new Date().toLocaleString('pt-BR')}\n🌍 *Environment:* ${process.env.NODE_ENV || 'development'}\n🤖 *Platform:* ${BOT_PLATFORM}\n\n📊 *Health monitoring is active*`;
+          await alertService.sendStartupAlert({
+            platform: BOT_PLATFORM || 'unknown',
+            environment: process.env.NODE_ENV || 'development',
+            timestamp: new Date(),
+          });
 
-          await healthMonitor!.sendAlert(startupMessage);
           logger.info('Startup alert sent', { module: 'Bot' });
         } catch (error) {
           logger.error('Failed to start monitoring or send startup alert', {
@@ -158,9 +114,11 @@ async function main() {
       });
 
       // Enviar alerta de shutdown
-      const shutdownMessage = `⚠️ *DashBot Shutdown*\n\n🔄 *Signal:* ${signal}\n🕒 *Time:* ${new Date().toLocaleString('pt-BR')}\n⏱ *Uptime:* ${Math.floor(process.uptime() / 60)} minutes\n\n🔧 *Process is shutting down gracefully*`;
-
-      await sendDirectTelegramAlert(shutdownMessage);
+      await alertService.sendShutdownAlert({
+        signal,
+        uptime: process.uptime(),
+        timestamp: new Date(),
+      });
 
       if (healthMonitor) {
         healthMonitor.stopMonitoring();
@@ -181,9 +139,12 @@ async function main() {
     process.on('uncaughtException', async error => {
       logger.error('Uncaught Exception', { module: 'Bot' }, error);
 
-      const crashMessage = `🚨 *DashBot Crashed*\n\n❌ *Uncaught Exception*\n🕒 *Time:* ${new Date().toLocaleString('pt-BR')}\n⚠️ *Error:* ${error.message}\n\n🔧 *Process will restart automatically*`;
-
-      await sendDirectTelegramAlert(crashMessage);
+      await alertService.sendCriticalAlert({
+        message: `Uncaught Exception: ${error.message}`,
+        stack: error.stack,
+        context: { type: 'uncaughtException' },
+        timestamp: new Date(),
+      });
 
       // Aguardar o alerta ser enviado antes de sair
       setTimeout(() => {
@@ -199,9 +160,11 @@ async function main() {
         new Error(String(reason))
       );
 
-      const rejectionMessage = `⚠️ *DashBot Promise Rejection*\n\n❌ *Unhandled Rejection*\n🕒 *Time:* ${new Date().toLocaleString('pt-BR')}\n⚠️ *Reason:* ${String(reason)}\n\n🔧 *Process continues running*`;
-
-      await sendDirectTelegramAlert(rejectionMessage);
+      await alertService.sendErrorAlert({
+        message: `Unhandled Promise Rejection: ${String(reason)}`,
+        context: { type: 'unhandledRejection' },
+        timestamp: new Date(),
+      });
     });
   } catch (error) {
     logger.error(
@@ -214,9 +177,12 @@ async function main() {
     );
 
     // Enviar alerta de erro crítico de inicialização
-    const errorMessage = `🚨 *DashBot Startup Failed*\n\n❌ *Error:* ${(error as Error).message}\n🕒 *Time:* ${new Date().toLocaleString('pt-BR')}\n\n🔧 *Check configuration and restart*`;
-
-    await sendDirectTelegramAlert(errorMessage);
+    await alertService.sendCriticalAlert({
+      message: `Bot startup failed: ${(error as Error).message}`,
+      stack: (error as Error).stack,
+      context: { action: 'initialize_error' },
+      timestamp: new Date(),
+    });
 
     // Aguardar o alerta ser enviado antes de sair
     setTimeout(() => {
