@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "dotenv -e .env.development -- tsx watch src/bot.ts",
+    "dev:watchdog": "node scripts/bot-watchdog.js",
     "build": "node scripts/build-production.js",
     "start": "node dist/bot.js",
     "setup": "./scripts/setup-dev.sh",
@@ -19,15 +20,25 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "type-check": "tsc --noEmit",
-    "setup:api": "./scripts/setup-api-endpoints.sh"
+    "setup:api": "./scripts/setup-api-endpoints.sh",
+    "health:check": "curl -f http://localhost:3001/health || curl -f https://dash-bot-telegram.fly.dev/health",
+    "health:detailed": "curl -f http://localhost:3001/health/detailed || curl -f https://dash-bot-telegram.fly.dev/health/detailed",
+    "health:test": "./scripts/test-bot-health.sh",
+    "alerts:quick": "./scripts/quick-alert-test.sh",
+    "alerts:test": "./scripts/test-alerts.sh",
+    "alerts:interactive": "node scripts/test-alerts-interactive.js",
+    "simulate:failure": "./scripts/simulate-failure.sh",
+    "test:monitoring": "./scripts/test-monitoring-complete.sh"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/express": "^5.0.3",
     "axios": "^1.11.0",
     "dotenv": "^16.0.0",
     "dotenv-cli": "^8.0.0",
+    "express": "^5.1.0",
     "node-telegram-bot-api": "^0.66.0"
   },
   "devDependencies": {
