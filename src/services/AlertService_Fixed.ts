@@ -74,9 +74,9 @@ export class AlertService {
     // Para evitar problemas com parsing Markdown, vamos usar texto simples
     // e apenas escapar caracteres problemáticos básicos
     return text
+      .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/&/g, '&amp;');
+      .replace(/>/g, '&gt;');
   }
 
   private createSafeMessage(text: string): string {
