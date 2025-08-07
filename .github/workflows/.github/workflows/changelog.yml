@@ -5,7 +5,15 @@ on:
     branches: [main]
     paths-ignore:
       - 'CHANGELOG.md'
-      - 'package.json'
+      - 'pa      - name: 🚀 Create Release
+        if: steps.changelog.outputs.skipped == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.changelog.outputs.version }}
+          name: Release v${{ steps.changelog.outputs.version }}
+          body: ${{ steps.changelog.outputs.clean_changelog }}
+          draft: false
+          token: ${{ secrets.GITHUB_TOKEN }}'
       - 'package-lock.json'
   release:
     types: [published]
