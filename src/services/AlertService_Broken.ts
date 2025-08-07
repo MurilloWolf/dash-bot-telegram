@@ -59,33 +59,33 @@ export class AlertService {
   private sanitizeMarkdown(text: string): string {
     // Escape caracteres especiais do Markdown V2 do Telegram
     return text
-      .replace(/\\/g, '\\\\')  // Escape backslashes first
-      .replace(/\*/g, '\\*')    // Escape asterisks
-      .replace(/_/g, '\\_')     // Escape underscores
-      .replace(/\[/g, '\\[')    // Escape square brackets
-      .replace(/\]/g, '\\]')    // Escape square brackets
-      .replace(/\(/g, '\\(')    // Escape parentheses
-      .replace(/\)/g, '\\)')    // Escape parentheses
-      .replace(/~/g, '\\~')     // Escape tildes
-      .replace(/`/g, '\\`')     // Escape backticks
-      .replace(/>/g, '\\>')     // Escape greater than
-      .replace(/#/g, '\\#')     // Escape hash
-      .replace(/\+/g, '\\+')    // Escape plus
-      .replace(/-/g, '\\-')     // Escape minus
-      .replace(/=/g, '\\=')     // Escape equals
-      .replace(/\|/g, '\\|')    // Escape pipe
-      .replace(/\{/g, '\\{')    // Escape curly braces
-      .replace(/\}/g, '\\}')    // Escape curly braces
-      .replace(/\./g, '\\.')    // Escape dots
-      .replace(/!/g, '\\!');    // Escape exclamation marks
+      .replace(/\\/g, '\\\\') // Escape backslashes first
+      .replace(/\*/g, '\\*') // Escape asterisks
+      .replace(/_/g, '\\_') // Escape underscores
+      .replace(/\[/g, '\\[') // Escape square brackets
+      .replace(/\]/g, '\\]') // Escape square brackets
+      .replace(/\(/g, '\\(') // Escape parentheses
+      .replace(/\)/g, '\\)') // Escape parentheses
+      .replace(/~/g, '\\~') // Escape tildes
+      .replace(/`/g, '\\`') // Escape backticks
+      .replace(/>/g, '\\>') // Escape greater than
+      .replace(/#/g, '\\#') // Escape hash
+      .replace(/\+/g, '\\+') // Escape plus
+      .replace(/-/g, '\\-') // Escape minus
+      .replace(/=/g, '\\=') // Escape equals
+      .replace(/\|/g, '\\|') // Escape pipe
+      .replace(/\{/g, '\\{') // Escape curly braces
+      .replace(/\}/g, '\\}') // Escape curly braces
+      .replace(/\./g, '\\.') // Escape dots
+      .replace(/!/g, '\\!'); // Escape exclamation marks
   }
 
   private createSafeMarkdownMessage(text: string): string {
     // Para mensagens simples, usar texto sem formatação especial
     // Apenas manter algumas formatações básicas seguras
     return text
-      .replace(/\*\*(.*?)\*\*/g, '*$1*')  // Converter bold duplo para simples
-      .replace(/__(.*?)__/g, '_$1_');     // Converter itálico duplo para simples
+      .replace(/\*\*(.*?)\*\*/g, '*$1*') // Converter bold duplo para simples
+      .replace(/__(.*?)__/g, '_$1_'); // Converter itálico duplo para simples
   }
 
   private validateConfig(): void {
@@ -132,7 +132,8 @@ export class AlertService {
         logger.info('Alert skipped - rate limited', {
           module: 'AlertService',
           type,
-          cooldownRemaining: this.config.rateLimitCooldown - (now - rateLimit.lastSent),
+          cooldownRemaining:
+            this.config.rateLimitCooldown - (now - rateLimit.lastSent),
         });
         return false;
       }
@@ -171,10 +172,10 @@ export class AlertService {
 
     try {
       const alertUrl = `https://api.telegram.org/bot${this.config.botToken}/sendMessage`;
-      
+
       // Sanitizar a mensagem para evitar problemas de parsing
       const safMessage = this.createSafeMarkdownMessage(message);
-      
+
       const response = await fetch(alertUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -233,7 +234,7 @@ export class AlertService {
 📊 *Health monitoring is active*`;
 
     const success = await this.sendAlert(message, { level: 'info' });
-    
+
     if (success) {
       this.updateRateLimit(alertType);
     }
@@ -259,7 +260,7 @@ export class AlertService {
 🔧 *Process is shutting down gracefully*`;
 
     const success = await this.sendAlert(message, { level: 'warning' });
-    
+
     if (success) {
       this.updateRateLimit(alertType);
     }
@@ -289,7 +290,7 @@ ${contextInfo ? `\n📋 *Context:*\n${contextInfo}` : ''}
 🔧 *Please check logs for details*`;
 
     const success = await this.sendAlert(message, { level: 'error' });
-    
+
     if (success) {
       this.updateRateLimit(alertType);
     }
@@ -301,8 +302,10 @@ ${contextInfo ? `\n📋 *Context:*\n${contextInfo}` : ''}
     const alertType = 'critical';
 
     // Critical alerts bypass rate limiting in production
-    if (this.config.environment === 'production' &&
-        (!this.config.botToken || !this.config.alertAgent)) {
+    if (
+      this.config.environment === 'production' &&
+      (!this.config.botToken || !this.config.alertAgent)
+    ) {
       logger.warn('Critical alert skipped - missing configuration', {
         module: 'AlertService',
         type: alertType,
@@ -334,7 +337,7 @@ ${contextInfo ? `\n📋 *Context:*\n${contextInfo}` : ''}
 
     try {
       const alertUrl = `https://api.telegram.org/bot${this.config.botToken}/sendMessage`;
-      
+
       const response = await fetch(alertUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
