@@ -16,6 +16,30 @@ primary_region = 'gig'
 [processes]
   app = "npm run start"
 
+# Expor porta para health checks
+[[services]]
+  internal_port = 3001
+  protocol = "tcp"
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+# Health checks do Fly.io
+[checks]
+  [checks.health]
+    grace_period = "30s"
+    interval = "60s"
+    method = "GET"
+    path = "/health"
+    port = 3001
+    timeout = "10s"
+    type = "http"
+
 # Configuração de deploy
 [deploy]
   strategy = "immediate"

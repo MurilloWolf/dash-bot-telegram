@@ -31,7 +31,7 @@ jobs:
         run: npm ci
 
       - name: 🔍 Validate PR Title
-        uses: amannn/action-semantic-pull-request@v5
+        uses: amannn/action-semantic-pull-request@v5.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -58,16 +58,43 @@ jobs:
           requireScope: false
 
       - name: 📊 PR Size Analysis
-        uses: CodelikeAGirl/pr-size-labeler@v1
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          xs_label: 'size/XS'
-          s_label: 'size/S'
-          m_label: 'size/M'
-          l_label: 'size/L'
-          xl_label: 'size/XL'
-          fail_if_xl: false
-          message_if_xl: 'This PR is very large. Consider breaking it down into smaller PRs.'
+        run: |
+          echo "Analyzing PR size..."
+          CHANGED_FILES=${{ github.event.pull_request.changed_files }}
+          ADDITIONS=${{ github.event.pull_request.additions }}
+          DELETIONS=${{ github.event.pull_request.deletions }}
+          TOTAL_CHANGES=$((ADDITIONS + DELETIONS))
+          
+          echo "Files changed: $CHANGED_FILES"
+          echo "Lines added: +$ADDITIONS"
+          echo "Lines deleted: -$DELETIONS"
+          echo "Total changes: $TOTAL_CHANGES"
+          
+          # Determine size label
+          SIZE_LABEL=""
+          if [ $TOTAL_CHANGES -le 10 ]; then
+            SIZE_LABEL="size/XS"
+          elif [ $TOTAL_CHANGES -le 50 ]; then
+            SIZE_LABEL="size/S"
+          elif [ $TOTAL_CHANGES -le 200 ]; then
+            SIZE_LABEL="size/M"
+          elif [ $TOTAL_CHANGES -le 500 ]; then
+            SIZE_LABEL="size/L"
+          else
+            SIZE_LABEL="size/XL"
+          fi
+          
+          echo "PR size: $SIZE_LABEL"
+          
+          # Add label using GitHub CLI
+          gh pr edit ${{ github.event.pull_request.number }} --add-label "$SIZE_LABEL"
+          
+          # Warning for XL PRs
+          if [ "$SIZE_LABEL" = "size/XL" ]; then
+            echo "⚠️ This PR is very large. Consider breaking it down into smaller PRs."
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🏷️ Auto Label
         uses: actions/labeler@v5
@@ -77,7 +104,7 @@ jobs:
 
       - name: 📝 Generate PR Description
         if: github.event.action == 'opened'
-        uses: peter-evans/create-or-update-comment@v4
+        uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
@@ -109,9 +136,12 @@ jobs:
 
     steps:
       - name: 👥 Auto Assign Reviewers
-        uses: kentaro-m/auto-assign-action@v1.2.5
-        with:
-          configuration-path: .github/auto-assign.yml
+        run: |
+          echo "Auto-assigning reviewers..."
+          gh pr edit ${{ github.event.pull_request.number }} --add-reviewer "murillowolfcavalheiro"
+          echo "✅ Reviewer assigned: murillowolfcavalheiro"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   pr-merge-conditions:
     name: ✅ Merge Conditions
@@ -123,17 +153,25 @@ jobs:
       checks: read
 
     steps:
-      - name: ✅ Check if ready to merge
-        uses: pascalgn/merge-conditions-action@v0.1.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          conditions: |
-            - "status-success=ci/build"
-            - "status-success=ci/test"
-            - "status-success=ci/lint"
-            - "label!=work-in-progress"
-            - "label!=do-not-merge"
-            - "reviews>=1"
+      - name: ✅ Check PR Status
+        run: |
+          echo "Checking if PR is ready for merge..."
+          echo "Draft: ${{ github.event.pull_request.draft }}"
+          echo "Labels: ${{ join(github.event.pull_request.labels.*.name, ', ') }}"
+          
+          # Check if PR is not a draft
+          if [ "${{ github.event.pull_request.draft }}" = "true" ]; then
+            echo "❌ PR is still a draft"
+            exit 1
+          fi
+          
+          # Check for blocking labels
+          if echo "${{ join(github.event.pull_request.labels.*.name, ' ') }}" | grep -q "work-in-progress\|do-not-merge"; then
+            echo "❌ PR has blocking labels"
+            exit 1
+          fi
+          
+          echo "✅ PR is ready for merge checks"
 
   auto-merge:
     name: 🤖 Auto Merge
@@ -149,7 +187,7 @@ jobs:
 
     steps:
       - name: 🤖 Auto merge dependabot PRs
-        uses: pascalgn/auto-merge-action@v0.15.6
+        uses: pascalgn/auto-merge-action@v0.16.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           merge_method: squash

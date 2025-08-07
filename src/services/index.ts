@@ -5,6 +5,10 @@ export { chatApiService } from './ChatApiService.ts';
 export { messageApiService } from './MessageApiService.ts';
 export { raceApiService } from './RaceApiService.ts';
 export { favoriteApiService } from './FavoriteApiService.ts';
+export { healthApiService } from './HealthApiService.ts';
+
+// Alert service singleton
+export { alertService } from './AlertService.ts';
 
 // Re-export types for convenience
 export type { CreateUserRequest } from '../types/Service.ts';

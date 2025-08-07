@@ -104,8 +104,8 @@ class ApiService {
         `/users/telegram/${telegramId}`
       );
       return response.data;
-    } catch (error: any) {
-      if (error.response?.status === 404) {
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
         return null;
       }
       logger.error(
@@ -128,8 +128,8 @@ class ApiService {
         `/chats/telegram/${telegramId}`
       );
       return response.data;
-    } catch (error: any) {
-      if (error.response?.status === 404) {
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
         return null;
       }
       logger.error(
@@ -200,8 +200,8 @@ class ApiService {
         `/messages/${id}`
       );
       return response.data;
-    } catch (error: any) {
-      if (error.response?.status === 404) {
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
         return null;
       }
       logger.error(
