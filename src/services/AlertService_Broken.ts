@@ -215,8 +215,6 @@ export class AlertService {
       return false;
     }
   }
-    }
-  }
 
   async sendStartupAlert(info: StartupInfo): Promise<boolean> {
     const alertType = 'startup';
